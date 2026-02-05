@@ -425,12 +425,14 @@ button:disabled {
   transform: translate(-50%, -50%);
   background: white;
   border-radius: 16px;
-  padding: 2.5rem;
-  max-width: 600px;
+  padding: 1.5rem;
+  max-width: 90%;
+  max-height: 90vh; /* NOVO: limita altura */
   width: 90%;
   z-index: 1000;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   text-align: center;
+  overflow-y: auto; /* NOVO: permite scroll se necessário */
 }
 .welcome-overlay {
   position: fixed;
@@ -557,5 +559,38 @@ button:disabled {
   .admin-table th,
   .admin-table td {
     padding: 0.75rem 0.5rem;
+  @media(max-width: 480px) {
+  .welcome-popup {
+    padding: 1rem;
+    max-height: 85vh;
+    width: 95%;
   }
+  
+  .welcome-feature {
+    flex-direction: column;
+    text-align: center;
+    padding: 0.8rem;
+  }
+  
+  .welcome-feature-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+  }
+  
+  .welcome-popup h2 {
+    font-size: 1.3rem;
+  }
+  
+  .welcome-popup p {
+    font-size: 0.9rem;
+    margin: 0.8rem 0;
+  }
+  
+  .welcome-popup button {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
 }
