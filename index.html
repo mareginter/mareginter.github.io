@@ -4,373 +4,1263 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academia Anti-Phishing Elite | Mareginter</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --mareginter-blue: #1e40af;
+            --mareginter-dark: #111827;
+            --mareginter-light: #f8fafc;
+            --mareginter-success: #10b981;
+            --mareginter-warning: #f59e0b;
+            --mareginter-danger: #ef4444;
+            --mareginter-gray: #6b7280;
+            --mareginter-border: #e5e7eb;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--mareginter-dark);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* ===== LAYOUT ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: white;
+            border-bottom: 2px solid var(--mareginter-border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--mareginter-blue), #3730a3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-badge {
+            background: var(--mareginter-light);
+            border: 1px solid var(--mareginter-border);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .level-indicator {
+            background: var(--mareginter-blue);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* ===== DASHBOARD ===== */
+        .dashboard {
+            padding: 2rem 0;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ===== CARD STYLES ===== */
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--mareginter-border);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--mareginter-light);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--mareginter-dark);
+        }
+        
+        /* ===== XP & LEVEL PROGRESS ===== */
+        .xp-progress {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .xp-total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--mareginter-blue);
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: var(--mareginter-border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--mareginter-blue), #4f46e5);
+            border-radius: 6px;
+            transition: width 1s ease-in-out;
+        }
+        
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--mareginter-gray);
+        }
+        
+        /* ===== BADGES GRID ===== */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .badge-card {
+            background: var(--mareginter-light);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--mareginter-border);
+            transition: all 0.2s;
+        }
+        
+        .badge-card:hover {
+            border-color: var(--mareginter-blue);
+            transform: translateY(-3px);
+        }
+        
+        .badge-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+        }
+        
+        .badge-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .badge-desc {
+            font-size: 0.8rem;
+            color: var(--mareginter-gray);
+        }
+        
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: var(--mareginter-light);
+            border-radius: 12px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--mareginter-blue);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--mareginter-gray);
+            margin-top: 0.25rem;
+        }
+        
+        /* ===== MODULES ===== */
+        .modules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .module-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--mareginter-light);
+            border-radius: 12px;
+            border: 1px solid var(--mareginter-border);
+        }
+        
+        .module-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .module-status {
+            font-size: 0.9rem;
+            color: var(--mareginter-gray);
+        }
+        
+        .module-status.completed {
+            color: var(--mareginter-success);
+        }
+        
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background: var(--mareginter-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1e3a8a;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--mareginter-dark);
+            border: 1px solid var(--mareginter-border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--mareginter-light);
+        }
+        
+        /* ===== WELCOME MESSAGE ===== */
+        .welcome-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--mareginter-blue), #3730a3);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(30, 64, 175, 0.3);
+            z-index: 1000;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .welcome-message.hiding {
+            animation: slideOut 0.3s ease forwards;
+        }
+        
+        @keyframes slideOut {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* ===== ADMIN FORM (CORRIGIDO) ===== */
+        .admin-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--mareginter-light);
+            border-radius: 12px;
+            border: 1px solid var(--mareginter-border);
+        }
+        
+        .admin-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .admin-form input {
+            padding: 10px 15px;
+            border: 1px solid var(--mareginter-border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .admin-form input:focus {
+            outline: none;
+            border-color: var(--mareginter-blue);
+        }
+        
+        /* ===== LOADING ===== */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--mareginter-border);
+            border-top-color: var(--mareginter-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--mareginter-gray);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--mareginter-border);
+            margin-top: 3rem;
+        }
+    </style>
 </head>
 <body>
+    <!-- HEADER -->
     <header>
-        <h1>🎓 Academia Anti-Phishing Elite | Mareginter</h1>
-        <div class="nav" id="navbar">
-            <button onclick="goToDash()" id="btnDash">📊 Dashboard</button>
-            <button onclick="goToMods()" id="btnMods">📚 Módulos</button>
-            <button onclick="goToSimulator()" id="btnSim">🎮 Simulador</button>
-            <button onclick="goToBadges()" id="btnBadges">🏅 Conquistas</button>
-            <button onclick="goToLibrary()" id="btnLib">📖 Biblioteca</button>
-            <button onclick="goToCert()" id="btnCert" style="display:none">📜 Certificado</button>
-            <button onclick="goToAdmin()" id="btnAdmin" style="display:none">👑 Admin</button>
-            <button onclick="logout()" class="logout-btn">🚪 Sair</button>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🛡️</div>
+                    <h1>Academia Mareginter</h1>
+                </div>
+                <div class="user-info">
+                    <div class="user-badge">
+                        <span id="userName">Carregando...</span>
+                        <div class="level-indicator" id="userLevel">N1</div>
+                    </div>
+                    <div id="xpDisplay">0 XP</div>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main>
-        <!-- LOGIN -->
-        <div class="box" id="loginPage" style="max-width:500px;margin:4rem auto;text-align:center">
-            <h2>🎯 Bem-vindo</h2>
-            <p style="color:#64748b;margin:1rem 0">Sistema de Formação em Segurança Digital | Mareginter</p>
-            
-            <div style="margin-bottom:2rem">
-                <button onclick="showLoginType('user')" id="btnLoginUser" style="margin:0.5rem">👤 Colaborador</button>
-                <button onclick="showLoginType('admin')" id="btnLoginAdmin" style="margin:0.5rem;background:#8b5cf6">👑 Administrador</button>
-            </div>
-
-            <div id="userLogin">
-                <input type="text" id="userName" placeholder="Nome completo" />
-                <input type="email" id="userEmail" placeholder="Email profissional" />
-                <input type="text" id="companyCode" placeholder="Código da Empresa (opcional)" style="font-family:monospace" />
-                <br>
-                <button onclick="doLogin()">▶ Entrar</button>
-            </div>
-
-            <div id="adminLogin" style="display:none">
-                <p style="font-size:0.9rem;color:#64748b;margin-bottom:1rem">
-                    <strong>Login rápido:</strong> Email + Senha
-                </p>
-                
-                <input type="email" id="adminEmail" placeholder="Email Administrador *" style="border-color:#8b5cf6" />
-                <input type="password" id="adminPass" placeholder="Senha *" style="border-color:#8b5cf6" />
-                
-                <div id="adminExtraFields" style="display:none;margin-top:1rem;padding-top:1rem;border-top:2px dashed #e2e8f0">
-                    <p style="font-size:0.85rem;color:#ef4444;margin-bottom:0.5rem;font-weight:700">⚠️ Primeira vez? Preencha também:</p>
-                    <input type="text" id="adminName" placeholder="Nome do Administrador *" />
-                    <input type="text" id="companyName" placeholder="Nome da Empresa *" />
-                </div>
-                
-                <br>
-                <button onclick="doAdminLogin()" style="background:#8b5cf6">▶ Entrar como Admin</button>
-            </div>
-            
-            <p id="loginMsg" style="margin-top:1rem;color:#64748b;font-size:0.9rem"></p>
-        </div>
-
-        <!-- DASHBOARD -->
-        <div class="box hidden" id="dashboardPage">
-            <h2>📊 Painel de Controlo</h2>
-            <div style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-                <h3 style="margin-bottom:0.5rem">👋 Olá, <span id="dashName"></span>!</h3>
-                <p id="dashCompany" style="opacity:0.9"></p>
-            </div>
-
-            <div class="stat-grid">
-                <div class="stat-card" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
-                    <div class="stat-value" id="dashXP">0</div>
-                    <div class="stat-label">XP Total</div>
-                </div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#10b981,#059669)">
-                    <div class="stat-value" id="dashMods">0</div>
-                    <div class="stat-label">Módulos Concluídos</div>
-                </div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-                    <div class="stat-value" id="dashBadges">0</div>
-                    <div class="stat-label">Badges</div>
-                </div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">
-                    <div class="stat-value" id="dashSims">0</div>
-                    <div class="stat-label">Simulações</div>
-                </div>
-            </div>
-
-            <div style="margin-top:2rem">
-                <h3 style="margin-bottom:1rem">📈 Progresso Global</h3>
-                <div class="progress-bar" style="height:20px">
-                    <div class="progress-fill" id="dashProgress" style="width:0%"></div>
-                </div>
-                <p style="text-align:center;margin-top:0.5rem;color:#64748b">
-                    <span id="dashProgressPct">0</span>% concluído
-                </p>
-            </div>
-
-            <div style="margin-top:2rem;text-align:center">
-                <button onclick="goToMods()">📚 Continuar Formação</button>
-                <button onclick="goToSimulator()">🎮 Testar Conhecimentos</button>
-                <button onclick="goToLibrary()" style="background:#f59e0b">📖 Biblioteca</button>
-            </div>
-        </div>
-
-        <!-- MÓDULOS -->
-        <div class="box hidden" id="modulesPage">
-            <h2>📚 Módulos de Formação</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Complete todos os módulos para desbloquear o certificado</p>
-            <div id="modulesList"></div>
-            <div id="premiumModulesSection" style="display:none">
-                <h3 style="margin-top:2rem;border-top:2px solid #e2e8f0;padding-top:2rem">⭐ Módulos Premium</h3>
-                <p style="color:#64748b;margin-bottom:2rem">Conteúdo avançado disponível após completar os 5 módulos básicos com 4/5 ou mais</p>
-                <div id="premiumModulesList"></div>
-            </div>
-        </div>
-
-        <!-- QUIZ -->
-        <div class="box hidden" id="quizPage">
-            <div id="quizContent"></div>
-        </div>
-
-        <!-- SIMULADOR -->
-        <div class="box hidden" id="simulatorPage">
-            <h2>🎮 Simulador de Phishing</h2>
-            <p style="color:#64748b;margin-bottom:1rem">Teste suas habilidades em cenários realistas</p>
-            
-            <div style="background:#f8fafc;padding:1rem;border-radius:8px;margin-bottom:2rem;display:flex;justify-content:space-around">
-                <div style="text-align:center">
-                    <div style="font-size:1.5rem;font-weight:900;color:#3b82f6" id="simScore">0</div>
-                    <div style="font-size:0.9rem;color:#64748b">Score</div>
-                </div>
-                <div style="text-align:center">
-                    <div style="font-size:1.5rem;font-weight:900;color:#10b981" id="simXP">0</div>
-                    <div style="font-size:0.9rem;color:#64748b">XP Ganho</div>
-                </div>
-            </div>
-            
-            <div id="simulatorContent"></div>
-        </div>
-
-        <!-- CONQUISTAS -->
-        <div class="box hidden" id="badgesPage">
-            <h2>🏅 Conquistas e Badges</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Desbloqueie badges completando desafios</p>
-            
-            <div style="background:#f8fafc;padding:1.5rem;border-radius:8px;margin-bottom:2rem">
-                <h3 style="margin-bottom:1rem">🎯 Progresso</h3>
-                <div style="display:flex;justify-content:space-around;text-align:center">
-                    <div>
-                        <div style="font-size:2rem;font-weight:900;color:#3b82f6" id="badgesUnlocked">0</div>
-                        <div style="font-size:0.9rem;color:#64748b">Desbloqueados</div>
+    <!-- DASHBOARD -->
+    <main class="dashboard">
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- COLUNA ESQUERDA -->
+                <div class="left-column">
+                    <!-- PROGRESSO XP -->
+                    <div class="card xp-progress">
+                        <div class="card-header">
+                            <h2 class="card-title">Progresso de Carreira</h2>
+                            <div class="xp-total" id="totalXP">0 XP</div>
+                        </div>
+                        
+                        <div class="progress-header">
+                            <div>
+                                <h3 id="currentLevelName">VIGILANTE</h3>
+                                <p id="levelProgressText">0/500 XP para próximo nível</p>
+                            </div>
+                            <div id="nextLevelName">ATENTO</div>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="level-info">
+                            <span id="currentLevelXP">0 XP</span>
+                            <span id="nextLevelXP">500 XP</span>
+                        </div>
                     </div>
-                    <div>
-                        <div style="font-size:2rem;font-weight:900;color:#10b981" id="badgesXP">0</div>
-                        <div style="font-size:0.9rem;color:#64748b">XP Total</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="badgesList"></div>
-        </div>
 
-        <!-- BIBLIOTECA -->
-        <div class="box hidden" id="libraryPage">
-            <h2>📖 Biblioteca de Recursos</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Materiais de referência</p>
-            <div id="libraryContent"></div>
-        </div>
-
-        <!-- CERTIFICADO -->
-        <div class="box hidden" id="certificatePage">
-            <h2>📜 Certificado Profissional</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Parabéns pela conclusão da formação!</p>
-            
-            <div style="text-align:center;margin-bottom:2rem">
-                <div style="display:inline-block;text-align:left;background:#f8fafc;padding:1.5rem;border-radius:8px;margin-bottom:1rem">
-                    <p><strong>👤 Nome:</strong> <span id="certName">-</span></p>
-                    <p><strong>📧 Email:</strong> <span id="certEmail">-</span></p>
-                    <p><strong>🏢 Empresa:</strong> <span id="certCompany">-</span></p>
-                    <p><strong>📅 Data de Conclusão:</strong> <span id="certDate">-</span></p>
-                    <p><strong>⭐ XP Total:</strong> <span id="certXP">-</span></p>
-                    <p><strong>🏅 Badges:</strong> <span id="certBadges">-</span></p>
-                </div>
-            </div>
-            
-            <div style="text-align:center">
-                <canvas id="certCanvas" width="1000" height="850" style="border:8px double #1e293b;border-radius:12px;max-width:100%;height:auto"></canvas>
-                <div style="margin-top:1.5rem">
-                    <button onclick="downloadCert()">⬇ Descarregar Certificado</button>
-                    <button onclick="window.print()">🖨 Imprimir Página</button>
-                    <button onclick="goToDash()" style="background:#64748b">← Voltar ao Dashboard</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- PAINEL ADMIN -->
-        <div class="box hidden" id="adminPage">
-            <div style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;padding:2rem;border-radius:12px;margin-bottom:2rem">
-                <h2 style="margin-bottom:0.5rem">👑 Painel de Administração</h2>
-                <p id="adminWelcome" style="opacity:0.9"></p>
-            </div>
-
-            <div class="admin-metrics">
-                <div class="metric-card">
-                    <div class="metric-label">👥 Total Colaboradores</div>
-                    <div class="metric-value" id="metricTotalUsers">0</div>
-                    <div class="metric-trend up" id="metricUsersTrend">+0 este mês</div>
-                </div>
-
-                <div class="metric-card success">
-                    <div class="metric-label">✅ Formação Completa</div>
-                    <div class="metric-value" id="metricCompleted">0</div>
-                    <div class="metric-trend" id="metricCompletedPct">0%</div>
-                </div>
-
-                <div class="metric-card warning">
-                    <div class="metric-label">⏳ Em Progresso</div>
-                    <div class="metric-value" id="metricInProgress">0</div>
-                    <div class="metric-trend" id="metricProgressPct">0%</div>
-                </div>
-
-                <div class="metric-card danger">
-                    <div class="metric-label">❌ Não Iniciado</div>
-                    <div class="metric-value" id="metricNotStarted">0</div>
-                    <div class="metric-trend" id="metricNotStartedPct">0%</div>
-                </div>
-            </div>
-
-            <div class="admin-metrics">
-                <div class="metric-card">
-                    <div class="metric-label">🎯 Taxa de Conclusão</div>
-                    <div class="metric-value" id="metricCompletionRate">0%</div>
-                    <div class="progress-bar" style="margin-top:0.5rem">
-                        <div class="progress-fill" id="metricCompletionBar" style="width:0%"></div>
+                    <!-- MÓDULOS -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Módulos de Formação</h2>
+                            <button class="btn btn-secondary" onclick="startModule()">Iniciar Novo</button>
+                        </div>
+                        
+                        <div class="modules-list" id="modulesList">
+                            <!-- Dinâmico -->
+                        </div>
                     </div>
                 </div>
 
-                <div class="metric-card">
-                    <div class="metric-label">⭐ XP Médio</div>
-                    <div class="metric-value" id="metricAvgXP">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">pontos por colaborador</div>
+                <!-- COLUNA DIREITA -->
+                <div class="right-column">
+                    <!-- BADGES -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Badges Conquistadas</h2>
+                            <span id="badgesCount">0/7</span>
+                        </div>
+                        
+                        <div class="badges-grid" id="badgesGrid">
+                            <!-- Dinâmico -->
+                        </div>
+                    </div>
+
+                    <!-- ESTATÍSTICAS -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Estatísticas</h2>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="statModules">0</div>
+                                <div class="stat-label">Módulos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statAccuracy">0%</div>
+                                <div class="stat-label">Precisão</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statTime">0s</div>
+                                <div class="stat-label">Tempo Médio</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statStreak">1</div>
+                                <div class="stat-label">Dias Sequência</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN (COM FORM CORRETO) -->
+                    <div class="admin-section">
+                        <h3>🔧 Administração</h3>
+                        <form class="admin-form" onsubmit="return adminAction()">
+                            <input type="password" id="adminPass" placeholder="Senha *" required>
+                            <button type="submit" class="btn btn-primary">Ações Admin</button>
+                        </form>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--mareginter-gray);">
+                            <small>Exportar dados | Reset progresso | Ver logs</small>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">🏅 Badges Totais</div>
-                    <div class="metric-value" id="metricTotalBadges">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">na empresa</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">🎮 Simulações</div>
-                    <div class="metric-value" id="metricTotalSims">0</div>
-                    <div class="metric-trend" id="metricSimsAvg">média por user</div>
-                </div>
-            </div>
-
-            <div class="admin-metrics">
-                <div class="metric-card premium">
-                    <div class="metric-label">⭐ Colaboradores Premium</div>
-                    <div class="metric-value" id="metricPremiumUsers">0</div>
-                    <div class="metric-trend" id="metricPremiumPct">0%</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">📅 Dias Média de Conclusão</div>
-                    <div class="metric-value" id="metricAvgDays">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">para completar formação</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">📊 Taxa de Aprovação</div>
-                    <div class="metric-value" id="metricPassRate">0%</div>
-                    <div style="font-size:0.85rem;color:#64748b">média 4/5 ou mais</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">⏱️ Atividade Recente</div>
-                    <div class="metric-value" id="metricActive7d">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">últimos 7 dias</div>
-                </div>
-            </div>
-
-            <div class="box" style="background:#f8fafc">
-                <h3 style="margin-bottom:1rem">📊 Desempenho por Módulo</h3>
-                <div id="adminModuleStats"></div>
-            </div>
-
-            <div class="invite-box">
-                <h3 style="margin-bottom:1rem">📧 Convite para Colaboradores</h3>
-                <p style="opacity:0.95;margin-bottom:1rem">Partilhe este link:</p>
-                <div class="invite-link" id="inviteLink"></div>
-                <button onclick="copyInviteLink()" style="background:#10b981">📋 Copiar Link</button>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">📋 Cronologia da Formação</h3>
-                <div id="adminTimeline"></div>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">🏆 Ranking de Colaboradores</h3>
-                <div id="adminRanking"></div>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">👥 Lista de Colaboradores</h3>
-                <input type="text" placeholder="🔍 Pesquisar..." style="width:100%;max-width:100%;margin-bottom:1rem" onkeyup="filterEmployees(this.value)" />
-                <div id="adminEmployees"></div>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">📈 Estatísticas Detalhadas</h3>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Status</th>
-                            <th>Início</th>
-                            <th>Conclusão</th>
-                            <th>Duração</th>
-                            <th>Média</th>
-                            <th>Premium</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminDetailedStats">
-                    </tbody>
-                </table>
             </div>
         </div>
     </main>
 
-    <!-- POPUP DE BOAS-VINDAS -->
-    <div id="welcomeOverlay" class="welcome-overlay hidden"></div>
-    <div id="welcomePopup" class="welcome-popup hidden">
-        <h2>🎉 Bem-vindo à Academia Anti-Phishing Elite!</h2>
-        <p>Estamos muito felizes por teres iniciado esta jornada de formação em segurança digital.</p>
-        
-        <div class="welcome-feature">
-            <div class="welcome-feature-icon">📚</div>
-            <div>
-                <strong>Módulos de Formação</strong>
-                <p>5 módulos progressivos para dominar a segurança digital</p>
-            </div>
+    <footer>
+        <div class="container">
+            <p>© 2024 Mareginter. Todos os direitos reservados.</p>
+            <p>Academia Anti-Phishing | academia.mareginter.pt</p>
         </div>
-        
-        <div class="welcome-feature">
-            <div class="welcome-feature-icon">🎮</div>
-            <div>
-                <strong>Simulador Prático</strong>
-                <p>Testa teus conhecimentos com emails reais de phishing</p>
-            </div>
-        </div>
-        
-        <div class="welcome-feature">
-            <div class="welcome-feature-icon">📖</div>
-            <div>
-                <strong>Biblioteca de Recursos</strong>
-                <p><strong>Importante:</strong> Se ainda não te sentes preparado para os quizes ou simulações, podes aceder à biblioteca onde podes ler e aprender ao teu ritmo.</p>
-            </div>
-        </div>
-        
-        <p style="margin-top:2rem;color:#3b82f6;font-weight:600">
-            💡 Dica: Começa pela biblioteca para conhecer os conceitos antes de fazer os testes!
-        </p>
-        
-        <button onclick="closeWelcomePopup()" style="margin-top:2rem;padding:1rem 2rem;font-size:1.1rem">
-            ▶ Começar Formação
-        </button>
-    </div>
+    </footer>
 
-    <script src="script.js"></script>
+    <!-- SISTEMA COMPLETO JAVASCRIPT -->
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO FIREBASE
+        // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDe4b9NpoVMWZPqs7JQC9w6gVdU1XGAUh0",
+            authDomain: "digital-security-excellence.firebaseapp.com",
+            databaseURL: "https://digital-security-excellence-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "digital-security-excellence",
+            storageBucket: "digital-security-excellence.firebasestorage.app",
+            messagingSenderId: "923777170542",
+            appId: "1:923777170542:web:5a37f1f45eaa0904e9ba7f",
+            measurementId: "G-MDRR1704B8"
+        };
+
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('🔥 Firebase configurado');
+        }
+
+        // ============================================
+        // SISTEMA DE PERSISTÊNCIA
+        // ============================================
+        class MareginterPersistence {
+            constructor() {
+                this.db = firebase.database();
+                this.auth = firebase.auth();
+                this.currentUser = null;
+                this.userRef = null;
+                console.log('🔧 Sistema de persistência inicializado');
+            }
+
+            async init() {
+                try {
+                    // Configurar persistência local
+                    await this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                    
+                    return new Promise((resolve) => {
+                        this.auth.onAuthStateChanged(async (user) => {
+                            if (user) {
+                                console.log('✅ Usuário autenticado:', user.uid.substring(0, 8) + '...');
+                                this.currentUser = user;
+                                this.userRef = this.db.ref('users/' + user.uid);
+                                resolve(await this.loadUserData());
+                            } else {
+                                // Criar usuário anônimo
+                                const result = await this.auth.signInAnonymously();
+                                console.log('👤 Novo usuário:', result.user.uid.substring(0, 8) + '...');
+                                this.currentUser = result.user;
+                                this.userRef = this.db.ref('users/' + result.user.uid);
+                                resolve(await this.createNewUser());
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('❌ Erro na inicialização:', error);
+                    return this.createOfflineUser();
+                }
+            }
+
+            async loadUserData() {
+                try {
+                    const snapshot = await this.userRef.once('value');
+                    if (snapshot.exists()) {
+                        console.log('📂 Dados carregados do Firebase');
+                        return snapshot.val();
+                    }
+                } catch (error) {
+                    console.log('⚠️ Firebase offline, usando localStorage');
+                }
+
+                // Fallback para localStorage
+                const localData = localStorage.getItem('mareginter_user_backup');
+                if (localData) {
+                    console.log('📂 Dados carregados do localStorage');
+                    return JSON.parse(localData);
+                }
+
+                return this.createNewUser();
+            }
+
+            createNewUser() {
+                const userId = this.currentUser.uid;
+                const newUser = {
+                    id: userId,
+                    name: "Colaborador Mareginter",
+                    xp: 0,
+                    level: 1,
+                    badges: [],
+                    modulesCompleted: [],
+                    stats: {
+                        totalModules: 0,
+                        avgAccuracy: 0,
+                        avgTime: 0,
+                        streak: 1
+                    },
+                    preferences: {
+                        notifications: true,
+                        darkMode: false
+                    },
+                    createdAt: Date.now(),
+                    lastLogin: Date.now()
+                };
+
+                console.log('👤 Novo perfil criado');
+                return newUser;
+            }
+
+            createOfflineUser() {
+                const offlineId = 'offline_' + Date.now();
+                return {
+                    id: offlineId,
+                    name: "Colaborador Mareginter (Offline)",
+                    xp: 0,
+                    level: 1,
+                    badges: [],
+                    modulesCompleted: [],
+                    stats: { totalModules: 0, avgAccuracy: 0, avgTime: 0, streak: 1 },
+                    isOffline: true,
+                    createdAt: Date.now(),
+                    lastLogin: Date.now()
+                };
+            }
+
+            async saveUserData(userData) {
+                // Adicionar timestamp
+                userData.lastUpdated = Date.now();
+                
+                // Salvar no localStorage (sempre)
+                localStorage.setItem('mareginter_user_backup', JSON.stringify(userData));
+                
+                // Tentar salvar no Firebase
+                if (this.userRef && !userData.isOffline) {
+                    try {
+                        await this.userRef.set(userData);
+                        console.log('💾 Dados salvos no Firebase');
+                    } catch (error) {
+                        console.log('⚠️ Erro ao salvar no Firebase:', error.message);
+                    }
+                }
+                
+                return userData;
+            }
+
+            setupAutoSave(userObject) {
+                // Auto-save a cada 30 segundos
+                setInterval(() => {
+                    if (userObject && userObject._hasChanges) {
+                        this.saveUserData(userObject);
+                        userObject._hasChanges = false;
+                    }
+                }, 30000);
+
+                // Save antes de fechar
+                window.addEventListener('beforeunload', () => {
+                    if (userObject) {
+                        localStorage.setItem('mareginter_user_backup', JSON.stringify(userObject));
+                    }
+                });
+            }
+        }
+
+        // ============================================
+        // SISTEMA XP INTELIGENTE
+        // ============================================
+        class XPInteligente {
+            static calcularXP(score, timeSeconds, badges = [], moduleDifficulty = 'medium') {
+                // XP BASE
+                let xp = 100;
+                
+                // 1. BÔNUS PERFORMANCE (0-100% extra)
+                const performanceBonus = (score / 100) * 100;
+                xp += performanceBonus;
+                
+                // 2. BÔNUS VELOCIDADE (se <60s)
+                if (timeSeconds < 60) {
+                    const speedBonus = Math.round((1 - timeSeconds/60) * 50);
+                    xp += speedBonus;
+                }
+                
+                // 3. MULTIPLICADOR DIFICULDADE
+                const difficultyMultipliers = {
+                    easy: 1.0,
+                    medium: 1.25,
+                    hard: 1.5,
+                    expert: 2.0
+                };
+                xp *= difficultyMultipliers[moduleDifficulty] || 1.0;
+                
+                // 4. MULTIPLICADORES DE BADGES
+                let badgeMultiplier = 1.0;
+                
+                if (badges.includes('perfeccionista')) {
+                    badgeMultiplier *= 1.10;
+                }
+                
+                if (badges.includes('velocista') && timeSeconds < 60) {
+                    badgeMultiplier *= 1.15;
+                }
+                
+                if (badges.includes('detetive_financeiro')) {
+                    badgeMultiplier *= 1.25;
+                }
+                
+                // Aplicar todos os multiplicadores
+                xp *= badgeMultiplier;
+                
+                return Math.max(10, Math.round(xp));
+            }
+        }
+
+        // ============================================
+        // SISTEMA DE NÍVEIS
+        // ============================================
+        const MareginterLevels = {
+            1: { name: "VIGILANTE", minXP: 0, maxXP: 500, color: "#10B981" },
+            2: { name: "ATENTO", minXP: 501, maxXP: 1500, color: "#F59E0B" },
+            3: { name: "ANALISTA", minXP: 1501, maxXP: 3000, color: "#3B82F6" },
+            4: { name: "ESPECIALISTA", minXP: 3001, maxXP: 6000, color: "#8B5CF6" },
+            5: { name: "ESTRATEGA", minXP: 6001, maxXP: 10000, color: "#F97316" }
+        };
+
+        class LevelSystem {
+            static getCurrentLevel(xp) {
+                for (let i = 5; i >= 1; i--) {
+                    if (xp >= MareginterLevels[i].minXP) {
+                        return { ...MareginterLevels[i], level: i };
+                    }
+                }
+                return { ...MareginterLevels[1], level: 1 };
+            }
+
+            static getProgress(xp) {
+                const current = this.getCurrentLevel(xp);
+                const next = MareginterLevels[current.level + 1];
+                
+                if (!next) return 100;
+                
+                const range = next.minXP - current.minXP;
+                const progressInRange = xp - current.minXP;
+                
+                return Math.min(100, (progressInRange / range) * 100);
+            }
+
+            static getNextLevel(xp) {
+                const current = this.getCurrentLevel(xp);
+                return MareginterLevels[current.level + 1] || null;
+            }
+        }
+
+        // ============================================
+        // BADGES COM PODERES
+        // ============================================
+        const MareginterBadges = {
+            'inicio_perfeito': {
+                name: 'Início Perfeito',
+                emoji: '🎯',
+                description: '100% no primeiro módulo',
+                effect: { type: 'xp_multiplier', value: 1.10, duration: 'next_3_modules' }
+            },
+            'velocista': {
+                name: 'Velocista',
+                emoji: '⚡', 
+                description: 'Respostas em <60s',
+                effect: { type: 'xp_bonus', value: 25, trigger: 'time < 60' }
+            },
+            'detetive_financeiro': {
+                name: 'Detetive Financeiro',
+                emoji: '💰',
+                description: 'Especialista em phishing financeiro',
+                effect: { type: 'sector_boost', sector: 'finance', value: 1.25 }
+            },
+            'gdpr_guardian': {
+                name: 'Guardião GDPR',
+                emoji: '🔐',
+                description: 'Especialista em proteção de dados',
+                effect: { type: 'sector_boost', sector: 'gdpr', value: 1.25 }
+            },
+            'mentor': {
+                name: 'Mentor',
+                emoji: '👥',
+                description: 'Ajuda colegas a evoluir',
+                effect: { type: 'xp_per_mentee', value: 50 }
+            },
+            'sentinela': {
+                name: 'Sentinela',
+                emoji: '🚨',
+                description: 'Reporta phishing rapidamente',
+                effect: { type: 'xp_bonus', value: 100, trigger: 'report < 5min' }
+            },
+            'analista_cyber': {
+                name: 'Analista Cyber',
+                emoji: '💻',
+                description: 'Especialista em cibersegurança',
+                effect: { type: 'sector_boost', sector: 'cybersecurity', value: 1.30 }
+            }
+        };
+
+        // ============================================
+        // APLICAÇÃO PRINCIPAL
+        // ============================================
+        class MareginterApp {
+            constructor() {
+                this.user = null;
+                this.persistence = new MareginterPersistence();
+                this.init();
+            }
+
+            async init() {
+                console.log('🚀 Iniciando Academia Mareginter...');
+                
+                try {
+                    // Carregar dados do usuário
+                    const userData = await this.persistence.init();
+                    
+                    // Configurar usuário reativo
+                    this.user = this.createReactiveUser(userData);
+                    
+                    // Configurar auto-save
+                    this.persistence.setupAutoSave(this.user);
+                    
+                    // Inicializar UI
+                    this.initUI();
+                    
+                    // Mostrar welcome
+                    this.showWelcomeMessage();
+                    
+                    console.log('✅ Academia Mareginter inicializada!');
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao inicializar:', error);
+                    this.showError();
+                }
+            }
+
+            createReactiveUser(baseData) {
+                const user = {
+                    ...baseData,
+                    _hasChanges: false,
+                    
+                    // Métodos
+                    addXP(amount, reason = '') {
+                        const oldXP = this.xp;
+                        this.xp += amount;
+                        this._hasChanges = true;
+                        
+                        console.log(`✨ +${amount} XP ${reason ? `(${reason})` : ''}`);
+                        
+                        // Verificar level up
+                        const newLevel = LevelSystem.getCurrentLevel(this.xp).level;
+                        if (newLevel > this.level) {
+                            this.level = newLevel;
+                            console.log(`🎉 LEVEL UP! Novo nível: ${newLevel}`);
+                            app.showLevelUpNotification(newLevel);
+                        }
+                        
+                        return this;
+                    },
+                    
+                    addBadge(badgeId) {
+                        if (!this.badges.includes(badgeId)) {
+                            this.badges.push(badgeId);
+                            this._hasChanges = true;
+                            console.log(`🏅 Badge conquistada: ${badgeId}`);
+                            app.showBadgeNotification(badgeId);
+                        }
+                        return this;
+                    },
+                    
+                    completeModule(moduleName, score, timeSeconds) {
+                        const moduleRecord = {
+                            name: moduleName,
+                            score: score,
+                            time: timeSeconds,
+                            completedAt: Date.now(),
+                            xpEarned: XPInteligente.calcularXP(score, timeSeconds, this.badges)
+                        };
+                        
+                        this.modulesCompleted.push(moduleRecord);
+                        this.stats.totalModules = this.modulesCompleted.length;
+                        
+                        // Calcular novas estatísticas
+                        this.updateStats();
+                        
+                        this._hasChanges = true;
+                        
+                        // Adicionar XP
+                        this.addXP(moduleRecord.xpEarned, moduleName);
+                        
+                        return moduleRecord;
+                    },
+                    
+                    updateStats() {
+                        if (this.modulesCompleted.length === 0) return;
+                        
+                        const totalScore = this.modulesCompleted.reduce((sum, m) => sum + m.score, 0);
+                        const totalTime = this.modulesCompleted.reduce((sum, m) => sum + m.time, 0);
+                        
+                        this.stats.avgAccuracy = Math.round(totalScore / this.modulesCompleted.length);
+                        this.stats.avgTime = Math.round(totalTime / this.modulesCompleted.length);
+                    },
+                    
+                    async save() {
+                        return this.persistence.saveUserData(this);
+                    }
+                };
+                
+                return new Proxy(user, {
+                    set(target, property, value) {
+                        if (!property.startsWith('_') && target[property] !== value) {
+                            target._hasChanges = true;
+                        }
+                        target[property] = value;
+                        return true;
+                    }
+                });
+            }
+
+            initUI() {
+                this.updateDashboard();
+                this.renderBadges();
+                this.renderModules();
+                this.updateStatsDisplay();
+            }
+
+            updateDashboard() {
+                if (!this.user) return;
+                
+                const currentLevel = LevelSystem.getCurrentLevel(this.user.xp);
+                const nextLevel = LevelSystem.getNextLevel(this.user.xp);
+                const progress = LevelSystem.getProgress(this.user.xp);
+                
+                // Atualizar elementos
+                document.getElementById('userName').textContent = this.user.name;
+                document.getElementById('userLevel').textContent = `N${currentLevel.level}`;
+                document.getElementById('totalXP').textContent = `${this.user.xp} XP`;
+                document.getElementById('currentLevelName').textContent = currentLevel.name;
+                document.getElementById('nextLevelName').textContent = nextLevel ? nextLevel.name : 'Nível Máximo';
+                document.getElementById('levelProgressText').textContent = 
+                    nextLevel ? `${this.user.xp}/${nextLevel.minXP} XP` : 'Nível máximo atingido';
+                document.getElementById('currentLevelXP').textContent = `${currentLevel.minXP} XP`;
+                document.getElementById('nextLevelXP').textContent = nextLevel ? `${nextLevel.minXP} XP` : '';
+                
+                // Barra de progresso
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                document.getElementById('xpDisplay').textContent = `${this.user.xp} XP`;
+            }
+
+            renderBadges() {
+                const badgesGrid = document.getElementById('badgesGrid');
+                const badgesCount = document.getElementById('badgesCount');
+                
+                if (!badgesGrid) return;
+                
+                badgesGrid.innerHTML = '';
+                const userBadges = this.user.badges || [];
+                
+                // Atualizar contador
+                badgesCount.textContent = `${userBadges.length}/${Object.keys(MareginterBadges).length}`;
+                
+                // Renderizar todas as badges
+                Object.entries(MareginterBadges).forEach(([id, badge]) => {
+                    const hasBadge = userBadges.includes(id);
+                    
+                    const badgeCard = document.createElement('div');
+                    badgeCard.className = `badge-card ${hasBadge ? '' : 'locked'}`;
+                    badgeCard.innerHTML = `
+                        <div class="badge-icon">${badge.emoji}</div>
+                        <div class="badge-name">${badge.name}</div>
+                        <div class="badge-desc">${badge.description}</div>
+                    `;
+                    
+                    if (hasBadge) {
+                        badgeCard.style.borderColor = '#10B981';
+                    }
+                    
+                    badgesGrid.appendChild(badgeCard);
+                });
+            }
+
+            renderModules() {
+                const modulesList = document.getElementById('modulesList');
+                if (!modulesList) return;
+                
+                const modules = this.user.modulesCompleted || [];
+                
+                if (modules.length === 0) {
+                    modulesList.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--mareginter-gray);">
+                            <p>Nenhum módulo concluído ainda.</p>
+                            <button class="btn btn-primary" onclick="startModule()" style="margin-top: 1rem;">
+                                Iniciar Primeiro Módulo
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                modulesList.innerHTML = '';
+                
+                // Mostrar últimos 5 módulos
+                modules.slice(-5).reverse().forEach(module => {
+                    const moduleCard = document.createElement('div');
+                    moduleCard.className = 'module-card';
+                    moduleCard.innerHTML = `
+                        <div class="module-info">
+                            <h4>${module.name}</h4>
+                            <div class="module-status completed">
+                                Concluído • ${module.score}% • ${module.time}s
+                            </div>
+                        </div>
+                        <div style="font-weight: bold; color: var(--mareginter-blue);">
+                            +${module.xpEarned} XP
+                        </div>
+                    `;
+                    modulesList.appendChild(moduleCard);
+                });
+            }
+
+            updateStatsDisplay() {
+                document.getElementById('statModules').textContent = this.user.stats.totalModules || 0;
+                document.getElementById('statAccuracy').textContent = `${this.user.stats.avgAccuracy || 0}%`;
+                document.getElementById('statTime').textContent = `${this.user.stats.avgTime || 0}s`;
+                document.getElementById('statStreak').textContent = this.user.stats.streak || 1;
+            }
+
+            showWelcomeMessage() {
+                const isReturning = this.user.createdAt < Date.now() - 60000;
+                const levelInfo = LevelSystem.getCurrentLevel(this.user.xp);
+                
+                const welcomeEl = document.createElement('div');
+                welcomeEl.className = 'welcome-message';
+                welcomeEl.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">
+                        ${isReturning ? '👋 Bem-vindo de volta!' : '🎯 Bem-vindo à Academia!'}
+                    </div>
+                    <div style="font-size: 0.9em; opacity: 0.9;">
+                        ${this.user.name} • ${levelInfo.name}
+                    </div>
+                    <div style="font-size: 0.8em; margin-top: 8px;">
+                        ${this.user.xp} XP • ${this.user.badges.length} badges
+                        ${this.user.isOffline ? ' • 🌐 Offline' : ''}
+                    </div>
+                `;
+                
+                document.body.appendChild(welcomeEl);
+                
+                // Remover após 5 segundos
+                setTimeout(() => {
+                    welcomeEl.classList.add('hiding');
+                    setTimeout(() => welcomeEl.remove(), 300);
+                }, 5000);
+            }
+
+            showLevelUpNotification(newLevel) {
+                const levelInfo = MareginterLevels[newLevel];
+                
+                const notification = document.createElement('div');
+                notification.className = 'welcome-message';
+                notification.style.background = `linear-gradient(135deg, ${levelInfo.color}, ${levelInfo.color}99)`;
+                notification.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">
+                        🎉 LEVEL UP!
+                    </div>
+                    <div style="font-size: 0.9em;">
+                        Novo nível: <strong>${levelInfo.name}</strong>
+                    </div>
+                    <div style="font-size: 0.8em; margin-top: 8px;">
+                        Parabéns pelo progresso!
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('hiding');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+
+            showBadgeNotification(badgeId) {
+                const badge = MareginterBadges[badgeId];
+                if (!badge) return;
+                
+                const notification = document.createElement('div');
+                notification.className = 'welcome-message';
+                notification.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">
+                        🏅 Nova Badge!
+                    </div>
+                    <div style="font-size: 0.9em;">
+                        ${badge.emoji} <strong>${badge.name}</strong>
+                    </div>
+                    <div style="font-size: 0.8em; margin-top: 8px; opacity: 0.8;">
+                        ${badge.description}
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('hiding');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            }
+
+            showError() {
+                const errorEl = document.createElement('div');
+                errorEl.className = 'welcome-message';
+                errorEl.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                errorEl.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">
+                        ⚠️ Erro de Conexão
+                    </div>
+                    <div style="font-size: 0.9em;">
+                        Modo offline ativado
+                    </div>
+                    <div style="font-size: 0.8em; margin-top: 8px;">
+                        Dados serão sincronizados quando possível
+                    </div>
+                `;
+                
+                document.body.appendChild(errorEl);
+            }
+        }
+
+        // ============================================
+        // FUNÇÕES GLOBAIS
+        // ============================================
+        let app;
+
+        function startModule() {
+            if (!app || !app.user) return;
+            
+            // Simular módulo (em produção, seria um sistema real)
+            const moduleName = "Introdução à Segurança";
+            const score = Math.floor(Math.random() * 30) + 70; // 70-100%
+            const timeSeconds = Math.floor(Math.random() * 60) + 30; // 30-90s
+            
+            // Completar módulo
+            const result = app.user.completeModule(moduleName, score, timeSeconds);
+            
+            // Atualizar UI
+            app.updateDashboard();
+            app.renderModules();
+            app.updateStatsDisplay();
+            
+            // Verificar badges
+            if (score === 100 && !app.user.badges.includes('inicio_perfeito')) {
+                app.user.addBadge('inicio_perfeito');
+                app.renderBadges();
+            }
+            
+            // Salvar
+            app.user.save();
+            
+            console.log(`✅ Módulo "${moduleName}" concluído: ${score}% em ${timeSeconds}s (+${result.xpEarned} XP)`);
+        }
+
+        function adminAction() {
+            const password = document.getElementById('adminPass').value;
+            
+            // Simples validação (em produção seria mais seguro)
+            if (password === 'mareginter2024') {
+                alert('Acesso admin concedido!');
+                // Aqui iriam as ações admin
+                return false;
+            } else {
+                alert('Senha incorreta');
+                return false;
+            }
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mostrar loading
+            document.body.innerHTML += `
+                <div class="loading" id="loadingScreen">
+                    <div class="spinner"></div>
+                    <p>Inicializando Academia Mareginter...</p>
+                </div>
+            `;
+            
+            // Inicializar app
+            setTimeout(async () => {
+                app = new MareginterApp();
+                
+                // Esconder loading após 1.5 segundos
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if (loadingScreen) {
+                        loadingScreen.style.opacity = '0';
+                        loadingScreen.style.transition = 'opacity 0.3s';
+                        setTimeout(() => loadingScreen.remove(), 300);
+                    }
+                }, 1500);
+            }, 500);
+        });
+
+        // Exportar para console
+        window.MareginterApp = MareginterApp;
+        window.XPInteligente = XPInteligente;
+        window.LevelSystem = LevelSystem;
+        window.MareginterBadges = MareginterBadges;
+        
+        console.log('✅ Sistema Mareginter carregado. Use:');
+        console.log('   app.user.addXP(100) - Adicionar XP');
+        console.log('   app.user.addBadge("inicio_perfeito") - Adicionar badge');
+        console.log('   startModule() - Simular módulo');
+    </script>
 </body>
 </html>
