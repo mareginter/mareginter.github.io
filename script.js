@@ -73,7 +73,7 @@ var MODULES = [
             {q:'O que é phishing?',opts:['Técnica de pesca','Ataque via email fraudulento','Software antivírus','Tipo de firewall'],correct:1},
             {q:'Qual o principal objetivo do phishing?',opts:['Melhorar segurança','Roubar informações sensíveis','Acelerar a internet','Criar backups'],correct:1},
             {q:'Como identificar um email suspeito?',opts:['Confiar sempre','Verificar remetente e links','Ignorar sempre','Clicar imediatamente'],correct:1},
-            {q:'O que fazer ao receber email suspeito?',opts:['Clicar em todos os links','Encaminhar para amigos','Reportar ao TI','Responder com dados pessoais'],correct:2},
+            {q:'O que fazer ao receber email suspeito?',opts:['Clicar em todos os links','Encaminhar para amigos','Reportar á Ciber Segurança','Responder com dados pessoais'],correct:2},
             {q:'Phishing pode ocorrer via:',opts:['Apenas email','Email, SMS e redes sociais','Só telefone','Apenas websites'],correct:1}
         ]
     },
