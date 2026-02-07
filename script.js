@@ -48,6 +48,7 @@ var COMPANY = {
     employees: []
 };
 
+/*
 // SISTEMA DE CHAVES DE ATIVAÇÃO
 var ACTIVATION_SYSTEM = {
     // Configuração: permite acesso sem chave? true = sim, false = não
@@ -61,6 +62,7 @@ var ACTIVATION_SYSTEM = {
         'TEST-1234': { valid: true, used: false, type: 'basic' }
     }
 };
+*/
 
 // MÓDULOS
 var MODULES = [
@@ -376,16 +378,13 @@ var CURRENT_MODULE = null;
 
 // Função para verificar chave de ativação
 async function checkActivationKey(key) {
-    try {
-        console.log('🔑 Verificando chave:', key);
-        
-        // Primeiro verifica no Firebase
+ try {
+        // APENAS Firebase - remova o fallback
         var keyRef = database.ref('activationKeys/' + key);
         var snapshot = await keyRef.once('value');
         
         if (snapshot.exists()) {
             var keyData = snapshot.val();
-            console.log('Chave encontrada no Firebase:', keyData);
             return {
                 valid: keyData.valid === true,
                 used: keyData.used === true,
@@ -393,24 +392,10 @@ async function checkActivationKey(key) {
                 maxUses: keyData.maxUses || 1,
                 usedCount: keyData.usedCount || 0
             };
-        } else {
-            // Fallback para as chaves locais
-            if (ACTIVATION_SYSTEM.defaultKeys[key]) {
-                console.log('Chave encontrada nas chaves locais');
-                return {
-                    valid: ACTIVATION_SYSTEM.defaultKeys[key].valid,
-                    used: ACTIVATION_SYSTEM.defaultKeys[key].used,
-                    type: ACTIVATION_SYSTEM.defaultKeys[key].type,
-                    maxUses: 1,
-                    usedCount: 0
-                };
-            }
-            console.log('❌ Chave não encontrada');
-            return { valid: false, used: false, type: 'invalid' };
         }
+        return { valid: false }; // Não encontrada no Firebase
     } catch (error) {
-        console.error('Erro ao verificar chave:', error);
-        return { valid: false, used: false, type: 'error' };
+        return { valid: false };
     }
 }
 
