@@ -19,6 +19,8 @@ try {
 }
 const database = firebase.database();
 
+
+
 // DADOS GLOBAIS
 var USER = {
     id: '',
@@ -64,7 +66,9 @@ var ACTIVATION_SYSTEM = {
 };
 */
 
-// MÓDULOS
+// ==================== DADOS DOS MÓDULOS ====================
+
+// MÓDULOS BÁSICOS
 var MODULES = [
     {
         id: 'mod1',
@@ -114,7 +118,7 @@ var MODULES = [
         questions: [
             {q:'O que é ransomware?',opts:['Antivírus gratuito','Malware que encripta ficheiros e pede resgate','Ferramenta de backup','Sistema operativo'],correct:1},
             {q:'Principal forma de infeção por ransomware:',opts:['Atualização do sistema','Email com anexo malicioso ou link','Comprar software legal','Desligar o computador'],correct:1},
-                        {q:'Se for vítima de ransomware, deve:',opts:['Pagar o resgate imediatamente','Desligar rede, reportar TI, NÃO pagar','Apagar o computador','Formatar sem fazer backup'],correct:1},
+            {q:'Se for vítima de ransomware, deve:',opts:['Pagar o resgate imediatamente','Desligar rede, reportar TI, NÃO pagar','Apagar o computador','Formatar sem fazer backup'],correct:1},
             {q:'Melhor proteção contra ransomware:',opts:['Não usar computador','Backups regulares offline + software atualizado','Pagar antecipadamente','Confiar em tudo'],correct:1},
             {q:'Extensões de ficheiro suspeitas:',opts:['.pdf e .docx','.exe, .scr, .bat','.jpg e .png','.mp3 e .mp4'],correct:1}
         ]
@@ -135,7 +139,7 @@ var MODULES = [
     }
 ];
 
-// MÓDULOS PREMIUM
+// MÓDULOS PREMIUM - CORRIGIDO
 var PREMIUM_MODULES = [
     {
         id: 'prem1',
@@ -162,7 +166,7 @@ var PREMIUM_MODULES = [
             {q:'Chave pública vs. privada:',opts:['São iguais','Pública encripta, privada decifra','Privada encripta, pública decifra','Não relacionadas'],correct:1},
             {q:'O que é um certificado SSL/TLS?',opts:['Antivírus','Certificado digital que autentica websites','Software de backup','Tipo de senha'],correct:1},
             {q:'"End-to-end encryption" significa:',opts:['Dados só são decifrados nos extremos','Encriptação parcial','Sem encriptação','Encriptação fraca'],correct:0},
-            {q:'PGP/GPG são usados para:',opts:['Encriptação de emails','Jogos','Compressão','Anti-spam'],correct:0}
+            {q:'PGP/GPG são usados para:',opts:['Encriptação de emails','Jogos','Compression','Anti-spam'],correct:0}
         ]
     },
     {
@@ -177,6 +181,157 @@ var PREMIUM_MODULES = [
             {q:'Plano de resposta a incidentes deve incluir:',opts:['Apenas TI','Equipa multidisciplinar com funções definidas','Só administradores','Ninguém'],correct:1},
             {q:'"Lessons learned" após incidente:',opts:['Ignorar o acontecido','Documentar para melhorar processos futuros','Culpar alguém','Esquecer tudo'],correct:1},
             {q:'Comunicação durante incidente deve ser:',opts:['Interna e controlada','Pública imediatamente','Somente oral','Inexistente'],correct:0}
+        ]
+    },
+    // NOVO MÓDULO STORYTELLING - CORRIGIDO
+    {
+        id: 'prem4',
+        title: '📖 Histórias Reais de Phishing',
+        desc: '5 casos reais que aconteceram e como poderiam ter sido evitados',
+        xp: 350,
+        isPremium: true,
+        stories: true,
+        cases: [
+            {
+                id: 'case1',
+                title: 'CEO Fraud - A Fraude do CEO',
+                company: 'Empresa Multinacional (2015)',
+                scenario: 'O CFO recebeu um email urgente do "CEO" (email hackeado) pedindo transferência urgente de €500.000 para um fornecedor "crítico". O email parecia legítimo, com tom e estilo conhecidos.',
+                whatHappened: 'O CFO, pressionado pela urgência, autorizou a transferência sem verificar por telefone. O dinheiro foi para uma conta fraudulenta na Ásia e nunca mais foi recuperado.',
+                redFlags: [
+                    'Urgência excessiva ("em 2 horas")',
+                    'Pedido de transferência fora dos canais normais',
+                    'Email solicitando confidencialidade total',
+                    'Valor anormalmente alto para transação única'
+                ],
+                prevention: [
+                    'Política de verificação por telefone para grandes transferências',
+                    'Limites de autorização por nível hierárquico',
+                    'Treino específico para departamento financeiro',
+                    'Sistema de aprovação dupla para transações acima de certo valor'
+                ],
+                question: 'Qual a medida MAIS eficaz para prevenir este tipo de ataque?',
+                opts: [
+                    'Ignorar todos os emails do CEO',
+                    'Implementar verificação obrigatória por telefone/vídeo para transações grandes',
+                    'Limitar o acesso à internet do departamento financeiro',
+                    'Usar apenas email interno'
+                ],
+                correct: 1,
+                source: 'Relatório FBI IC3 2016'
+            },
+            {
+                id: 'case2',
+                title: 'Ataque à Cadeia de Fornecimento',
+                company: 'Fabricante Automóvel (2020)',
+                scenario: 'Um fornecedor de peças foi comprometido. Os hackers enviaram emails de phishing para funcionários do fabricante, parecendo vir do fornecedor legítimo, com faturas alteradas.',
+                whatHappened: 'Os funcionários pagaram as faturas falsas para contas controladas pelos hackers. Perda total: €2.3 milhões antes da deteção.',
+                redFlags: [
+                    'Número de conta bancária alterado de repente',
+                    'Email do fornecedor com pequenos erros no domínio',
+                    'Pressão para pagamento rápido devido a "problemas bancários"',
+                    'Falta de resposta rápida quando questionado por telefone'
+                ],
+                prevention: [
+                    'Lista verificada de contas bancárias por fornecedor',
+                    'Política de verificação para qualquer alteração de dados bancários',
+                    'Treino específico para departamento de compras',
+                    'Sistema de alerta para alterações em dados de fornecedores'
+                ],
+                question: 'Como validar uma mudança de conta bancária de fornecedor?',
+                opts: [
+                    'Confiar no email se tiver assinatura digital',
+                    'Ligar para número no email recebido',
+                    'Contactar através de canal conhecido previamente (telefone guardado)',
+                    'Perguntar a outro colega'
+                ],
+                correct: 2,
+                source: 'Relatório Europol 2021'
+            },
+            {
+                id: 'case3',
+                title: 'Phishing de Credenciais de VPN',
+                company: 'Empresa de Saúde (2019)',
+                scenario: 'Durante a pandemia, funcionários receberam email aparentando ser do departamento de TI, pedindo para "atualizar credenciais de VPN" devido a "atualização de segurança".',
+                whatHappened: 'Múltiplos funcionários introduziram suas credenciais no site falso. Hackers acederam à rede interna, roubaram dados de pacientes e instalaram ransomware.',
+                redFlags: [
+                    'URL do site de login diferente do habitual',
+                    'Faltava o certificado SSL válido',
+                    'Email genérico ("Prezado colaborador") em vez de nome pessoal',
+                    'Design ligeiramente diferente do portal legítimo'
+                ],
+                prevention: [
+                    'Autenticação multi-fator obrigatória para VPN',
+                    'Treino específico sobre phishing de credenciais',
+                    'Portal único de acesso com bookmarks oficiais',
+                    'Monitorização de logins suspeitos'
+                ],
+                question: 'Qual é o melhor método para evitar phishing de credenciais?',
+                opts: [
+                    'Mudar senhas todas as semanas',
+                    'Implementar autenticação multi-fator (MFA)',
+                    'Usar senhas muito complexas',
+                    'Não aceder a links em emails'
+                ],
+                correct: 1,
+                source: 'Departamento de Saúde EUA, 2020'
+            },
+            {
+                id: 'case4',
+                title: 'Business Email Compromise - Caso Imobiliário',
+                company: 'Agência Imobiliária (2021)',
+                scenario: 'Cliente a comprar casa recebeu email do "advogado" com instruções para transferir sinal de €85.000. O email do advogado tinha sido hackeado dias antes.',
+                whatHappened: 'O cliente transferiu o dinheiro para conta fraudulenta. Só descobriu no dia da escritura quando o advogado real perguntou sobre o pagamento.',
+                redFlags: [
+                    'Email sobre pagamento sem referência a detalhes específicos discutidos',
+                    'Conta bancária em banco diferente do habitual',
+                    'Assinatura de email incompleta',
+                    'Tom mais impessoal que o normal'
+                ],
+                prevention: [
+                    'Verificação telefónica para confirmação de dados bancários',
+                    'Uso de frases de código previamente combinadas',
+                    'Comunicação através de plataforma segura com verificação de identidade',
+                    'Educação dos clientes sobre estes riscos'
+                ],
+                question: 'Que medida poderia ter prevenido esta fraude?',
+                opts: [
+                    'Usar apenas transferências bancárias',
+                    'Estabelecer frase de código com clientes para confirmar mudanças',
+                    'Não discutir negócios por email',
+                    'Pedir cópia do cartão de cidadão'
+                ],
+                correct: 1,
+                source: 'APAV - Associação Portuguesa de Apoio à Vítima'
+            },
+            {
+                id: 'case5',
+                title: 'W-2 Phishing - Dados Fiscais',
+                company: 'Escola Pública (2018)',
+                scenario: 'Email aparentando vir do diretor para assistente administrativo: "Preciso dos W-2 de todos os funcionários para revisão urgente. Envie hoje."',
+                whatHappened: 'A assistente enviou os formulários W-2 (com números de segurança social, salários, endereços) de 2.000 funcionários. Dados usados para fraude fiscal em larga escala.',
+                redFlags: [
+                    'Pedido fora do ciclo normal (W-2 normalmente em Janeiro)',
+                    'Email enviado fora de horas',
+                    'Tom mais direto que o estilo habitual do diretor',
+                    'Pedido para ignorar procedimentos normais'
+                ],
+                prevention: [
+                    'Política clara sobre partilha de dados sensíveis',
+                    'Verificação obrigatória para pedidos de dados confidenciais',
+                    'Treino específico para funcionários com acesso a dados pessoais',
+                    'Classificação e proteção de dados por sensibilidade'
+                ],
+                question: 'Como lidar com pedido urgente de dados sensíveis?',
+                opts: [
+                    'Obedecer imediatamente por ser superior hierárquico',
+                    'Verificar através de canal secundário (telefone, presencial)',
+                    'Enviar mas pedir confirmação depois',
+                    'Pedir autorização por escrito'
+                ],
+                correct: 1,
+                source: 'IRS Alert SA-2018-2'
+            }
         ]
     }
 ];
@@ -198,7 +353,12 @@ var BADGES = [
     {id:'premium_access',name:'⭐ Premium',desc:'Desbloqueou módulos premium',check:function(){return hasPremiumAccess()}},
     {id:'prem1',name:'🧠 Engenheiro Social',desc:'Completou módulo Engenharia Social',check:function(){return USER.scores['prem1'] !== undefined}},
     {id:'prem2',name:'🔐 Criptógrafo',desc:'Completou módulo Criptografia',check:function(){return USER.scores['prem2'] !== undefined}},
-    {id:'prem3',name:'🛡️ Incident Commander',desc:'Completou módulo Resposta a Incidentes',check:function(){return USER.scores['prem3'] !== undefined}}
+    {id:'prem3',name:'🛡️ Incident Commander',desc:'Completou módulo Resposta a Incidentes',check:function(){return USER.scores['prem3'] !== undefined}},
+    {id:'story_master',name:'📖 Mestre das Histórias',desc:'Completou todos os casos reais de phishing',check:function(){
+        var storyModule = PREMIUM_MODULES.find(m => m.stories);
+        if(!storyModule) return false;
+        return storyModule.cases.every(c => USER.scores[c.id] !== undefined);
+    }}
 ];
 
 var PHISHING_EMAILS = [
@@ -1027,7 +1187,11 @@ function updateDashboard() {
 }
 
 // ==================== FUNÇÕES DE MÓDULOS ====================
-
+function renderModules() {
+    console.log('🔄 renderModules() chamado. USER:', USER.name, 'Premium access:', hasPremiumAccess());
+    
+    // ... resto do código ...
+}
 function renderModules() {
     var html = '';
     
@@ -1112,6 +1276,12 @@ function startModule(modId, isPremium) {
     
     if(!CURRENT_MODULE) return;
     
+    // VERIFICA SE É MÓDULO DE STORYTELLING
+    if(CURRENT_MODULE.stories) {
+        renderStoryModule();
+        return;
+    }
+
     var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
     html += '<h2>' + CURRENT_MODULE.title;
     if(CURRENT_MODULE.isPremium) {
@@ -1492,7 +1662,26 @@ async function updateAdminDashboard() {
     
     var employees = COMPANY.employees || [];
     var total = employees.length;
+     var storyModule = PREMIUM_MODULES.find(m => m.stories);
+    var storyStats = { total: 0, completed: 0 };
     
+    if(storyModule) {
+        employees.forEach(function(emp) {
+            var userStoryCases = 0;
+            var userCompletedStoryCases = 0;
+            
+            storyModule.cases.forEach(function(caseStudy) {
+                if(emp.scores && emp.scores[caseStudy.id] !== undefined) {
+                    userCompletedStoryCases++;
+                }
+                userStoryCases++;
+            });
+            
+            storyStats.total += userStoryCases;
+            storyStats.completed += userCompletedStoryCases;
+        });
+    }
+
     // Atualiza dados dos colaboradores
     for (var i = 0; i < employees.length; i++) {
         var emp = employees[i];
@@ -1623,6 +1812,177 @@ async function updateAdminDashboard() {
     
     var inviteUrl = window.location.origin + window.location.pathname + '?company=' + COMPANY.code;
     document.getElementById('inviteLink').textContent = inviteUrl;
+}
+
+function renderStoryModule() {
+    if(!CURRENT_MODULE || !CURRENT_MODULE.stories) return;
+    
+    var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
+    html += '<h2>' + CURRENT_MODULE.title;
+    html += ' <span style="background:#8b5cf6;color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.85rem">📖 Storytelling</span>';
+    html += '</h2>';
+    html += '<p style="color:#64748b;margin-bottom:2rem">' + CURRENT_MODULE.desc + '</p>';
+    
+    // Indicador de progresso
+    var completedStories = CURRENT_MODULE.cases.filter(function(c) {
+        return USER.scores[c.id] !== undefined;
+    }).length;
+    
+    html += '<div style="background:#f0fdf4;padding:1rem;border-radius:8px;margin-bottom:2rem;text-align:center">';
+    html += '<p><strong>Progresso:</strong> ' + completedStories + '/' + CURRENT_MODULE.cases.length + ' casos completados</p>';
+    html += '<div class="progress-bar" style="height:10px;margin:0.5rem 0">';
+    html += '<div class="progress-fill" style="width:' + ((completedStories / CURRENT_MODULE.cases.length) * 100) + '%"></div>';
+    html += '</div>';
+    html += '</div>';
+    
+    // Lista de casos
+    CURRENT_MODULE.cases.forEach(function(caseStudy, index) {
+        var isCompleted = USER.scores[caseStudy.id] !== undefined;
+        var score = USER.scores[caseStudy.id] || 0;
+        
+        html += '<div class="module ' + (isCompleted ? 'completed' : '') + '" style="margin-bottom:2rem;cursor:pointer" onclick="openStoryCase(' + index + ')">';
+        html += '<h3>📋 Caso ' + (index + 1) + ': ' + caseStudy.title + '</h3>';
+        html += '<p style="color:#64748b;margin:0.5rem 0"><strong>Empresa:</strong> ' + caseStudy.company + '</p>';
+        html += '<p style="color:#64748b;margin:0.5rem 0">' + caseStudy.scenario.substring(0, 150) + '...</p>';
+        
+        if(isCompleted) {
+            html += '<p style="color:#10b981;font-weight:700;margin-top:0.5rem">✓ Completado: ' + score + '/1</p>';
+        } else {
+            html += '<p style="color:#64748b;font-size:0.9rem;margin-top:0.5rem">▶ Clique para estudar este caso</p>';
+        }
+        
+        html += '</div>';
+    });
+    
+    document.getElementById('quizContent').innerHTML = html;
+    showPage('quizPage');
+}
+
+function openStoryCase(caseIndex) {
+    if(!CURRENT_MODULE || !CURRENT_MODULE.cases || !CURRENT_MODULE.cases[caseIndex]) return;
+    
+    var caseStudy = CURRENT_MODULE.cases[caseIndex];
+    var isCompleted = USER.scores[caseStudy.id] !== undefined;
+    
+    var html = '<button onclick="renderStoryModule()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Casos</button>';
+    html += '<div class="module" style="border-left-color:#8b5cf6">';
+    html += '<h2>📖 ' + caseStudy.title + '</h2>';
+    html += '<p style="color:#64748b;margin-bottom:1rem"><strong>Empresa:</strong> ' + caseStudy.company + '</p>';
+    
+    // Cenário
+    html += '<div style="background:#f8fafc;padding:1.5rem;border-radius:8px;margin:1rem 0">';
+    html += '<h4 style="color:#3b82f6;margin-bottom:0.5rem">🎭 O CENÁRIO</h4>';
+    html += '<p style="white-space:pre-wrap;line-height:1.6">' + caseStudy.scenario + '</p>';
+    html += '</div>';
+    
+    // O que aconteceu
+    html += '<div style="background:#fef2f2;padding:1.5rem;border-radius:8px;margin:1rem 0">';
+    html += '<h4 style="color:#ef4444;margin-bottom:0.5rem">💥 O QUE ACONTECEU NA REALIDADE</h4>';
+    html += '<p style="white-space:pre-wrap;line-height:1.6">' + caseStudy.whatHappened + '</p>';
+    html += '</div>';
+    
+    // Bandeiras vermelhas
+    html += '<div style="background:#fffbeb;padding:1.5rem;border-radius:8px;margin:1rem 0">';
+    html += '<h4 style="color:#d97706;margin-bottom:0.5rem">🚩 BANDEIRAS VERMELHAS QUE FORAM IGNORADAS</h4>';
+    html += '<ul style="margin-left:1.5rem;line-height:1.8">';
+    caseStudy.redFlags.forEach(function(flag) {
+        html += '<li>' + flag + '</li>';
+    });
+    html += '</ul>';
+    html += '</div>';
+    
+    // Medidas de prevenção
+    html += '<div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;margin:1rem 0">';
+    html += '<h4 style="color:#10b981;margin-bottom:0.5rem">🛡️ COMO PODERIA TER SIDO PREVENIDO</h4>';
+    html += '<ul style="margin-left:1.5rem;line-height:1.8">';
+    caseStudy.prevention.forEach(function(prevent) {
+        html += '<li>' + prevent + '</li>';
+    });
+    html += '</ul>';
+    html += '</div>';
+    
+    // Fonte
+    html += '<div style="background:#f1f5f9;padding:1rem;border-radius:6px;margin:1rem 0;text-align:center">';
+    html += '<p style="color:#64748b;font-size:0.9rem"><strong>Fonte:</strong> ' + caseStudy.source + '</p>';
+    html += '</div>';
+    
+    // Quiz se não completou
+    if(!isCompleted) {
+        html += '<div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:2rem 0">';
+        html += '<h4 style="color:#4f46e5;margin-bottom:1rem">🧠 TESTE SEU APRENDIZADO</h4>';
+        html += '<p style="margin-bottom:1rem"><strong>' + caseStudy.question + '</strong></p>';
+        
+        caseStudy.opts.forEach(function(opt, j) {
+            html += '<label style="display:block;margin:0.5rem 0;padding:0.75rem;background:#fff;border-radius:6px;cursor:pointer;transition:background 0.3s">';
+            html += '<input type="radio" name="storyCase" value="' + j + '"> ' + opt + '</label>';
+        });
+        
+        html += '<div style="text-align:center;margin-top:1.5rem">';
+        html += '<button onclick="submitStoryCase(' + caseIndex + ')">✓ Verificar Resposta</button>';
+        html += '</div>';
+        html += '</div>';
+    } else {
+        html += '<div style="background:#d1fae5;padding:1.5rem;border-radius:8px;margin:2rem 0;text-align:center">';
+        html += '<h4 style="color:#065f46">✅ CASO JÁ ESTUDADO</h4>';
+        html += '<p style="color:#047857;margin-top:0.5rem">Você já completou este caso com sucesso!</p>';
+        html += '<button onclick="renderStoryModule()" style="margin-top:1rem">← Voltar aos Casos</button>';
+        html += '</div>';
+    }
+    
+    html += '</div>'; // Fecha div.module
+    
+    document.getElementById('quizContent').innerHTML = html;
+}
+
+async function submitStoryCase(caseIndex) {
+    if(!CURRENT_MODULE || !CURRENT_MODULE.cases || !CURRENT_MODULE.cases[caseIndex]) return;
+    
+    var caseStudy = CURRENT_MODULE.cases[caseIndex];
+    var selected = document.querySelector('input[name="storyCase"]:checked');
+    
+    if(!selected) {
+        alert('Por favor selecione uma resposta');
+        return;
+    }
+    
+    var correct = (parseInt(selected.value) === caseStudy.correct);
+    var xpEarned = 70; // XP por caso estudado
+    
+    if(correct) {
+        USER.scores[caseStudy.id] = 1; // Marca como completado com pontuação 1
+        USER.xp += xpEarned;
+        
+        showXP('✅ Correto! +' + xpEarned + ' XP');
+        confetti();
+        
+        // Mostra feedback
+        var resultHtml = '<div style="background:#d1fae5;padding:1.5rem;border-radius:8px;margin-top:1rem;text-align:center">';
+        resultHtml += '<h4 style="color:#065f46">🎉 Excelente!</h4>';
+        resultHtml += '<p style="color:#047857;margin-top:0.5rem">Você identificou a melhor solução para prevenir este tipo de ataque.</p>';
+        resultHtml += '<button onclick="openStoryCase(' + caseIndex + ')" style="margin-top:1rem">↻ Rever Este Caso</button>';
+        resultHtml += '<button onclick="renderStoryModule()" style="background:#3b82f6;margin-top:1rem;margin-left:0.5rem">📋 Ver Todos os Casos</button>';
+        resultHtml += '</div>';
+        
+        // Substitui a seção do quiz
+        var quizSection = document.querySelector('[style*="background:#e0e7ff"]');
+        if(quizSection) {
+            quizSection.innerHTML = resultHtml;
+        }
+        
+        await saveDataToFirebase();
+        checkBadges();
+    } else {
+        var resultHtml = '<div style="background:#fef2f2;padding:1.5rem;border-radius:8px;margin-top:1rem;text-align:center">';
+        resultHtml += '<h4 style="color:#991b1b">📚 Continue Estudando</h4>';
+        resultHtml += '<p style="color:#b91c1c;margin-top:0.5rem">A resposta correta era: <strong>' + caseStudy.opts[caseStudy.correct] + '</strong></p>';
+        resultHtml += '<button onclick="openStoryCase(' + caseIndex + ')" style="background:#ef4444;margin-top:1rem">↻ Tentar Novamente</button>';
+        resultHtml += '</div>';
+        
+        var quizSection = document.querySelector('[style*="background:#e0e7ff"]');
+        if(quizSection) {
+            quizSection.innerHTML = resultHtml;
+        }
+    }
 }
 
 async function loadCompanyData(code) {
@@ -1990,7 +2350,12 @@ function filterEmployees(term) {
 }
 
 // ==================== INICIALIZAÇÃO ====================
-
+document.getElementById('adminEmail')?.addEventListener('blur', function() {
+    var email = this.value.trim();
+    if(email && document.getElementById('adminLogin').style.display !== 'none') {
+        checkAdminExists(email);
+    }
+});
 window.onload = function() {
     var urlParams = new URLSearchParams(window.location.search);
     var code = urlParams.get('company');
