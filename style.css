@@ -48,6 +48,69 @@ main {
   margin: 2rem auto;
   padding: 0 1rem;
 }
+/* Adicione ao style.css */
+.story-case {
+    background: linear-gradient(to right, #f5f3ff, #fff);
+    border-left: 5px solid #8b5cf6;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.story-case:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(139, 92, 246, 0.2);
+}
+
+.story-case.completed {
+    border-left-color: #10b981;
+    background: linear-gradient(to right, #f0fdf4, #fff);
+}
+
+.story-case::before {
+    content: '📖';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+}
+
+.case-study-header {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.case-section {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.scenario-section {
+    background: #e0e7ff;
+    border-left: 4px solid #4f46e5;
+}
+
+.reality-section {
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+}
+
+.redflags-section {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+}
+
+.prevention-section {
+    background: #d1fae5;
+    border-left: 4px solid #10b981;
+}
 .box {
   background: #fff;
   border-radius: 12px;
