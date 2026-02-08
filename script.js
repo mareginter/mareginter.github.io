@@ -19,8 +19,6 @@ try {
 }
 const database = firebase.database();
 
-
-
 // DADOS GLOBAIS
 var USER = {
     id: '',
@@ -50,7 +48,6 @@ var COMPANY = {
     employees: []
 };
 
-/*
 // SISTEMA DE CHAVES DE ATIVAÇÃO
 var ACTIVATION_SYSTEM = {
     // Configuração: permite acesso sem chave? true = sim, false = não
@@ -64,7 +61,6 @@ var ACTIVATION_SYSTEM = {
         'TEST-1234': { valid: true, used: false, type: 'basic' }
     }
 };
-*/
 
 // ==================== DADOS DOS MÓDULOS ====================
 
@@ -183,11 +179,10 @@ var PREMIUM_MODULES = [
             {q:'Comunicação durante incidente deve ser:',opts:['Interna e controlada','Pública imediatamente','Somente oral','Inexistente'],correct:0}
         ]
     },
-    // NOVO MÓDULO STORYTELLING - CORRIGIDO
     {
         id: 'prem4',
         title: '📖 Histórias Reais de Phishing',
-        desc: '5 casos reais que aconteceram e como poderiam ter sido evitados',
+        desc: 'Casos reais que aconteceram e como poderiam ter sido evitados',
         xp: 350,
         isPremium: true,
         stories: true,
@@ -331,8 +326,178 @@ var PREMIUM_MODULES = [
                 ],
                 correct: 1,
                 source: 'IRS Alert SA-2018-2'
+            },
+            {
+                id: 'case6',
+                title: 'Phishing em Setor Bancário',
+                company: 'Banco Europeu (2022)',
+                scenario: 'Clientes receberam SMS aparentando ser do banco: "Detetamos acesso suspeito à sua conta. Clique para verificar: banco-verificacao[.]com". O link levava a site idêntico ao do banco.',
+                whatHappened: 'Centenas de clientes introduziram credenciais bancárias. Perdas estimadas em €1.2 milhões antes do bloqueio.',
+                redFlags: [
+                    'URL diferente do domínio oficial do banco',
+                    'SMS com link em vez de app ou portal',
+                    'Pressão emocional ("acesso suspeito")',
+                    'Falta de identificação única do cliente'
+                ],
+                prevention: [
+                    'Comunicação oficial apenas através de app bancária',
+                    'Educação sobre nunca clicar em links de SMS bancários',
+                    'Verificação em duas etapas obrigatória',
+                    'Monitorização de domínios parecidos'
+                ],
+                question: 'Como identificar comunicação legítima do banco?',
+                opts: [
+                    'Confiar em qualquer SMS do banco',
+                    'Sempre aceder através da app oficial ou site conhecido',
+                    'Verificar se o email tem logo do banco',
+                    'Confiar se tiver seu nome completo'
+                ],
+                correct: 1,
+                source: 'Relatório Banco de Portugal 2022'
+            },
+            {
+                id: 'case7',
+                title: 'Ataque a Pequeno Comércio',
+                company: 'Loja Online Portuguesa (2023)',
+                scenario: 'Proprietário recebeu email da "equipa de suporte da plataforma de e-commerce" pedindo para atualizar dados de pagamento devido a "mudanças de segurança".',
+                whatHappened: 'O proprietário atualizou dados e os próximos pagamentos de clientes foram desviados. Prejuízo de €15.000 antes da deteção.',
+                redFlags: [
+                    'Email genérico em vez de ticket de suporte',
+                    'Solicitação fora do canal normal de suporte',
+                    'Urgência artificial ("atualize em 24h")',
+                    'Link para formulário não oficial'
+                ],
+                prevention: [
+                    'Canais oficiais de suporte documentados',
+                    'Verificação por telefone para mudanças críticas',
+                    'Treino específico para pequenos empresários',
+                    'Monitorização de transações incomuns'
+                ],
+                question: 'Como validar solicitação de suporte técnico?',
+                opts: [
+                    'Confiar se o email parece profissional',
+                    'Contactar através de canal oficial conhecido',
+                    'Responder ao email pedindo confirmação',
+                    'Pedir para colega verificar'
+                ],
+                correct: 1,
+                source: 'APDC - Associação Portuguesa para o Desenvolvimento das Comunicações'
             }
         ]
+    },
+    {
+        id: 'prem5',
+        title: '⚖️ Legislação e Conformidade',
+        desc: 'GDPR, LGPD e outras regulamentações de segurança de dados',
+        xp: 400,
+        isPremium: true,
+        questions: [
+            {
+                q: 'O que significa GDPR?',
+                opts: [
+                    'General Data Protection Regulation',
+                    'Global Digital Protection Rules',
+                    'Government Data Privacy Rights',
+                    'General Digital Privacy Regulation'
+                ],
+                correct: 0
+            },
+            {
+                q: 'Qual o valor máximo de multa por violação do GDPR?',
+                opts: [
+                    '€10 milhões ou 2% do faturamento',
+                    '€20 milhões ou 4% do faturamento global',
+                    '€50 milhões',
+                    'Não há limite de multa'
+                ],
+                correct: 1
+            },
+            {
+                q: 'O que são "dados pessoais" segundo o GDPR?',
+                opts: [
+                    'Apenas nome e email',
+                    'Qualquer informação relacionada a pessoa identificável',
+                    'Apenas dados financeiros',
+                    'Apenas dados de saúde'
+                ],
+                correct: 1
+            },
+            {
+                q: 'O princípio de "minimização de dados" significa:',
+                opts: [
+                    'Coletar o máximo de dados possível',
+                    'Coletar apenas dados necessários para a finalidade',
+                    'Eliminar todos os dados após 6 meses',
+                    'Não coletar dados de menores'
+                ],
+                correct: 1
+            },
+            {
+                q: 'Em caso de violação de dados, a empresa deve notificar:',
+                opts: [
+                    'Apenas os afetados',
+                    'Apenas a autoridade supervisora',
+                    'Autoridade supervisora em 72h e afetados se alto risco',
+                    'Ninguém, apenas resolver internamente'
+                ],
+                correct: 2
+            }
+        ],
+        legislationContent: `
+            <div style="margin:1.5rem 0">
+                <h4 style="color:#3b82f6;margin-bottom:1rem">📜 GDPR - Regulamento Geral de Proteção de Dados</h4>
+                
+                <div style="background:#f8fafc;padding:1.5rem;border-radius:8px;margin:1rem 0">
+                    <h5 style="color:#1e293b;margin-bottom:0.5rem">📋 Princípios Fundamentais</h5>
+                    <ul style="margin-left:1.5rem;line-height:1.8">
+                        <li><strong>Legalidade, lealdade e transparência:</strong> Processar dados de forma legal e transparente</li>
+                        <li><strong>Limitação da finalidade:</strong> Coletar dados para finalidades específicas e legítimas</li>
+                        <li><strong>Minimização de dados:</strong> Coletar apenas dados necessários</li>
+                        <li><strong>Exatidão:</strong> Manter dados atualizados e corretos</li>
+                        <li><strong>Limitação da conservação:</strong> Manter dados apenas pelo tempo necessário</li>
+                        <li><strong>Integridade e confidencialidade:</strong> Garantir segurança dos dados</li>
+                    </ul>
+                </div>
+                
+                <div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:1rem 0">
+                    <h5 style="color:#4f46e5;margin-bottom:0.5rem">👤 Direitos dos Titulares</h5>
+                    <ul style="margin-left:1.5rem;line-height:1.8">
+                        <li><strong>Direito de acesso:</strong> Saber que dados são processados</li>
+                        <li><strong>Direito de retificação:</strong> Corrigir dados incorretos</li>
+                        <li><strong>Direito ao apagamento ("direito ao esquecimento"):</strong> Remover dados</li>
+                        <li><strong>Direito à limitação do tratamento:</strong> Restringir processamento</li>
+                        <li><strong>Direito à portabilidade:</strong> Receber dados em formato estruturado</li>
+                        <li><strong>Direito de oposição:</strong> Opor-se ao processamento</li>
+                    </ul>
+                </div>
+                
+                <div style="background:#fffbeb;padding:1.5rem;border-radius:8px;margin:1rem 0">
+                    <h5 style="color:#d97706;margin-bottom:0.5rem">🏢 Obrigações das Empresas</h5>
+                    <ul style="margin-left:1.5rem;line-height:1.8">
+                        <li><strong>Registo de atividades de tratamento:</strong> Documentar processamento de dados</li>
+                        <li><strong>Avaliação de impacto (DPIA):</strong> Para processamentos de alto risco</li>
+                        <li><strong>Notificação de violações:</strong> 72h para autoridade, afetados se alto risco</li>
+                        <li><strong>Nomear DPO:</strong> Encarregado de proteção de dados se necessário</li>
+                        <li><strong>Contratos com processadores:</strong> Acordos escritos com fornecedores</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
+                <h5 style="color:#065f46;margin-bottom:1rem">🇵🇹 LGPD - Lei Geral de Proteção de Dados (Brasil)</h5>
+                <p>Inspirada no GDPR europeu, a LGPD brasileira estabelece:</p>
+                <ul style="margin-left:1.5rem;line-height:1.8;margin-top:0.5rem">
+                    <li>Multas até 2% do faturamento (máx. R$ 50 milhões)</li>
+                    <li>Vigência desde setembro de 2020</li>
+                    <li>Autoridade Nacional (ANPD)</li>
+                    <li>Direitos similares ao GDPR</li>
+                </ul>
+            </div>
+            
+            <div style="background:#f1f5f9;padding:1rem;border-radius:6px;margin:1rem 0;text-align:center">
+                <p style="color:#64748b;font-size:0.9rem"><strong>⚠️ Importante:</strong> Esta é uma visão geral. Consulte um especialista legal para conformidade específica.</p>
+            </div>
+        `
     }
 ];
 
@@ -354,6 +519,7 @@ var BADGES = [
     {id:'prem1',name:'🧠 Engenheiro Social',desc:'Completou módulo Engenharia Social',check:function(){return USER.scores['prem1'] !== undefined}},
     {id:'prem2',name:'🔐 Criptógrafo',desc:'Completou módulo Criptografia',check:function(){return USER.scores['prem2'] !== undefined}},
     {id:'prem3',name:'🛡️ Incident Commander',desc:'Completou módulo Resposta a Incidentes',check:function(){return USER.scores['prem3'] !== undefined}},
+    {id:'prem5',name:'⚖️ Especialista em Conformidade',desc:'Completou módulo de Legislação e GDPR',check:function(){return USER.scores['prem5'] !== undefined}},
     {id:'story_master',name:'📖 Mestre das Histórias',desc:'Completou todos os casos reais de phishing',check:function(){
         var storyModule = PREMIUM_MODULES.find(m => m.stories);
         if(!storyModule) return false;
@@ -1265,15 +1431,392 @@ async function logout() {
     await saveDataToFirebase();
     window.location.reload();
 }
-function showPage(pageId) {
-    closeAllPopups(); // ← ADICIONE ESTA LINHA AQUI!
+
+// ==================== MODO DE REVISÃO ====================
+
+function showReviewMode() {
+    var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
+    html += '<h2>📚 Modo de Revisão</h2>';
+    html += '<p style="color:#64748b;margin-bottom:2rem">Reveja conteúdos já estudados</p>';
     
-    var pages = ['dashboardPage','modulesPage','quizPage','simulatorPage','badgesPage','libraryPage','certificatePage','adminPage'];
-    pages.forEach(function(p) {
-        document.getElementById(p).classList.add('hidden');
+    // Revisão de módulos básicos
+    html += '<div class="box" style="background:#f0fdf4;margin-bottom:2rem">';
+    html += '<h3 style="color:#065f46;margin-bottom:1rem">📘 Módulos Básicos</h3>';
+    
+    MODULES.forEach(function(mod) {
+        var completed = USER.scores[mod.id] !== undefined;
+        var score = USER.scores[mod.id] || 0;
+        
+        if(completed) {
+            html += '<div class="module completed" style="margin-bottom:1rem">';
+            html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+            html += '<div>';
+            html += '<h4 style="margin-bottom:0.5rem">' + mod.title + '</h4>';
+            html += '<p style="color:#64748b">Nota: ' + score + '/5 (' + (score/5*100) + '%)</p>';
+            html += '</div>';
+            html += '<div>';
+            html += '<button onclick="reviewModule(\'' + mod.id + '\', false)" style="background:#3b82f6;margin-right:0.5rem">📖 Rever Conteúdo</button>';
+            html += '<button onclick="retakeQuiz(\'' + mod.id + '\', false)" style="background:#10b981">🔄 Refazer Quiz</button>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+        }
     });
-    document.getElementById(pageId).classList.remove('hidden');
+    
+    html += '</div>';
+    
+    // Revisão de módulos premium (se tiver acesso)
+    if(hasPremiumAccess()) {
+        html += '<div class="box" style="background:#f5f3ff;margin-bottom:2rem">';
+        html += '<h3 style="color:#7c3aed;margin-bottom:1rem">⭐ Módulos Premium</h3>';
+        
+        PREMIUM_MODULES.forEach(function(mod) {
+            var completed = USER.scores[mod.id] !== undefined;
+            var score = USER.scores[mod.id] || 0;
+            
+            if(completed) {
+                html += '<div class="module premium" style="margin-bottom:1rem">';
+                html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+                html += '<div>';
+                html += '<h4 style="margin-bottom:0.5rem">' + mod.title + '</h4>';
+                html += '<p style="color:#64748b">';
+                if(mod.stories) {
+                    html += 'Casos estudados: ' + (score || 0) + '/' + mod.cases.length;
+                } else {
+                    html += 'Nota: ' + score + '/5 (' + (score/5*100) + '%)';
+                }
+                html += '</p>';
+                html += '</div>';
+                html += '<div>';
+                if(mod.stories) {
+                    html += '<button onclick="reviewModule(\'' + mod.id + '\', true)" style="background:#8b5cf6">📖 Rever Casos</button>';
+                } else {
+                    html += '<button onclick="reviewModule(\'' + mod.id + '\', true)" style="background:#8b5cf6;margin-right:0.5rem">📖 Rever Conteúdo</button>';
+                    html += '<button onclick="retakeQuiz(\'' + mod.id + '\', true)" style="background:#10b981">🔄 Refazer Quiz</button>';
+                }
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            }
+        });
+        
+        html += '</div>';
+    }
+    
+    // Revisão de simulador
+    html += '<div class="box" style="background:#fffbeb">';
+    html += '<h3 style="color:#d97706;margin-bottom:1rem">🎮 Simulador de Phishing</h3>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    html += '<div>';
+    html += '<p style="color:#64748b">Email analisados: ' + USER.simCompleted.length + '/' + PHISHING_EMAILS.length + '</p>';
+    html += '<p style="color:#64748b">Pontuação: ' + USER.simScore + '/' + PHISHING_EMAILS.length + '</p>';
+    html += '</div>';
+    html += '<div>';
+    html += '<button onclick="reviewSimulator()" style="background:#f59e0b">📖 Rever Emails</button>';
+    if(USER.simCompleted.length === PHISHING_EMAILS.length) {
+        html += '<button onclick="retakeSimulator()" style="background:#ef4444;margin-left:0.5rem">🔄 Refazer Simulador</button>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    document.getElementById('quizContent').innerHTML = html;
+    showPage('quizPage');
 }
+
+function reviewModule(modId, isPremium) {
+    var module = isPremium ? 
+        PREMIUM_MODULES.find(m => m.id === modId) : 
+        MODULES.find(m => m.id === modId);
+    
+    if(!module) return;
+    
+    CURRENT_MODULE = module;
+    
+    if(module.stories) {
+        // Modo de revisão para storytelling
+        reviewStoryModule();
+    } else if (module.legislationContent) {
+        // Modo de revisão para legislação
+        reviewLegislationModule();
+    } else {
+        // Modo de revisão para módulos normais
+        var html = '<button onclick="showReviewMode()" style="background:#64748b;margin-bottom:1rem">← Voltar ao Modo de Revisão</button>';
+        html += '<h2>📖 Revisão: ' + module.title + '</h2>';
+        
+        // Mostrar todas as perguntas com respostas corretas
+        module.questions.forEach(function(q, i) {
+            var userAnswer = USER.answers && USER.answers[module.id] ? USER.answers[module.id][i] : null;
+            var isCorrect = userAnswer === q.correct;
+            
+            html += '<div style="background:' + (isCorrect ? '#f0fdf4' : '#fef2f2') + ';padding:1.5rem;margin:1rem 0;border-radius:8px;border:2px solid ' + (isCorrect ? '#10b981' : '#ef4444') + '">';
+            html += '<h4 style="margin-bottom:1rem">' + (i + 1) + '. ' + q.q + '</h4>';
+            
+            q.opts.forEach(function(opt, j) {
+                var style = 'display:block;margin:0.5rem 0;padding:0.75rem;border-radius:6px;';
+                
+                if(j === q.correct) {
+                    style += 'background:#d1fae5;border:2px solid #10b981;';
+                } else if(j === userAnswer) {
+                    style += 'background:#fee2e2;border:2px solid #ef4444;';
+                } else {
+                    style += 'background:#f8fafc;border:1px solid #e2e8f0;';
+                }
+                
+                html += '<div style="' + style + '">';
+                if(j === q.correct) html += '✅ ';
+                if(j === userAnswer && j !== q.correct) html += '❌ ';
+                html += opt;
+                if(j === q.correct) html += ' <small style="color:#065f46;margin-left:0.5rem">(Resposta correta)</small>';
+                if(j === userAnswer && j !== q.correct) html += ' <small style="color:#b91c1c;margin-left:0.5rem">(Sua resposta)</small>';
+                html += '</div>';
+            });
+            
+            html += '</div>';
+        });
+        
+        html += '<div style="text-align:center;margin-top:2rem">';
+        html += '<button onclick="retakeQuiz(\'' + modId + '\', ' + isPremium + ')" style="background:#10b981">🔄 Refazer Este Quiz</button>';
+        html += '</div>';
+        
+        document.getElementById('quizContent').innerHTML = html;
+        showPage('quizPage');
+    }
+}
+
+function reviewLegislationModule() {
+    if(!CURRENT_MODULE) return;
+    
+    var html = '<button onclick="showReviewMode()" style="background:#64748b;margin-bottom:1rem">← Voltar ao Modo de Revisão</button>';
+    html += '<h2>📖 Revisão: ' + CURRENT_MODULE.title + '</h2>';
+    html += '<p style="color:#64748b;margin-bottom:2rem">' + CURRENT_MODULE.desc + '</p>';
+    
+    // Mostrar conteúdo legislativo
+    html += CURRENT_MODULE.legislationContent;
+    
+    // Mostrar perguntas com respostas corretas
+    html += '<div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:2rem 0">';
+    html += '<h4 style="color:#4f46e5;margin-bottom:1rem">🧠 Suas Respostas</h4>';
+    
+    CURRENT_MODULE.questions.forEach(function(q, i) {
+        var userAnswer = USER.answers && USER.answers[CURRENT_MODULE.id] ? USER.answers[CURRENT_MODULE.id][i] : null;
+        var isCorrect = userAnswer === q.correct;
+        
+        html += '<div style="background:' + (isCorrect ? '#f0fdf4' : '#fef2f2') + ';padding:1.5rem;margin:1rem 0;border-radius:8px;border:2px solid ' + (isCorrect ? '#10b981' : '#ef4444') + '">';
+        html += '<h4 style="margin-bottom:1rem">' + (i + 1) + '. ' + q.q + '</h4>';
+        
+        q.opts.forEach(function(opt, j) {
+            var style = 'display:block;margin:0.5rem 0;padding:0.75rem;border-radius:6px;';
+            
+            if(j === q.correct) {
+                style += 'background:#d1fae5;border:2px solid #10b981;';
+            } else if(j === userAnswer) {
+                style += 'background:#fee2e2;border:2px solid #ef4444;';
+            } else {
+                style += 'background:#f8fafc;border:1px solid #e2e8f0;';
+            }
+            
+            html += '<div style="' + style + '">';
+            if(j === q.correct) html += '✅ ';
+            if(j === userAnswer && j !== q.correct) html += '❌ ';
+            html += opt;
+            if(j === q.correct) html += ' <small style="color:#065f46;margin-left:0.5rem">(Resposta correta)</small>';
+            if(j === userAnswer && j !== q.correct) html += ' <small style="color:#b91c1c;margin-left:0.5rem">(Sua resposta)</small>';
+            html += '</div>';
+        });
+        
+        html += '</div>';
+    });
+    
+    html += '<div style="text-align:center;margin-top:1.5rem">';
+    html += '<button onclick="retakeQuiz(\'' + CURRENT_MODULE.id + '\', true)" style="background:#10b981">🔄 Refazer Este Quiz</button>';
+    html += '</div>';
+    html += '</div>';
+    
+    document.getElementById('quizContent').innerHTML = html;
+    showPage('quizPage');
+}
+
+function retakeQuiz(modId, isPremium) {
+    // Limpar pontuação anterior para permitir refazer
+    delete USER.scores[modId];
+    
+    // Iniciar o módulo normalmente
+    startModule(modId, isPremium);
+}
+
+function reviewSimulator() {
+    var html = '<button onclick="showReviewMode()" style="background:#64748b;margin-bottom:1rem">← Voltar ao Modo de Revisão</button>';
+    html += '<h2>📖 Revisão do Simulador</h2>';
+    html += '<p style="color:#64748b;margin-bottom:2rem">Emails já analisados</p>';
+    
+    PHISHING_EMAILS.forEach(function(email, index) {
+        var completed = USER.simCompleted.includes(email.id);
+        
+        if(completed) {
+            html += '<div class="simulator-email" style="margin-bottom:1.5rem">';
+            html += '<div class="email-header">';
+            html += '<div><strong>De:</strong> ' + email.from + '</div>';
+            html += '<div><strong>Assunto:</strong> ' + email.subject + '</div>';
+            html += '</div>';
+            html += '<div style="white-space:pre-wrap;margin:1rem 0">' + email.body + '</div>';
+            html += '<div style="background:#f0fdf4;padding:1rem;border-radius:6px;margin-top:1rem">';
+            html += '<p><strong>' + (email.isPhishing ? '🚨 É PHISHING' : '✅ É LEGÍTIMO') + '</strong></p>';
+            html += '<p style="color:#64748b;margin-top:0.5rem">' + email.explanation + '</p>';
+            html += '</div>';
+            html += '</div>';
+        }
+    });
+    
+    document.getElementById('simulatorContent').innerHTML = html;
+    showPage('simulatorPage');
+}
+
+// ==================== SISTEMA DE LEMBRETES ====================
+
+function getReminders() {
+    var reminders = [];
+    
+    // Verificar módulos não iniciados
+    MODULES.forEach(function(mod) {
+        if(!USER.scores[mod.id]) {
+            reminders.push({
+                type: 'module',
+                priority: 'high',
+                title: 'Iniciar módulo: ' + mod.title,
+                desc: mod.desc,
+                action: function() { startModule(mod.id, false); }
+            });
+        }
+    });
+    
+    // Verificar módulos com nota baixa (< 4/5)
+    MODULES.forEach(function(mod) {
+        if(USER.scores[mod.id] && USER.scores[mod.id] < 4) {
+            reminders.push({
+                type: 'review',
+                priority: 'medium',
+                title: 'Melhorar nota: ' + mod.title,
+                desc: 'Nota atual: ' + USER.scores[mod.id] + '/5',
+                action: function() { reviewModule(mod.id, false); }
+            });
+        }
+    });
+    
+    // Verificar módulos premium disponíveis
+    if(hasPremiumAccess()) {
+        PREMIUM_MODULES.forEach(function(mod) {
+            if(!USER.scores[mod.id]) {
+                reminders.push({
+                    type: 'premium',
+                    priority: 'medium',
+                    title: 'Conteúdo premium: ' + mod.title,
+                    desc: mod.desc,
+                    action: function() { startModule(mod.id, true); }
+                });
+            }
+        });
+    }
+    
+    // Verificar simulador não iniciado/completo
+    if(USER.simCompleted.length === 0) {
+        reminders.push({
+            type: 'simulator',
+            priority: 'high',
+            title: 'Experimentar simulador',
+            desc: 'Teste suas habilidades com emails reais',
+            action: goToSimulator
+        });
+    } else if(USER.simCompleted.length < PHISHING_EMAILS.length) {
+        reminders.push({
+            type: 'simulator',
+            priority: 'medium',
+            title: 'Continuar simulador',
+            desc: USER.simCompleted.length + '/' + PHISHING_EMAILS.length + ' emails analisados',
+            action: goToSimulator
+        });
+    }
+    
+    // Verificar certificado disponível
+    var completedBasic = Object.keys(USER.scores).filter(k => 
+        k.startsWith('mod') && !k.startsWith('prem')
+    ).length;
+    
+    if(completedBasic === TOTAL_MODULES && !USER.completionDate) {
+        reminders.push({
+            type: 'certificate',
+            priority: 'high',
+            title: '🎉 Certificado disponível!',
+            desc: 'Parabéns! Pode emitir seu certificado profissional',
+            action: goToCert
+        });
+    }
+    
+    return reminders;
+}
+
+function renderReminders() {
+    var reminders = getReminders();
+    
+    if(reminders.length === 0) {
+        return '<div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;text-align:center">' +
+               '<p style="color:#065f46">🎉 Está em dia com sua formação!</p>' +
+               '<p style="color:#047857;font-size:0.9rem;margin-top:0.5rem">Continue estudando ou revise conteúdos</p>' +
+               '</div>';
+    }
+    
+    var html = '<div style="margin-bottom:1.5rem">';
+    html += '<h4 style="margin-bottom:1rem">📋 Suas Tarefas Pendentes</h4>';
+    
+    // Ordenar por prioridade
+    reminders.sort(function(a, b) {
+        var priorityOrder = { high: 1, medium: 2, low: 3 };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
+    
+    reminders.forEach(function(reminder, index) {
+        var priorityColor = {
+            high: '#ef4444',
+            medium: '#f59e0b',
+            low: '#3b82f6'
+        }[reminder.priority];
+        
+        var icon = {
+            module: '📚',
+            review: '🔄',
+            premium: '⭐',
+            simulator: '🎮',
+            certificate: '🏆'
+        }[reminder.type] || '📋';
+        
+        html += '<div style="background:#fff;border-left:4px solid ' + priorityColor + ';padding:1rem;margin:0.5rem 0;border-radius:6px;display:flex;justify-content:space-between;align-items:center">';
+        html += '<div>';
+        html += '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
+        html += '<span>' + icon + '</span>';
+        html += '<strong>' + reminder.title + '</strong>';
+        html += '</div>';
+        html += '<p style="color:#64748b;font-size:0.9rem;margin:0">' + reminder.desc + '</p>';
+        html += '</div>';
+        html += '<button onclick="reminders[' + index + '].action()" style="padding:0.5rem 1rem;font-size:0.9rem">▶ Ir</button>';
+        html += '</div>';
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+function retakeSimulator() {
+    if(!confirm('Refazer simulador? Isto irá reiniciar o seu progresso no simulador.')) return;
+    
+    USER.simCompleted = [];
+    USER.simScore = 0;
+    USER.simXP = 0;
+    
+    saveDataToFirebase();
+    renderSimulator();
+    showXP('🔄 Simulador reiniciado');
+}
+
 // ==================== FUNÇÕES DE DASHBOARD ====================
 
 function updateDashboard() {
@@ -1299,14 +1842,22 @@ function updateDashboard() {
     } else {
         document.getElementById('btnCert').style.display = 'none';
     }
+    
+    // Adicionar lembretes
+    var remindersHtml = renderReminders();
+    var progressSection = document.querySelector('#dashboardPage > div:nth-child(4)');
+    if(progressSection) {
+        progressSection.insertAdjacentHTML('afterend', 
+            '<div style="margin-top:2rem">' +
+            '<h3 style="margin-bottom:1rem">📋 Próximos Passos</h3>' +
+            remindersHtml +
+            '</div>'
+        );
+    }
 }
 
 // ==================== FUNÇÕES DE MÓDULOS ====================
-function renderModules() {
-    console.log('🔄 renderModules() chamado. USER:', USER.name, 'Premium access:', hasPremiumAccess());
-    
-    // ... resto do código ...
-}
+
 function renderModules() {
     var html = '';
     
@@ -1326,9 +1877,9 @@ function renderModules() {
         
         if(completed) {
             html += '<p style="color:#10b981;font-weight:700">✓ Concluído: ' + score + '/5</p>';
-            html += '<button onclick="startModule(\'' + mod.id + '\')">🔄 Refazer</button>';
+            html += '<button onclick="startModule(\'' + mod.id + '\', false)">🔄 Refazer</button>';
         } else {
-            html += '<button onclick="startModule(\'' + mod.id + '\')">▶ Iniciar</button>';
+            html += '<button onclick="startModule(\'' + mod.id + '\', false)">▶ Iniciar</button>';
         }
         
         html += '</div>';
@@ -1355,7 +1906,7 @@ function renderModules() {
             premiumHtml += '<p style="margin:0.5rem 0"><strong>💎 XP:</strong> ' + mod.xp + '</p>';
             
             if(completed) {
-                premiumHtml += '<p style="color:#10b981;font-weight:700">✓ Concluído: ' + score + '/5</p>';
+                premiumHtml += '<p style="color:#10b981;font-weight:700">✓ Concluído: ' + (mod.stories ? 'Casos estudados: ' + (score || 0) + '/' + mod.cases.length : score + '/5') + '</p>';
                 premiumHtml += '<button onclick="startModule(\'' + mod.id + '\', true)">🔄 Refazer</button>';
             } else {
                 premiumHtml += '<button onclick="startModule(\'' + mod.id + '\', true)" style="background:#8b5cf6">⭐ Iniciar Módulo Premium</button>';
@@ -1396,6 +1947,12 @@ function startModule(modId, isPremium) {
         renderStoryModule();
         return;
     }
+    
+    // VERIFICA SE É MÓDULO DE LEGISLAÇÃO
+    if(CURRENT_MODULE.legislationContent) {
+        renderLegislationModule();
+        return;
+    }
 
     var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
     html += '<h2>' + CURRENT_MODULE.title;
@@ -1425,32 +1982,75 @@ function startModule(modId, isPremium) {
     showPage('quizPage');
 }
 
+function renderLegislationModule() {
+    if(!CURRENT_MODULE) return;
+    
+    var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
+    html += '<h2>' + CURRENT_MODULE.title;
+    html += ' <span style="background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.85rem">⚖️ Legislação</span>';
+    html += '</h2>';
+    html += '<p style="color:#64748b;margin-bottom:2rem">' + CURRENT_MODULE.desc + '</p>';
+    
+    // Conteúdo legislativo
+    html += CURRENT_MODULE.legislationContent;
+    
+    // Quiz após o conteúdo
+    html += '<div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:2rem 0">';
+    html += '<h4 style="color:#4f46e5;margin-bottom:1rem">🧠 Teste Seu Conhecimento</h4>';
+    
+    CURRENT_MODULE.questions.forEach(function(q, i) {
+        html += '<div style="background:#f8fafc;padding:1.5rem;margin:1rem 0;border-radius:8px" id="q' + i + '">';
+        html += '<h4 style="margin-bottom:1rem">' + (i + 1) + '. ' + q.q + '</h4>';
+        
+        q.opts.forEach(function(opt, j) {
+            html += '<label style="display:block;margin:0.5rem 0;padding:0.5rem;border-radius:6px;cursor:pointer;transition:background 0.3s"><input type="radio" name="q' + i + '" value="' + j + '"> ' + opt + '</label>';
+        });
+        
+        html += '</div>';
+    });
+    
+    html += '<div style="text-align:center;margin-top:2rem">';
+    html += '<button onclick="submitQuiz()">✓ Submeter Respostas</button>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div id="quizResult"></div>';
+    
+    document.getElementById('quizContent').innerHTML = html;
+    showPage('quizPage');
+}
+
 async function submitQuiz() {
     if(!CURRENT_MODULE) return;
     
     var score = 0;
-    var total = CURRENT_MODULE.questions.length;
+    var total = CURRENT_MODULE.questions ? CURRENT_MODULE.questions.length : 0;
     
-    CURRENT_MODULE.questions.forEach(function(q, i) {
-        var selected = document.querySelector('input[name="q' + i + '"]:checked');
-        var qDiv = document.getElementById('q' + i);
-        
-        if(selected && parseInt(selected.value) === q.correct) {
-            score++;
-            qDiv.style.background = '#f0fdf4';
-            qDiv.style.border = '2px solid #10b981';
-        } else {
-            qDiv.style.background = '#fef2f2';
-            qDiv.style.border = '2px solid #ef4444';
-        }
-    });
+    if (CURRENT_MODULE.stories) {
+        // Para módulos de storytelling, cada caso vale 1 ponto
+        score = USER.scores[CURRENT_MODULE.id] || 0;
+    } else {
+        // Para módulos normais
+        CURRENT_MODULE.questions.forEach(function(q, i) {
+            var selected = document.querySelector('input[name="q' + i + '"]:checked');
+            var qDiv = document.getElementById('q' + i);
+            
+            if(selected && parseInt(selected.value) === q.correct) {
+                score++;
+                qDiv.style.background = '#f0fdf4';
+                qDiv.style.border = '2px solid #10b981';
+            } else {
+                qDiv.style.background = '#fef2f2';
+                qDiv.style.border = '2px solid #ef4444';
+            }
+        });
+    }
     
     USER.scores[CURRENT_MODULE.id] = score;
     
     var xpEarned = Math.round((score / total) * CURRENT_MODULE.xp);
     USER.xp += xpEarned;
     
-    var pct = Math.round((score / total) * 100);
+    var pct = total > 0 ? Math.round((score / total) * 100) : 100;
     var resultHtml = '<div style="margin-top:2rem;padding:1.5rem;border-radius:8px;text-align:center;' +
         'background:' + (pct >= 80 ? '#d1fae5' : '#fee2e2') + ';' +
         'color:' + (pct >= 80 ? '#065f46' : '#991b1b') + '">';
@@ -1777,7 +2377,7 @@ async function updateAdminDashboard() {
     
     var employees = COMPANY.employees || [];
     var total = employees.length;
-     var storyModule = PREMIUM_MODULES.find(m => m.stories);
+    var storyModule = PREMIUM_MODULES.find(m => m.stories);
     var storyStats = { total: 0, completed: 0 };
     
     if(storyModule) {
@@ -2899,7 +3499,7 @@ function exportKeysToCSV() {
     showXP('📥 CSV exportado com sucesso');
 }
 
-/// ==================== FUNÇÕES UTILITÁRIAS ====================
+// ==================== FUNÇÕES UTILITÁRIAS ====================
 
 async function checkBadges() {
     var unlocked = false;
@@ -3201,8 +3801,8 @@ document.getElementById('adminEmail')?.addEventListener('blur', function() {
         checkAdminExists(email);
     }
 });
+
 window.onload = function() {
-    window.onload = function() {
     var urlParams = new URLSearchParams(window.location.search);
     var code = urlParams.get('company');
     
@@ -3215,16 +3815,6 @@ window.onload = function() {
     var lastEmail = localStorage.getItem('last_user_email');
     if(lastEmail) {
         document.getElementById('userEmail').value = lastEmail;
-    }
-    
-    console.log('✅ Academia Anti-Phishing Elite | Mareginter - Sistema Completo com Chaves de Ativação 🔑');
-};
-    var urlParams = new URLSearchParams(window.location.search);
-    var code = urlParams.get('company');
-    
-    if(code) {
-        document.getElementById('companyCode').value = code.toUpperCase();
-        showLoginType('user');
     }
     
     console.log('✅ Academia Anti-Phishing Elite | Mareginter - Sistema Completo com Chaves de Ativação 🔑');
