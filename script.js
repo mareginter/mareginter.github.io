@@ -538,23 +538,47 @@ var CURRENT_MODULE = null;
 
 // Função para verificar chave de ativação
 async function checkActivationKey(key) {
- try {
-        // APENAS Firebase - remova o fallback
+    try {
         var keyRef = database.ref('activationKeys/' + key);
         var snapshot = await keyRef.once('value');
         
         if (snapshot.exists()) {
             var keyData = snapshot.val();
+            
+            // Verificar se a chave expirou
+            if (keyData.expirationDate) {
+                var expirationDate = new Date(keyData.expirationDate);
+                var now = new Date();
+                
+                if (now > expirationDate) {
+                    console.log('❌ Chave expirada:', key);
+                    keyData.valid = false;
+                    
+                    // Atualizar no Firebase
+                    await keyRef.update({ valid: false });
+                    
+                    return {
+                        valid: false,
+                        expired: true,
+                        message: 'Chave expirada'
+                    };
+                }
+            }
+            
             return {
                 valid: keyData.valid === true,
                 used: keyData.used === true,
                 type: keyData.type || 'basic',
                 maxUses: keyData.maxUses || 1,
-                usedCount: keyData.usedCount || 0
+                usedCount: keyData.usedCount || 0,
+                daysValid: keyData.daysValid || 30,
+                expirationDate: keyData.expirationDate,
+                created: keyData.created
             };
         }
         return { valid: false }; // Não encontrada no Firebase
     } catch (error) {
+        console.error('Erro ao verificar chave:', error);
         return { valid: false };
     }
 }
@@ -584,7 +608,7 @@ async function markKeyAsUsed(key, userEmail) {
 }
 
 // Função para gerar nova chave (para admin)
-async function generateActivationKey(type = 'basic', maxUses = 1) {
+async function generateActivationKey(type = 'basic', maxUses = 1, daysValid = 30) {
     var prefix = '';
     switch(type) {
         case 'premium': prefix = 'PREMIUM-'; break;
@@ -595,6 +619,10 @@ async function generateActivationKey(type = 'basic', maxUses = 1) {
     var key = prefix + Date.now().toString(36).toUpperCase() + '-' + 
               Math.random().toString(36).substr(2, 4).toUpperCase();
     
+    // Calcular data de expiração
+    var expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + daysValid);
+    
     var keyData = {
         key: key,
         type: type,
@@ -602,6 +630,8 @@ async function generateActivationKey(type = 'basic', maxUses = 1) {
         used: false,
         maxUses: maxUses,
         usedCount: 0,
+        daysValid: daysValid,
+        expirationDate: expirationDate.toISOString(),
         created: new Date().toISOString(),
         createdBy: USER.email
     };
@@ -609,7 +639,7 @@ async function generateActivationKey(type = 'basic', maxUses = 1) {
     try {
         await database.ref('activationKeys/' + key).set(keyData);
         console.log('✅ Nova chave gerada:', key);
-        return key;
+        return { key: key, data: keyData };
     } catch (error) {
         console.error('Erro ao gerar chave:', error);
         return null;
@@ -869,6 +899,75 @@ async function doLogin() {
         return;
     }
     
+    // VERIFICAÇÃO DE USUÁRIO EXISTENTE
+    // Primeiro verifica se já existe no Firebase
+    try {
+        var userEmailKey = email.replace(/[.#$[\]]/g, '_');
+        var userSnapshot = await database.ref('users').orderByChild('email').equalTo(email).once('value');
+        
+        if(userSnapshot.exists()) {
+            // Usuário já existe, carrega dados
+            var users = userSnapshot.val();
+            var userId = Object.keys(users)[0];
+            var userData = users[userId];
+            
+            console.log('✅ Usuário encontrado:', userData.name);
+            
+            // Atualiza objeto USER com dados do Firebase
+            USER.id = userId;
+            USER.name = userData.name;
+            USER.email = userData.email;
+            USER.isAdmin = userData.isAdmin || false;
+            USER.companyCode = userData.companyCode || 'INDIVIDUAL';
+            USER.xp = userData.xp || 0;
+            USER.scores = userData.scores || {};
+            USER.badges = userData.badges || [];
+            USER.simulations = userData.simulations || 0;
+            USER.simScore = userData.simScore || 0;
+            USER.simXP = userData.simXP || 0;
+            USER.simCompleted = userData.simCompleted || [];
+            USER.startDate = userData.startDate || new Date().toISOString();
+            USER.completionDate = userData.completionDate;
+            USER.hasSeenWelcome = userData.hasSeenWelcome || false;
+            USER.activationKey = userData.activationKey || activationKey || null;
+            USER.keyType = userData.keyType || 'basic';
+            
+            // Se já tinha chave, não precisa pedir novamente
+            if(userData.activationKey && !activationKey) {
+                console.log('🔑 Usando chave guardada:', userData.activationKey);
+                activationKey = userData.activationKey;
+            }
+            
+            // Pular verificação de chave se já tem uma válida
+            if(userData.activationKey && userData.keyType) {
+                console.log('✅ Usuário já tem chave válida guardada');
+                
+                if(code) {
+                    await loadCompanyData(code);
+                } else {
+                    COMPANY.name = 'Formação Individual';
+                }
+                
+                await loadDataFromFirebase();
+                
+                // Se é primeiro acesso, mostra popup
+                if(!USER.hasSeenWelcome) {
+                    showWelcomePopup();
+                    USER.hasSeenWelcome = true;
+                    await saveDataToFirebase();
+                }
+                
+                checkBadges();
+                localStorage.setItem('last_user_email', email);
+                startApp();
+                return;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao verificar usuário existente:', error);
+    }
+    
+    // CÓDIGO EXISTENTE PARA NOVOS USUÁRIOS (mantenha o que já tem)
     // Verificar chave de ativação (se fornecida)
     var keyValid = true;
     var keyType = 'basic';
@@ -921,7 +1020,7 @@ async function doLogin() {
     
     await loadDataFromFirebase();
     
-    // Se é primeiro acesso, mostra popup de boas-vindas
+    // Se é primeiro acesso, mostra popup
     if(!USER.hasSeenWelcome) {
         showWelcomePopup();
         USER.hasSeenWelcome = true;
@@ -2035,17 +2134,25 @@ async function loadCompanyEmployees() {
 async function generateNewKey() {
     var type = document.getElementById('keyType').value;
     var maxUses = parseInt(document.getElementById('keyUses').value) || 1;
+    var daysValid = parseInt(document.getElementById('keyDays').value) || 30;
     
-    var key = await generateActivationKey(type, maxUses);
+    var result = await generateActivationKey(type, maxUses, daysValid);
     
-    if (key) {
+    if (result && result.key) {
         var resultDiv = document.getElementById('newKeyResult');
+        var expirationDate = new Date(result.data.expirationDate);
+        var formattedDate = expirationDate.toLocaleDateString('pt-PT') + ' ' + expirationDate.toLocaleTimeString('pt-PT');
+        
         resultDiv.innerHTML = '<div style="background:#d1fae5;padding:1.5rem;border-radius:12px;margin-top:1rem;border:2px solid #10b981">';
         resultDiv.innerHTML += '<h4 style="color:#065f46;margin-bottom:1rem">✅ Nova Chave Gerada!</h4>';
-        resultDiv.innerHTML += '<p style="font-family:monospace;background:#fff;padding:1rem;border-radius:8px;margin:0.5rem 0;font-size:1.1rem;font-weight:bold;border:2px dashed #10b981">' + key + '</p>';
-        resultDiv.innerHTML += '<p style="color:#047857;margin-bottom:0.5rem"><strong>Tipo:</strong> ' + type + '</p>';
-        resultDiv.innerHTML += '<p style="color:#047857"><strong>Utilizações máximas:</strong> ' + maxUses + '</p>';
-        resultDiv.innerHTML += '<button onclick="copyToClipboard(\'' + key + '\')" style="background:#3b82f6;margin-top:1rem">📋 Copiar Chave</button>';
+        resultDiv.innerHTML += '<p style="font-family:monospace;background:#fff;padding:1rem;border-radius:8px;margin:0.5rem 0;font-size:1.1rem;font-weight:bold;border:2px dashed #10b981">' + result.key + '</p>';
+        resultDiv.innerHTML += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-top:1rem">';
+        resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>🔤 Tipo:</strong> ' + type + '</div>';
+        resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>👥 Utilizações:</strong> ' + maxUses + '</div>';
+        resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>📅 Validade:</strong> ' + daysValid + ' dias</div>';
+        resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>⏰ Expira em:</strong> ' + formattedDate + '</div>';
+        resultDiv.innerHTML += '</div>';
+        resultDiv.innerHTML += '<button onclick="copyToClipboard(\'' + result.key + '\')" style="background:#3b82f6;margin-top:1rem">📋 Copiar Chave</button>';
         resultDiv.innerHTML += '</div>';
         
         showXP('✅ Chave gerada com sucesso!');
@@ -2054,6 +2161,63 @@ async function generateNewKey() {
     }
 }
 
+async function viewAllKeys() {
+    try {
+        var keysSnapshot = await database.ref('activationKeys').once('value');
+        var keys = keysSnapshot.val();
+        
+        var html = '<div style="max-height:400px;overflow-y:auto">';
+        html += '<h4 style="margin-bottom:1rem">🗝️ Chaves Existentes</h4>';
+        
+        if (!keys) {
+            html += '<p style="text-align:center;color:#64748b;padding:2rem">Nenhuma chave gerada</p>';
+        } else {
+            html += '<table style="width:100%;border-collapse:collapse">';
+            html += '<thead><tr><th>Chave</th><th>Tipo</th><th>Utilizações</th><th>Validade</th><th>Estado</th></tr></thead>';
+            html += '<tbody>';
+            
+            for (var key in keys) {
+                var keyData = keys[key];
+                var expirationDate = keyData.expirationDate ? new Date(keyData.expirationDate) : null;
+                var now = new Date();
+                var expired = expirationDate && now > expirationDate;
+                var usedUp = keyData.usedCount >= keyData.maxUses;
+                
+                html += '<tr style="border-bottom:1px solid #e2e8f0">';
+                html += '<td style="padding:0.5rem"><code style="font-size:0.8rem">' + key + '</code></td>';
+                html += '<td style="padding:0.5rem">' + keyData.type + '</td>';
+                html += '<td style="padding:0.5rem">' + (keyData.usedCount || 0) + '/' + keyData.maxUses + '</td>';
+                html += '<td style="padding:0.5rem">' + (expirationDate ? expirationDate.toLocaleDateString('pt-PT') : '∞') + '</td>';
+                html += '<td style="padding:0.5rem">';
+                
+                if (!keyData.valid || expired) {
+                    html += '<span style="color:#ef4444">❌ Inválida</span>';
+                } else if (usedUp) {
+                    html += '<span style="color:#f59e0b">⚠️ Esgotada</span>';
+                } else {
+                    html += '<span style="color:#10b981">✅ Ativa</span>';
+                }
+                
+                html += '</td>';
+                html += '</tr>';
+            }
+            
+            html += '</tbody></table>';
+        }
+        
+        html += '</div>';
+        
+        // Mostrar em um popup
+        var popup = document.createElement('div');
+        popup.className = 'welcome-popup';
+        popup.innerHTML = html + '<div style="text-align:center;margin-top:1rem"><button onclick="this.parentElement.remove()">Fechar</button></div>';
+        document.body.appendChild(popup);
+        
+    } catch (error) {
+        console.error('Erro ao listar chaves:', error);
+        alert('Erro ao carregar chaves: ' + error.message);
+    }
+}
 // ==================== FUNÇÕES UTILITÁRIAS ====================
 
 async function checkBadges() {
@@ -2357,6 +2521,23 @@ document.getElementById('adminEmail')?.addEventListener('blur', function() {
     }
 });
 window.onload = function() {
+    window.onload = function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var code = urlParams.get('company');
+    
+    if(code) {
+        document.getElementById('companyCode').value = code.toUpperCase();
+        showLoginType('user');
+    }
+    
+    // Tentar carregar último email usado
+    var lastEmail = localStorage.getItem('last_user_email');
+    if(lastEmail) {
+        document.getElementById('userEmail').value = lastEmail;
+    }
+    
+    console.log('✅ Academia Anti-Phishing Elite | Mareginter - Sistema Completo com Chaves de Ativação 🔑');
+};
     var urlParams = new URLSearchParams(window.location.search);
     var code = urlParams.get('company');
     
