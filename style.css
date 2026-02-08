@@ -622,6 +622,125 @@ button:disabled {
   background: linear-gradient(135deg, #fffbeb, #fff) !important;
   border-left: 5px solid #f59e0b !important;
 }
+/* Estilos para gestão de chaves */
+.key-status-active {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.key-status-expired {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.key-status-invalid {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.key-status-used {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.key-type-basic {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.key-type-premium {
+    background: #ede9fe;
+    color: #5b21b6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.key-type-full {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Tabela de chaves */
+.keys-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.keys-table th {
+    background: #f1f5f9;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+}
+
+.keys-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.keys-table tr:hover {
+    background: #f8fafc;
+}
+
+/* Filtros */
+.filter-box {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 2px solid #e2e8f0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .keys-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .filter-box > div {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-box select,
+    .filter-box input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
 /* RESPONSIVIDADE */
 @media(max-width: 768px) {
   h1 { font-size: 1.3rem; }
