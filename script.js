@@ -1817,6 +1817,27 @@ function retakeSimulator() {
     showXP('🔄 Simulador reiniciado');
 }
 
+// Adicione esta função para esconder elementos de admin periodicamente
+function hideAdminElements() {
+    if (!USER.isAdmin) {
+        // Esconde o botão Admin no navbar
+        var adminBtn = document.getElementById('btnAdmin');
+        if (adminBtn) adminBtn.style.display = 'none';
+        
+        // Esconde qualquer botão relacionado a chaves
+        var allButtons = document.querySelectorAll('button');
+        allButtons.forEach(function(btn) {
+            if (btn.textContent.includes('Chave') || btn.textContent.includes('Key') || 
+                btn.onclick && btn.onclick.toString().includes('Key')) {
+                btn.style.display = 'none';
+            }
+        });
+    }
+}
+
+// Chame esta função periodicamente
+setInterval(hideAdminElements, 1000);
+
 // ==================== FUNÇÕES DE DASHBOARD ====================
 
 function updateDashboard() {
