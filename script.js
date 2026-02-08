@@ -1195,31 +1195,37 @@ function showPage(pageId) {
 }
 
 function goToDash() {
+    closeAllPopups(); 
     showPage('dashboardPage');
     updateDashboard();
 }
 
 function goToMods() {
+    closeAllPopups(); 
     showPage('modulesPage');
     renderModules();
 }
 
 function goToSimulator() {
+    closeAllPopups(); 
     showPage('simulatorPage');
     renderSimulator();
 }
 
 function goToBadges() {
+    closeAllPopups(); 
     showPage('badgesPage');
     renderBadges();
 }
 
 function goToLibrary() {
+    closeAllPopups(); 
     showPage('libraryPage');
     renderLibrary();
 }
 
 function goToCert() {
+    closeAllPopups(); 
     showPage('certificatePage');
     
     // Atualizar informações no certificado
@@ -1240,6 +1246,7 @@ function goToCert() {
 }
 
 function goToAdmin() {
+    closeAllPopups(); 
     if(!USER.isAdmin) {
         alert('Acesso apenas para administradores');
         return;
@@ -1250,6 +1257,7 @@ function goToAdmin() {
 }
 
 async function logout() {
+    closeAllPopups();
     if(!confirm('Sair? Progresso guardado.')) {
         return;
     }
@@ -1257,7 +1265,15 @@ async function logout() {
     await saveDataToFirebase();
     window.location.reload();
 }
-
+function showPage(pageId) {
+    closeAllPopups(); // ← ADICIONE ESTA LINHA AQUI!
+    
+    var pages = ['dashboardPage','modulesPage','quizPage','simulatorPage','badgesPage','libraryPage','certificatePage','adminPage'];
+    pages.forEach(function(p) {
+        document.getElementById(p).classList.add('hidden');
+    });
+    document.getElementById(pageId).classList.remove('hidden');
+}
 // ==================== FUNÇÕES DE DASHBOARD ====================
 
 function updateDashboard() {
@@ -2179,24 +2195,343 @@ async function generateNewKey() {
         alert('❌ Erro ao gerar chave!');
     }
 }
+
 // ==================== SISTEMA COMPLETO DE GESTÃO DE CHAVES ====================
+
+// Fechar popup de gestão de chaves
+function closeKeyManagementPopup() {
+    console.log('🔒 Fechando popup de gestão de chaves...');
+    
+    var popup = document.getElementById('keysPopup');
+    var overlay = document.getElementById('keysOverlay');
+    
+    if (popup) popup.remove();
+    if (overlay) overlay.remove();
+    
+    // Remover event listener do ESC
+    document.removeEventListener('keydown', handleKeysPopupEscape);
+}
 
 // Função melhorada para visualizar todas as chaves
 async function viewAllKeys() {
     try {
-        // Mostrar seção de gestão
-        document.getElementById('keyManagementSection').style.display = 'block';
+        // Fechar qualquer popup existente
+        closeKeyManagementPopup();
+        
+        // Criar overlay e popup
+        createKeyManagementPopup();
         
         // Carregar chaves
         await loadAllKeys();
-        
-        // Rolar para a seção
-        document.getElementById('keyManagementSection').scrollIntoView({ behavior: 'smooth' });
         
     } catch (error) {
         console.error('Erro ao carregar chaves:', error);
         alert('Erro ao carregar chaves: ' + error.message);
     }
+}
+
+// Remover popups de chaves existentes antes de criar novos
+function removeExistingKeyPopups() {
+    var existingPopup = document.getElementById('keysPopup');
+    var existingOverlay = document.getElementById('keysOverlay');
+    
+    if (existingPopup) existingPopup.remove();
+    if (existingOverlay) existingOverlay.remove();
+}
+
+// Atualizar a função closeAllPopups para funcionar com o novo sistema
+function closeAllPopups() {
+    console.log('🔒 Fechando todos os popups...');
+    
+    // Fechar popup de gestão de chaves
+    closeKeyManagementPopup();
+    
+    // Fechar popup de estatísticas (se existir)
+    var statsPopup = document.getElementById('keyStatsPopup');
+    if (statsPopup) statsPopup.remove();
+    
+    // Fechar popup de boas-vindas
+    closeWelcomePopup();
+    
+    // Fechar qualquer overlay restante (exceto o de boas-vindas)
+    var overlays = document.querySelectorAll('.welcome-overlay');
+    overlays.forEach(function(overlay) {
+        if (overlay.id !== 'welcomeOverlay') {
+            overlay.remove();
+        }
+    });
+}
+
+// Criar popup de gestão de chaves (função corrigida)
+function createKeyManagementPopup() {
+    // Remover popups existentes
+    removeExistingKeyPopups();
+    
+    // Criar overlay
+    var overlay = document.createElement('div');
+    overlay.id = 'keysOverlay';
+    overlay.className = 'welcome-overlay';
+    overlay.style.zIndex = '1001';
+    overlay.onclick = closeKeyManagementPopup; // Fecha ao clicar fora
+    
+    // Criar popup
+    var popup = document.createElement('div');
+    popup.id = 'keysPopup';
+    popup.className = 'welcome-popup';
+    popup.style.zIndex = '1002';
+    popup.style.maxWidth = '95%';
+    popup.style.width = '1200px';
+    popup.style.maxHeight = '90vh';
+    popup.style.overflow = 'hidden'; // Impede overflow do popup
+    
+    // Conteúdo do popup (HTML corrigido)
+    popup.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <h2 style="color:#1e293b;margin:0">🗝️ Gestão de Chaves de Ativação</h2>
+            <button onclick="closeKeyManagementPopup()" style="background:#ef4444;padding:0.5rem 1rem;font-size:1rem;border:none;border-radius:6px;cursor:pointer">✕ Fechar</button>
+        </div>
+        
+        <!-- Filtros -->
+        <div style="background:#f8fafc;padding:1rem;border-radius:8px;margin-bottom:1.5rem;border:1px solid #e2e8f0">
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+                <div>
+                    <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Tipo:</label>
+                    <select id="filterType" onchange="filterKeys()" style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0;background:white">
+                        <option value="all">Todos</option>
+                        <option value="basic">Básica</option>
+                        <option value="premium">Premium</option>
+                        <option value="full">Elite</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Estado:</label>
+                    <select id="filterStatus" onchange="filterKeys()" style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0;background:white">
+                        <option value="all">Todos</option>
+                        <option value="active">Ativas</option>
+                        <option value="used">Usadas</option>
+                        <option value="expired">Expiradas</option>
+                        <option value="invalid">Inválidas</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Pesquisar:</label>
+                    <input type="text" id="filterSearch" placeholder="Chave ou email..." onkeyup="filterKeys()" 
+                           style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0;width:200px;background:white">
+                </div>
+                
+                <div style="margin-left:auto;display:flex;gap:0.5rem">
+                    <button onclick="refreshKeyList()" style="background:#64748b;padding:0.5rem 1rem;border:none;border-radius:6px;color:white;cursor:pointer">🔄 Atualizar</button>
+                    <button onclick="exportKeysToCSV()" style="background:#10b981;padding:0.5rem 1rem;border:none;border-radius:6px;color:white;cursor:pointer">📥 Exportar CSV</button>
+                    <button onclick="viewKeyStats()" style="background:#8b5cf6;padding:0.5rem 1rem;border:none;border-radius:6px;color:white;cursor:pointer">📊 Estatísticas</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estatísticas rápidas -->
+        <div id="keyStats" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.5rem"></div>
+        
+        <!-- Lista de chaves (com scroll) -->
+        <div style="height:400px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px;">
+            <table id="keysTable" style="width:100%;border-collapse:collapse;min-height:200px">
+                <thead>
+                    <tr style="background:#f1f5f9;position:sticky;top:0;z-index:10">
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Chave</th>
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Tipo</th>
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Utilizações</th>
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Validade</th>
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Estado</th>
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Criada</th>
+                        <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="keysList">
+                    <tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b">Carregando chaves...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align:center;margin-top:1rem;color:#64748b;font-size:0.9rem;padding:1rem;background:#f8fafc;border-radius:6px">
+            <p>Total de chaves: <span id="totalKeysCount">0</span> | Mostrando: <span id="showingKeysCount">0</span></p>
+        </div>
+    `;
+    
+    // Adicionar ao DOM
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+    
+    // Adicionar evento para fechar com ESC
+    document.addEventListener('keydown', handleKeysPopupEscape);
+}
+
+// Handler para tecla ESC
+function handleKeysPopupEscape(event) {
+    if (event.key === 'Escape') {
+        closeKeyManagementPopup();
+    }
+}
+
+// Atualizar a função de estatísticas para usar popup próprio
+function viewKeyStats() {
+    if (!window.ALL_KEYS) {
+        alert('Primeiro carregue as chaves clicando em "Ver Todas as Chaves"');
+        return;
+    }
+    
+    // Fechar popup de estatísticas existente
+    var existingPopup = document.getElementById('keyStatsPopup');
+    if (existingPopup) existingPopup.remove();
+    
+    // Criar overlay para estatísticas
+    var overlay = document.createElement('div');
+    overlay.className = 'welcome-overlay';
+    overlay.style.zIndex = '1003';
+    overlay.onclick = function() { 
+        this.remove(); 
+        document.getElementById('keyStatsPopup')?.remove(); 
+    };
+    
+    // Criar popup de estatísticas
+    var popup = document.createElement('div');
+    popup.id = 'keyStatsPopup';
+    popup.className = 'welcome-popup';
+    popup.style.zIndex = '1004';
+    popup.style.maxWidth = '800px';
+    popup.style.maxHeight = '90vh';
+    popup.style.overflowY = 'auto';
+    
+    // Calcular estatísticas
+    var keys = Object.values(window.ALL_KEYS);
+    var now = new Date();
+    
+    var stats = {
+        total: keys.length,
+        active: 0,
+        expired: 0,
+        usedUp: 0,
+        invalid: 0,
+        byType: { basic: 0, premium: 0, full: 0 },
+        avgUses: 0,
+        avgValidity: 0
+    };
+    
+    var totalUses = 0;
+    var totalValidityDays = 0;
+    var keysWithValidity = 0;
+    
+    keys.forEach(function(key) {
+        // Por tipo
+        stats.byType[key.type] = (stats.byType[key.type] || 0) + 1;
+        
+        // Utilizações
+        totalUses += key.usedCount || 0;
+        
+        // Validade
+        if (key.expirationDate) {
+            var created = new Date(key.created || now);
+            var expires = new Date(key.expirationDate);
+            var days = Math.ceil((expires - created) / (1000 * 60 * 60 * 24));
+            totalValidityDays += days;
+            keysWithValidity++;
+        }
+        
+        // Estado
+        var isExpired = key.expirationDate && now > new Date(key.expirationDate);
+        var isUsedUp = key.usedCount >= key.maxUses;
+        var isValid = key.valid === true && !isExpired && !isUsedUp;
+        
+        if (!isValid) stats.invalid++;
+        if (isExpired) stats.expired++;
+        if (isUsedUp) stats.usedUp++;
+        if (isValid && !isUsedUp) stats.active++;
+    });
+    
+    stats.avgUses = keys.length > 0 ? (totalUses / keys.length).toFixed(1) : 0;
+    stats.avgValidity = keysWithValidity > 0 ? Math.round(totalValidityDays / keysWithValidity) : 0;
+    
+    // HTML das estatísticas
+    var statsHtml = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+            <h2 style="color:#1e293b;margin:0">📊 Estatísticas de Chaves</h2>
+            <button onclick="closeKeyManagementPopup(); document.getElementById('keyStatsPopup')?.remove();" 
+                    style="background:#ef4444;padding:0.5rem 1rem;font-size:1rem;border:none;border-radius:6px;cursor:pointer">✕ Fechar</button>
+        </div>
+        
+        <!-- Estatísticas principais -->
+        <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:1rem;margin-bottom:2rem">
+            <div style="background:#f8fafc;padding:1.5rem;border-radius:8px;text-align:center">
+                <div style="font-size:0.9rem;color:#64748b;margin-bottom:0.5rem">Total de Chaves</div>
+                <div style="font-size:2.5rem;font-weight:bold;color:#3b82f6">${stats.total}</div>
+            </div>
+            
+            <div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;text-align:center">
+                <div style="font-size:0.9rem;color:#64748b;margin-bottom:0.5rem">Chaves Ativas</div>
+                <div style="font-size:2.5rem;font-weight:bold;color:#10b981">${stats.active}</div>
+                <div style="font-size:0.8rem;color:#64748b">${Math.round((stats.active / stats.total) * 100)}% do total</div>
+            </div>
+            
+            <div style="background:#fffbeb;padding:1.5rem;border-radius:8px;text-align:center">
+                <div style="font-size:0.9rem;color:#64748b;margin-bottom:0.5rem">Média de Utilizações</div>
+                <div style="font-size:2.5rem;font-weight:bold;color:#f59e0b">${stats.avgUses}</div>
+                <div style="font-size:0.8rem;color:#64748b">por chave</div>
+            </div>
+            
+            <div style="background:#f5f3ff;padding:1.5rem;border-radius:8px;text-align:center">
+                <div style="font-size:0.9rem;color:#64748b;margin-bottom:0.5rem">Validade Média</div>
+                <div style="font-size:2.5rem;font-weight:bold;color:#8b5cf6">${stats.avgValidity}</div>
+                <div style="font-size:0.8rem;color:#64748b">dias</div>
+            </div>
+        </div>
+        
+        <!-- Distribuição por tipo -->
+        <div style="background:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;border:1px solid #e2e8f0">
+            <h4 style="color:#1e293b;margin-bottom:1rem">📈 Distribuição por Tipo</h4>
+            
+            <div style="display:flex;height:30px;border-radius:6px;overflow:hidden;margin-bottom:1rem">
+                <div style="background:#3b82f6;width:${Math.round((stats.byType.basic / stats.total) * 100)}%" title="Básica: ${stats.byType.basic}"></div>
+                <div style="background:#8b5cf6;width:${Math.round((stats.byType.premium / stats.total) * 100)}%" title="Premium: ${stats.byType.premium}"></div>
+                <div style="background:#f59e0b;width:${Math.round((stats.byType.full / stats.total) * 100)}%" title="Elite: ${stats.byType.full}"></div>
+            </div>
+            
+            <div style="display:flex;justify-content:space-around;font-size:0.9rem">
+                <div><span style="color:#3b82f6">■</span> Básica: ${stats.byType.basic} (${Math.round((stats.byType.basic / stats.total) * 100)}%)</div>
+                <div><span style="color:#8b5cf6">■</span> Premium: ${stats.byType.premium} (${Math.round((stats.byType.premium / stats.total) * 100)}%)</div>
+                <div><span style="color:#f59e0b">■</span> Elite: ${stats.byType.full} (${Math.round((stats.byType.full / stats.total) * 100)}%)</div>
+            </div>
+        </div>
+        
+        <!-- Detalhes por estado -->
+        <div style="background:#fff;padding:1.5rem;border-radius:8px;border:1px solid #e2e8f0">
+            <h4 style="color:#1e293b;margin-bottom:1rem">📋 Detalhes por Estado</h4>
+            
+            <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:1rem">
+                <div style="text-align:center">
+                    <div style="font-size:0.9rem;color:#64748b">Expiradas</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#f59e0b">${stats.expired}</div>
+                </div>
+                
+                <div style="text-align:center">
+                    <div style="font-size:0.9rem;color:#64748b">Esgotadas</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#d97706">${stats.usedUp}</div>
+                </div>
+                
+                <div style="text-align:center">
+                    <div style="font-size:0.9rem;color:#64748b">Inválidas</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#ef4444">${stats.invalid}</div>
+                </div>
+                
+                <div style="text-align:center">
+                    <div style="font-size:0.9rem;color:#64748b">Taxa de Uso</div>
+                    <div style="font-size:1.5rem;font-weight:bold;color:#10b981">${stats.total > 0 ? Math.round((totalUses / (stats.total * 10)) * 100) : 0}%</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    popup.innerHTML = statsHtml;
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
 }
 
 // Função para carregar todas as chaves
@@ -2217,7 +2552,7 @@ async function loadAllKeys() {
     } catch (error) {
         console.error('Erro ao carregar chaves:', error);
         document.getElementById('keysList').innerHTML = 
-            '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#ef4444">Erro ao carregar chaves</td></tr>';
+            '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#ef4444">Erro ao carregar chaves: ' + error.message + '</td></tr>';
     }
 }
 
@@ -2261,7 +2596,7 @@ function updateKeyStats() {
     var statsHtml = '';
     
     // Estatísticas por tipo
-    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:2px solid #e2e8f0">';
+    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:1px solid #e2e8f0">';
     statsHtml += '<div style="font-size:0.9rem;color:#64748b;margin-bottom:0.3rem">📊 Por Tipo</div>';
     statsHtml += '<div style="display:flex;gap:0.5rem">';
     statsHtml += '<span style="background:#3b82f6;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Básicas: ' + basicCount + '</span>';
@@ -2271,7 +2606,7 @@ function updateKeyStats() {
     statsHtml += '</div>';
     
     // Estatísticas por estado
-    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:2px solid #e2e8f0">';
+    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:1px solid #e2e8f0">';
     statsHtml += '<div style="font-size:0.9rem;color:#64748b;margin-bottom:0.3rem">📈 Por Estado</div>';
     statsHtml += '<div style="display:flex;gap:0.5rem">';
     statsHtml += '<span style="background:#10b981;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Ativas: ' + activeCount + '</span>';
@@ -2286,7 +2621,7 @@ function updateKeyStats() {
     var totalMaxUses = keysArray.reduce((sum, k) => sum + (k.maxUses || 1), 0);
     var usageRate = totalMaxUses > 0 ? Math.round((totalUses / totalMaxUses) * 100) : 0;
     
-    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:2px solid #e2e8f0">';
+    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:1px solid #e2e8f0">';
     statsHtml += '<div style="font-size:0.9rem;color:#64748b;margin-bottom:0.3rem">🎯 Utilização</div>';
     statsHtml += '<div style="font-size:1.2rem;font-weight:bold;color:#3b82f6">' + usageRate + '%</div>';
     statsHtml += '<div style="font-size:0.85rem;color:#64748b">' + totalUses + '/' + totalMaxUses + ' utilizações</div>';
@@ -2410,11 +2745,11 @@ function renderKeysList(filteredKeys = null) {
         
         // Ações
         html += '<td style="padding:1rem;vertical-align:middle">';
-        html += '<button onclick="copyToClipboard(\'' + keyValue + '\')" style="background:#3b82f6;padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem">📋</button>';
+        html += '<button onclick="copyToClipboard(\'' + keyValue + '\')" style="background:#3b82f6;padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem;border:none;border-radius:4px;color:white;cursor:pointer">📋</button>';
         html += '<button onclick="toggleKeyValidity(\'' + keyValue + '\', ' + !keyData.valid + ')" style="background:' + 
-                (keyData.valid ? '#ef4444' : '#10b981') + ';padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem">' + 
+                (keyData.valid ? '#ef4444' : '#10b981') + ';padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem;border:none;border-radius:4px;color:white;cursor:pointer">' + 
                 (keyData.valid ? '❌' : '✅') + '</button>';
-        html += '<button onclick="deleteKey(\'' + keyValue + '\')" style="background:#64748b;padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem">🗑️</button>';
+        html += '<button onclick="deleteKey(\'' + keyValue + '\')" style="background:#64748b;padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem;border:none;border-radius:4px;color:white;cursor:pointer">🗑️</button>';
         html += '</td>';
         
         html += '</tr>';
@@ -2481,10 +2816,6 @@ function refreshKeyList() {
     showXP('🔄 Lista de chaves atualizada');
 }
 
-function hideKeyManagement() {
-    document.getElementById('keyManagementSection').style.display = 'none';
-}
-
 // Funções de ação nas chaves
 async function toggleKeyValidity(key, newValidity) {
     if (!confirm('Tem certeza que deseja ' + (newValidity ? 'ativar' : 'desativar') + ' esta chave?')) {
@@ -2514,126 +2845,6 @@ async function deleteKey(key) {
     }
 }
 
-// Função para ver estatísticas
-function viewKeyStats() {
-    if (!window.ALL_KEYS) {
-        alert('Primeiro carregue as chaves clicando em "Ver Todas as Chaves"');
-        return;
-    }
-    
-    var statsHtml = '<div style="text-align:center;padding:2rem">';
-    statsHtml += '<h3 style="color:#3b82f6;margin-bottom:1rem">📊 Estatísticas de Chaves</h3>';
-    
-    // Calcula estatísticas
-    var keys = Object.values(window.ALL_KEYS);
-    var now = new Date();
-    
-    var stats = {
-        total: keys.length,
-        active: 0,
-        expired: 0,
-        usedUp: 0,
-        invalid: 0,
-        byType: { basic: 0, premium: 0, full: 0 },
-        avgUses: 0,
-        avgValidity: 0
-    };
-    
-    var totalUses = 0;
-    var totalValidityDays = 0;
-    var keysWithValidity = 0;
-    
-    keys.forEach(function(key) {
-        // Por tipo
-        stats.byType[key.type] = (stats.byType[key.type] || 0) + 1;
-        
-        // Utilizações
-        totalUses += key.usedCount || 0;
-        
-        // Validade
-        if (key.expirationDate) {
-            var created = new Date(key.created || now);
-            var expires = new Date(key.expirationDate);
-            var days = Math.ceil((expires - created) / (1000 * 60 * 60 * 24));
-            totalValidityDays += days;
-            keysWithValidity++;
-        }
-        
-        // Estado
-        var isExpired = key.expirationDate && now > new Date(key.expirationDate);
-        var isUsedUp = key.usedCount >= key.maxUses;
-        var isValid = key.valid === true && !isExpired && !isUsedUp;
-        
-        if (!isValid) stats.invalid++;
-        if (isExpired) stats.expired++;
-        if (isUsedUp) stats.usedUp++;
-        if (isValid && !isUsedUp) stats.active++;
-    });
-    
-    stats.avgUses = keys.length > 0 ? (totalUses / keys.length).toFixed(1) : 0;
-    stats.avgValidity = keysWithValidity > 0 ? Math.round(totalValidityDays / keysWithValidity) : 0;
-    
-    // Mostrar estatísticas
-    statsHtml += '<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:1rem;text-align:left;margin:1.5rem 0">';
-    
-    statsHtml += '<div style="background:#f8fafc;padding:1rem;border-radius:8px">';
-    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Total de Chaves</div>';
-    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#3b82f6">' + stats.total + '</div>';
-    statsHtml += '</div>';
-    
-    statsHtml += '<div style="background:#f0fdf4;padding:1rem;border-radius:8px">';
-    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Chaves Ativas</div>';
-    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#10b981">' + stats.active + '</div>';
-    statsHtml += '<div style="font-size:0.8rem;color:#64748b">' + Math.round((stats.active / stats.total) * 100) + '% do total</div>';
-    statsHtml += '</div>';
-    
-    statsHtml += '<div style="background:#fffbeb;padding:1rem;border-radius:8px">';
-    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Média de Utilizações</div>';
-    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#f59e0b">' + stats.avgUses + '</div>';
-    statsHtml += '<div style="font-size:0.8rem;color:#64748b">por chave</div>';
-    statsHtml += '</div>';
-    
-    statsHtml += '<div style="background:#f5f3ff;padding:1rem;border-radius:8px">';
-    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Validade Média</div>';
-    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#8b5cf6">' + stats.avgValidity + '</div>';
-    statsHtml += '<div style="font-size:0.8rem;color:#64748b">dias</div>';
-    statsHtml += '</div>';
-    
-    statsHtml += '</div>';
-    
-    // Distribuição por tipo
-    statsHtml += '<div style="background:#fff;padding:1.5rem;border-radius:8px;margin-top:1rem;border:2px solid #e2e8f0">';
-    statsHtml += '<h4 style="color:#1e293b;margin-bottom:1rem">📈 Distribuição por Tipo</h4>';
-    
-    var totalPercent = 100;
-    var basicPercent = Math.round((stats.byType.basic / stats.total) * 100);
-    var premiumPercent = Math.round((stats.byType.premium / stats.total) * 100);
-    var fullPercent = totalPercent - basicPercent - premiumPercent;
-    
-    statsHtml += '<div style="display:flex;height:30px;border-radius:6px;overflow:hidden;margin-bottom:1rem">';
-    statsHtml += '<div style="background:#3b82f6;width:' + basicPercent + '%" title="Básica: ' + stats.byType.basic + '"></div>';
-    statsHtml += '<div style="background:#8b5cf6;width:' + premiumPercent + '%" title="Premium: ' + stats.byType.premium + '"></div>';
-    statsHtml += '<div style="background:#f59e0b;width:' + fullPercent + '%" title="Elite: ' + stats.byType.full + '"></div>';
-    statsHtml += '</div>';
-    
-    statsHtml += '<div style="display:flex;justify-content:space-around;font-size:0.9rem">';
-    statsHtml += '<div><span style="color:#3b82f6">■</span> Básica: ' + stats.byType.basic + ' (' + basicPercent + '%)</div>';
-    statsHtml += '<div><span style="color:#8b5cf6">■</span> Premium: ' + stats.byType.premium + ' (' + premiumPercent + '%)</div>';
-    statsHtml += '<div><span style="color:#f59e0b">■</span> Elite: ' + stats.byType.full + ' (' + fullPercent + '%)</div>';
-    statsHtml += '</div>';
-    
-    statsHtml += '</div>';
-    
-    statsHtml += '<button onclick="this.parentElement.remove()" style="margin-top:1.5rem">Fechar</button>';
-    statsHtml += '</div>';
-    
-    var popup = document.createElement('div');
-    popup.className = 'welcome-popup';
-    popup.innerHTML = statsHtml;
-    document.body.appendChild(popup);
-}
-
-// Função para exportar para CSV
 function exportKeysToCSV() {
     if (!window.ALL_KEYS || Object.keys(window.ALL_KEYS).length === 0) {
         alert('Não há chaves para exportar');
@@ -2687,7 +2898,8 @@ function exportKeysToCSV() {
     
     showXP('📥 CSV exportado com sucesso');
 }
-// ==================== FUNÇÕES UTILITÁRIAS ====================
+
+/// ==================== FUNÇÕES UTILITÁRIAS ====================
 
 async function checkBadges() {
     var unlocked = false;
