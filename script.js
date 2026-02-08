@@ -1843,6 +1843,14 @@ function updateDashboard() {
         document.getElementById('btnCert').style.display = 'none';
     }
     
+     // REMOVER QUALQUER ELEMENTO RELACIONADO A CHAVES DO DASHBOARD
+    var keyElements = document.querySelectorAll('[id*="Key"], [id*="key"]');
+    keyElements.forEach(function(el) {
+        if (el.id !== 'activationKey' && !USER.isAdmin) { // Mantém o campo de input de chave no login
+            el.style.display = 'none';
+        }
+    });
+
     // Adicionar lembretes
     var remindersHtml = renderReminders();
     var progressSection = document.querySelector('#dashboardPage > div:nth-child(4)');
