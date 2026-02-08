@@ -686,6 +686,101 @@ button:disabled {
     font-size: 0.85rem;
 }
 
+/* Estilos para popup de gestão de chaves */
+.keys-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 1200px;
+    width: 95%;
+    max-height: 90vh;
+    z-index: 1002;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow-y: auto;
+    border: 3px solid #3b82f6;
+}
+
+.keys-popup h2 {
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+}
+
+.keys-table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 1rem 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+/* Estilos para tabela dentro do popup */
+.keys-popup table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.keys-popup thead {
+    position: sticky;
+    top: 0;
+    background: #f1f5f9;
+    z-index: 10;
+}
+
+/* Botão de fechar específico para popup */
+.close-keys-popup {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.close-keys-popup:hover {
+    background: #dc2626;
+}
+
+/* Overlay específico para popup de chaves */
+.keys-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+    backdrop-filter: blur(2px);
+}
+
+/* Responsividade para popup */
+@media (max-width: 768px) {
+    .keys-popup {
+        padding: 1rem;
+        width: 98%;
+    }
+    
+    .keys-popup table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .keys-popup th,
+    .keys-popup td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
 /* Tabela de chaves */
 .keys-table {
     width: 100%;
