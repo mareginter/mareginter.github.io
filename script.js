@@ -2136,87 +2136,556 @@ async function generateNewKey() {
     var maxUses = parseInt(document.getElementById('keyUses').value) || 1;
     var daysValid = parseInt(document.getElementById('keyDays').value) || 30;
     
+    if (maxUses < 1 || maxUses > 1000) {
+        alert('Número de utilizações deve ser entre 1 e 1000');
+        return;
+    }
+    
+    if (daysValid < 1 || daysValid > 365) {
+        alert('Validade deve ser entre 1 e 365 dias');
+        return;
+    }
+    
     var result = await generateActivationKey(type, maxUses, daysValid);
     
     if (result && result.key) {
         var resultDiv = document.getElementById('newKeyResult');
         var expirationDate = new Date(result.data.expirationDate);
-        var formattedDate = expirationDate.toLocaleDateString('pt-PT') + ' ' + expirationDate.toLocaleTimeString('pt-PT');
+        var formattedDate = expirationDate.toLocaleDateString('pt-PT');
         
         resultDiv.innerHTML = '<div style="background:#d1fae5;padding:1.5rem;border-radius:12px;margin-top:1rem;border:2px solid #10b981">';
         resultDiv.innerHTML += '<h4 style="color:#065f46;margin-bottom:1rem">✅ Nova Chave Gerada!</h4>';
         resultDiv.innerHTML += '<p style="font-family:monospace;background:#fff;padding:1rem;border-radius:8px;margin:0.5rem 0;font-size:1.1rem;font-weight:bold;border:2px dashed #10b981">' + result.key + '</p>';
         resultDiv.innerHTML += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-top:1rem">';
-        resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>🔤 Tipo:</strong> ' + type + '</div>';
+        resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>🔤 Tipo:</strong> ' + 
+                               (type === 'full' ? 'Elite' : type === 'premium' ? 'Premium' : 'Básica') + '</div>';
         resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>👥 Utilizações:</strong> ' + maxUses + '</div>';
         resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>📅 Validade:</strong> ' + daysValid + ' dias</div>';
         resultDiv.innerHTML += '<div style="background:#fff;padding:0.8rem;border-radius:6px"><strong>⏰ Expira em:</strong> ' + formattedDate + '</div>';
         resultDiv.innerHTML += '</div>';
-        resultDiv.innerHTML += '<button onclick="copyToClipboard(\'' + result.key + '\')" style="background:#3b82f6;margin-top:1rem">📋 Copiar Chave</button>';
+        resultDiv.innerHTML += '<div style="display:flex;gap:0.5rem;margin-top:1rem">';
+        resultDiv.innerHTML += '<button onclick="copyToClipboard(\'' + result.key + '\')" style="background:#3b82f6">📋 Copiar Chave</button>';
+        resultDiv.innerHTML += '<button onclick="viewAllKeys()" style="background:#8b5cf6">👁️ Ver Todas as Chaves</button>';
         resultDiv.innerHTML += '</div>';
+        resultDiv.innerHTML += '</div>';
+        
+        // Atualizar a lista de chaves se estiver visível
+        if (document.getElementById('keyManagementSection').style.display === 'block') {
+            setTimeout(refreshKeyList, 500);
+        }
         
         showXP('✅ Chave gerada com sucesso!');
     } else {
         alert('❌ Erro ao gerar chave!');
     }
 }
+// ==================== SISTEMA COMPLETO DE GESTÃO DE CHAVES ====================
 
+// Função melhorada para visualizar todas as chaves
 async function viewAllKeys() {
+    try {
+        // Mostrar seção de gestão
+        document.getElementById('keyManagementSection').style.display = 'block';
+        
+        // Carregar chaves
+        await loadAllKeys();
+        
+        // Rolar para a seção
+        document.getElementById('keyManagementSection').scrollIntoView({ behavior: 'smooth' });
+        
+    } catch (error) {
+        console.error('Erro ao carregar chaves:', error);
+        alert('Erro ao carregar chaves: ' + error.message);
+    }
+}
+
+// Função para carregar todas as chaves
+async function loadAllKeys() {
     try {
         var keysSnapshot = await database.ref('activationKeys').once('value');
         var keys = keysSnapshot.val();
         
-        var html = '<div style="max-height:400px;overflow-y:auto">';
-        html += '<h4 style="margin-bottom:1rem">🗝️ Chaves Existentes</h4>';
+        // Guardar chaves globalmente para filtragem
+        window.ALL_KEYS = keys || {};
         
-        if (!keys) {
-            html += '<p style="text-align:center;color:#64748b;padding:2rem">Nenhuma chave gerada</p>';
-        } else {
-            html += '<table style="width:100%;border-collapse:collapse">';
-            html += '<thead><tr><th>Chave</th><th>Tipo</th><th>Utilizações</th><th>Validade</th><th>Estado</th></tr></thead>';
-            html += '<tbody>';
-            
-            for (var key in keys) {
-                var keyData = keys[key];
-                var expirationDate = keyData.expirationDate ? new Date(keyData.expirationDate) : null;
-                var now = new Date();
-                var expired = expirationDate && now > expirationDate;
-                var usedUp = keyData.usedCount >= keyData.maxUses;
-                
-                html += '<tr style="border-bottom:1px solid #e2e8f0">';
-                html += '<td style="padding:0.5rem"><code style="font-size:0.8rem">' + key + '</code></td>';
-                html += '<td style="padding:0.5rem">' + keyData.type + '</td>';
-                html += '<td style="padding:0.5rem">' + (keyData.usedCount || 0) + '/' + keyData.maxUses + '</td>';
-                html += '<td style="padding:0.5rem">' + (expirationDate ? expirationDate.toLocaleDateString('pt-PT') : '∞') + '</td>';
-                html += '<td style="padding:0.5rem">';
-                
-                if (!keyData.valid || expired) {
-                    html += '<span style="color:#ef4444">❌ Inválida</span>';
-                } else if (usedUp) {
-                    html += '<span style="color:#f59e0b">⚠️ Esgotada</span>';
-                } else {
-                    html += '<span style="color:#10b981">✅ Ativa</span>';
-                }
-                
-                html += '</td>';
-                html += '</tr>';
-            }
-            
-            html += '</tbody></table>';
-        }
+        // Atualizar estatísticas
+        updateKeyStats();
         
-        html += '</div>';
-        
-        // Mostrar em um popup
-        var popup = document.createElement('div');
-        popup.className = 'welcome-popup';
-        popup.innerHTML = html + '<div style="text-align:center;margin-top:1rem"><button onclick="this.parentElement.remove()">Fechar</button></div>';
-        document.body.appendChild(popup);
+        // Atualizar lista
+        renderKeysList();
         
     } catch (error) {
-        console.error('Erro ao listar chaves:', error);
-        alert('Erro ao carregar chaves: ' + error.message);
+        console.error('Erro ao carregar chaves:', error);
+        document.getElementById('keysList').innerHTML = 
+            '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#ef4444">Erro ao carregar chaves</td></tr>';
     }
+}
+
+// Atualizar estatísticas das chaves
+function updateKeyStats() {
+    if (!window.ALL_KEYS) return;
+    
+    var keys = window.ALL_KEYS;
+    var keysArray = Object.values(keys);
+    
+    // Contar por tipo
+    var basicCount = keysArray.filter(k => k.type === 'basic').length;
+    var premiumCount = keysArray.filter(k => k.type === 'premium').length;
+    var fullCount = keysArray.filter(k => k.type === 'full').length;
+    
+    // Contar por estado
+    var activeCount = 0;
+    var usedCount = 0;
+    var expiredCount = 0;
+    var invalidCount = 0;
+    
+    var now = new Date();
+    
+    keysArray.forEach(function(key) {
+        // Verificar se expirou
+        var isExpired = false;
+        if (key.expirationDate) {
+            var expirationDate = new Date(key.expirationDate);
+            isExpired = now > expirationDate;
+        }
+        
+        var isUsedUp = key.usedCount >= key.maxUses;
+        var isValid = key.valid === true && !isExpired && !isUsedUp;
+        
+        if (!isValid) invalidCount++;
+        if (isExpired) expiredCount++;
+        if (isUsedUp) usedCount++;
+        if (isValid && !isUsedUp) activeCount++;
+    });
+    
+    var statsHtml = '';
+    
+    // Estatísticas por tipo
+    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:2px solid #e2e8f0">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b;margin-bottom:0.3rem">📊 Por Tipo</div>';
+    statsHtml += '<div style="display:flex;gap:0.5rem">';
+    statsHtml += '<span style="background:#3b82f6;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Básicas: ' + basicCount + '</span>';
+    statsHtml += '<span style="background:#8b5cf6;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Premium: ' + premiumCount + '</span>';
+    statsHtml += '<span style="background:#f59e0b;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Elite: ' + fullCount + '</span>';
+    statsHtml += '</div>';
+    statsHtml += '</div>';
+    
+    // Estatísticas por estado
+    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:2px solid #e2e8f0">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b;margin-bottom:0.3rem">📈 Por Estado</div>';
+    statsHtml += '<div style="display:flex;gap:0.5rem">';
+    statsHtml += '<span style="background:#10b981;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Ativas: ' + activeCount + '</span>';
+    statsHtml += '<span style="background:#64748b;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Usadas: ' + usedCount + '</span>';
+    statsHtml += '<span style="background:#ef4444;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Expiradas: ' + expiredCount + '</span>';
+    statsHtml += '<span style="background:#94a3b8;color:white;padding:0.25rem 0.5rem;border-radius:4px;font-size:0.85rem">Inválidas: ' + invalidCount + '</span>';
+    statsHtml += '</div>';
+    statsHtml += '</div>';
+    
+    // Estatísticas de utilização
+    var totalUses = keysArray.reduce((sum, k) => sum + (k.usedCount || 0), 0);
+    var totalMaxUses = keysArray.reduce((sum, k) => sum + (k.maxUses || 1), 0);
+    var usageRate = totalMaxUses > 0 ? Math.round((totalUses / totalMaxUses) * 100) : 0;
+    
+    statsHtml += '<div style="background:#fff;padding:1rem;border-radius:8px;border:2px solid #e2e8f0">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b;margin-bottom:0.3rem">🎯 Utilização</div>';
+    statsHtml += '<div style="font-size:1.2rem;font-weight:bold;color:#3b82f6">' + usageRate + '%</div>';
+    statsHtml += '<div style="font-size:0.85rem;color:#64748b">' + totalUses + '/' + totalMaxUses + ' utilizações</div>';
+    statsHtml += '</div>';
+    
+    document.getElementById('keyStats').innerHTML = statsHtml;
+    document.getElementById('totalKeysCount').textContent = keysArray.length;
+}
+
+// Renderizar lista de chaves
+function renderKeysList(filteredKeys = null) {
+    var keys = filteredKeys || window.ALL_KEYS;
+    
+    if (!keys || Object.keys(keys).length === 0) {
+        document.getElementById('keysList').innerHTML = 
+            '<tr><td colspan="7" style="text-align:center;padding:3rem;color:#64748b">Nenhuma chave gerada ainda</td></tr>';
+        document.getElementById('showingKeysCount').textContent = '0';
+        return;
+    }
+    
+    var html = '';
+    var now = new Date();
+    var count = 0;
+    
+    // Ordenar por data de criação (mais recente primeiro)
+    var keysArray = Object.entries(keys).sort((a, b) => {
+        return new Date(b[1].created || 0) - new Date(a[1].created || 0);
+    });
+    
+    keysArray.forEach(function([keyValue, keyData]) {
+        // Aplicar filtros se houver
+        if (shouldFilterKey(keyValue, keyData)) {
+            return;
+        }
+        
+        count++;
+        
+        var expirationDate = keyData.expirationDate ? new Date(keyData.expirationDate) : null;
+        var createdDate = keyData.created ? new Date(keyData.created) : new Date();
+        
+        // Determinar estado
+        var isExpired = expirationDate && now > expirationDate;
+        var isUsedUp = keyData.usedCount >= keyData.maxUses;
+        var isValid = keyData.valid === true && !isExpired && !isUsedUp;
+        
+        var statusText = '';
+        var statusColor = '';
+        
+        if (!isValid) {
+            statusText = '❌ Inválida';
+            statusColor = '#ef4444';
+        } else if (isExpired) {
+            statusText = '⏰ Expirada';
+            statusColor = '#f59e0b';
+        } else if (isUsedUp) {
+            statusText = '⚠️ Esgotada';
+            statusColor = '#d97706';
+        } else {
+            statusText = '✅ Ativa';
+            statusColor = '#10b981';
+        }
+        
+        // Cor do tipo
+        var typeColor = {
+            basic: '#3b82f6',
+            premium: '#8b5cf6',
+            full: '#f59e0b'
+        }[keyData.type] || '#64748b';
+        
+        // Dias restantes
+        var daysLeft = '∞';
+        if (expirationDate) {
+            var diffTime = expirationDate - now;
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            daysLeft = diffDays > 0 ? diffDays + ' dias' : 'Expirada';
+        }
+        
+        html += '<tr style="border-bottom:1px solid #e2e8f0">';
+        
+        // Chave
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<div style="font-family:monospace;font-weight:bold;font-size:0.9rem">' + keyValue + '</div>';
+        if (keyData.usedBy) {
+            html += '<div style="font-size:0.8rem;color:#64748b">Usada por: ' + (keyData.usedBy || 'N/A') + '</div>';
+        }
+        html += '</td>';
+        
+        // Tipo
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<span style="color:' + typeColor + ';font-weight:bold">' + 
+                (keyData.type === 'full' ? 'Elite' : 
+                 keyData.type === 'premium' ? 'Premium' : 'Básica') + '</span>';
+        html += '</td>';
+        
+        // Utilizações
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<div style="font-weight:bold">' + (keyData.usedCount || 0) + '/' + keyData.maxUses + '</div>';
+        html += '<div style="font-size:0.8rem;color:#64748b">' + 
+                (keyData.usedCount || 0) + ' de ' + keyData.maxUses + '</div>';
+        html += '</td>';
+        
+        // Validade
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<div style="font-weight:bold">' + daysLeft + '</div>';
+        if (expirationDate) {
+            html += '<div style="font-size:0.8rem;color:#64748b">Expira: ' + 
+                    expirationDate.toLocaleDateString('pt-PT') + '</div>';
+        }
+        html += '</td>';
+        
+        // Estado
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<span style="color:' + statusColor + ';font-weight:bold">' + statusText + '</span>';
+        html += '</td>';
+        
+        // Criada
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<div style="font-size:0.9rem">' + createdDate.toLocaleDateString('pt-PT') + '</div>';
+        html += '<div style="font-size:0.8rem;color:#64748b">' + createdDate.toLocaleTimeString('pt-PT') + '</div>';
+        html += '</td>';
+        
+        // Ações
+        html += '<td style="padding:1rem;vertical-align:middle">';
+        html += '<button onclick="copyToClipboard(\'' + keyValue + '\')" style="background:#3b82f6;padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem">📋</button>';
+        html += '<button onclick="toggleKeyValidity(\'' + keyValue + '\', ' + !keyData.valid + ')" style="background:' + 
+                (keyData.valid ? '#ef4444' : '#10b981') + ';padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem">' + 
+                (keyData.valid ? '❌' : '✅') + '</button>';
+        html += '<button onclick="deleteKey(\'' + keyValue + '\')" style="background:#64748b;padding:0.3rem 0.6rem;font-size:0.8rem;margin:0.1rem">🗑️</button>';
+        html += '</td>';
+        
+        html += '</tr>';
+    });
+    
+    document.getElementById('keysList').innerHTML = html;
+    document.getElementById('showingKeysCount').textContent = count;
+}
+
+// Funções de filtragem
+function shouldFilterKey(keyValue, keyData) {
+    var filterType = document.getElementById('filterType').value;
+    var filterStatus = document.getElementById('filterStatus').value;
+    var searchTerm = document.getElementById('filterSearch').value.toLowerCase();
+    
+    // Filtro por tipo
+    if (filterType !== 'all' && keyData.type !== filterType) {
+        return true;
+    }
+    
+    // Filtro por estado
+    if (filterStatus !== 'all') {
+        var now = new Date();
+        var isExpired = keyData.expirationDate && now > new Date(keyData.expirationDate);
+        var isUsedUp = keyData.usedCount >= keyData.maxUses;
+        var isValid = keyData.valid === true && !isExpired && !isUsedUp;
+        
+        switch(filterStatus) {
+            case 'active':
+                if (!isValid) return true;
+                break;
+            case 'used':
+                if (!isUsedUp) return true;
+                break;
+            case 'expired':
+                if (!isExpired) return true;
+                break;
+            case 'invalid':
+                if (isValid) return true;
+                break;
+        }
+    }
+    
+    // Filtro por pesquisa
+    if (searchTerm) {
+        var keyMatches = keyValue.toLowerCase().includes(searchTerm);
+        var emailMatches = keyData.usedBy && keyData.usedBy.toLowerCase().includes(searchTerm);
+        var creatorMatches = keyData.createdBy && keyData.createdBy.toLowerCase().includes(searchTerm);
+        
+        if (!keyMatches && !emailMatches && !creatorMatches) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+function filterKeys() {
+    renderKeysList(window.ALL_KEYS);
+}
+
+function refreshKeyList() {
+    loadAllKeys();
+    showXP('🔄 Lista de chaves atualizada');
+}
+
+function hideKeyManagement() {
+    document.getElementById('keyManagementSection').style.display = 'none';
+}
+
+// Funções de ação nas chaves
+async function toggleKeyValidity(key, newValidity) {
+    if (!confirm('Tem certeza que deseja ' + (newValidity ? 'ativar' : 'desativar') + ' esta chave?')) {
+        return;
+    }
+    
+    try {
+        await database.ref('activationKeys/' + key).update({ valid: newValidity });
+        showXP(newValidity ? '✅ Chave ativada' : '❌ Chave desativada');
+        refreshKeyList();
+    } catch (error) {
+        alert('Erro ao atualizar chave: ' + error.message);
+    }
+}
+
+async function deleteKey(key) {
+    if (!confirm('Tem certeza que deseja APAGAR permanentemente esta chave?\nEsta ação não pode ser desfeita.')) {
+        return;
+    }
+    
+    try {
+        await database.ref('activationKeys/' + key).remove();
+        showXP('🗑️ Chave eliminada');
+        refreshKeyList();
+    } catch (error) {
+        alert('Erro ao eliminar chave: ' + error.message);
+    }
+}
+
+// Função para ver estatísticas
+function viewKeyStats() {
+    if (!window.ALL_KEYS) {
+        alert('Primeiro carregue as chaves clicando em "Ver Todas as Chaves"');
+        return;
+    }
+    
+    var statsHtml = '<div style="text-align:center;padding:2rem">';
+    statsHtml += '<h3 style="color:#3b82f6;margin-bottom:1rem">📊 Estatísticas de Chaves</h3>';
+    
+    // Calcula estatísticas
+    var keys = Object.values(window.ALL_KEYS);
+    var now = new Date();
+    
+    var stats = {
+        total: keys.length,
+        active: 0,
+        expired: 0,
+        usedUp: 0,
+        invalid: 0,
+        byType: { basic: 0, premium: 0, full: 0 },
+        avgUses: 0,
+        avgValidity: 0
+    };
+    
+    var totalUses = 0;
+    var totalValidityDays = 0;
+    var keysWithValidity = 0;
+    
+    keys.forEach(function(key) {
+        // Por tipo
+        stats.byType[key.type] = (stats.byType[key.type] || 0) + 1;
+        
+        // Utilizações
+        totalUses += key.usedCount || 0;
+        
+        // Validade
+        if (key.expirationDate) {
+            var created = new Date(key.created || now);
+            var expires = new Date(key.expirationDate);
+            var days = Math.ceil((expires - created) / (1000 * 60 * 60 * 24));
+            totalValidityDays += days;
+            keysWithValidity++;
+        }
+        
+        // Estado
+        var isExpired = key.expirationDate && now > new Date(key.expirationDate);
+        var isUsedUp = key.usedCount >= key.maxUses;
+        var isValid = key.valid === true && !isExpired && !isUsedUp;
+        
+        if (!isValid) stats.invalid++;
+        if (isExpired) stats.expired++;
+        if (isUsedUp) stats.usedUp++;
+        if (isValid && !isUsedUp) stats.active++;
+    });
+    
+    stats.avgUses = keys.length > 0 ? (totalUses / keys.length).toFixed(1) : 0;
+    stats.avgValidity = keysWithValidity > 0 ? Math.round(totalValidityDays / keysWithValidity) : 0;
+    
+    // Mostrar estatísticas
+    statsHtml += '<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:1rem;text-align:left;margin:1.5rem 0">';
+    
+    statsHtml += '<div style="background:#f8fafc;padding:1rem;border-radius:8px">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Total de Chaves</div>';
+    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#3b82f6">' + stats.total + '</div>';
+    statsHtml += '</div>';
+    
+    statsHtml += '<div style="background:#f0fdf4;padding:1rem;border-radius:8px">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Chaves Ativas</div>';
+    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#10b981">' + stats.active + '</div>';
+    statsHtml += '<div style="font-size:0.8rem;color:#64748b">' + Math.round((stats.active / stats.total) * 100) + '% do total</div>';
+    statsHtml += '</div>';
+    
+    statsHtml += '<div style="background:#fffbeb;padding:1rem;border-radius:8px">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Média de Utilizações</div>';
+    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#f59e0b">' + stats.avgUses + '</div>';
+    statsHtml += '<div style="font-size:0.8rem;color:#64748b">por chave</div>';
+    statsHtml += '</div>';
+    
+    statsHtml += '<div style="background:#f5f3ff;padding:1rem;border-radius:8px">';
+    statsHtml += '<div style="font-size:0.9rem;color:#64748b">Validade Média</div>';
+    statsHtml += '<div style="font-size:2rem;font-weight:bold;color:#8b5cf6">' + stats.avgValidity + '</div>';
+    statsHtml += '<div style="font-size:0.8rem;color:#64748b">dias</div>';
+    statsHtml += '</div>';
+    
+    statsHtml += '</div>';
+    
+    // Distribuição por tipo
+    statsHtml += '<div style="background:#fff;padding:1.5rem;border-radius:8px;margin-top:1rem;border:2px solid #e2e8f0">';
+    statsHtml += '<h4 style="color:#1e293b;margin-bottom:1rem">📈 Distribuição por Tipo</h4>';
+    
+    var totalPercent = 100;
+    var basicPercent = Math.round((stats.byType.basic / stats.total) * 100);
+    var premiumPercent = Math.round((stats.byType.premium / stats.total) * 100);
+    var fullPercent = totalPercent - basicPercent - premiumPercent;
+    
+    statsHtml += '<div style="display:flex;height:30px;border-radius:6px;overflow:hidden;margin-bottom:1rem">';
+    statsHtml += '<div style="background:#3b82f6;width:' + basicPercent + '%" title="Básica: ' + stats.byType.basic + '"></div>';
+    statsHtml += '<div style="background:#8b5cf6;width:' + premiumPercent + '%" title="Premium: ' + stats.byType.premium + '"></div>';
+    statsHtml += '<div style="background:#f59e0b;width:' + fullPercent + '%" title="Elite: ' + stats.byType.full + '"></div>';
+    statsHtml += '</div>';
+    
+    statsHtml += '<div style="display:flex;justify-content:space-around;font-size:0.9rem">';
+    statsHtml += '<div><span style="color:#3b82f6">■</span> Básica: ' + stats.byType.basic + ' (' + basicPercent + '%)</div>';
+    statsHtml += '<div><span style="color:#8b5cf6">■</span> Premium: ' + stats.byType.premium + ' (' + premiumPercent + '%)</div>';
+    statsHtml += '<div><span style="color:#f59e0b">■</span> Elite: ' + stats.byType.full + ' (' + fullPercent + '%)</div>';
+    statsHtml += '</div>';
+    
+    statsHtml += '</div>';
+    
+    statsHtml += '<button onclick="this.parentElement.remove()" style="margin-top:1.5rem">Fechar</button>';
+    statsHtml += '</div>';
+    
+    var popup = document.createElement('div');
+    popup.className = 'welcome-popup';
+    popup.innerHTML = statsHtml;
+    document.body.appendChild(popup);
+}
+
+// Função para exportar para CSV
+function exportKeysToCSV() {
+    if (!window.ALL_KEYS || Object.keys(window.ALL_KEYS).length === 0) {
+        alert('Não há chaves para exportar');
+        return;
+    }
+    
+    var csv = 'Chave,Tipo,Utilizações,Max Utilizações,Validade,Estado,Criado Por,Criado Em,Usado Por,Usado Em\n';
+    
+    Object.entries(window.ALL_KEYS).forEach(function([key, data]) {
+        var now = new Date();
+        var isExpired = data.expirationDate && now > new Date(data.expirationDate);
+        var isUsedUp = data.usedCount >= data.maxUses;
+        var isValid = data.valid === true && !isExpired && !isUsedUp;
+        
+        var status = 'Ativa';
+        if (!isValid) status = 'Inválida';
+        else if (isExpired) status = 'Expirada';
+        else if (isUsedUp) status = 'Esgotada';
+        
+        var type = data.type === 'full' ? 'Elite' : 
+                   data.type === 'premium' ? 'Premium' : 'Básica';
+        
+        var validity = data.expirationDate ? 
+            new Date(data.expirationDate).toLocaleDateString('pt-PT') : 'Ilimitada';
+        
+        csv += '"' + key + '",';
+        csv += '"' + type + '",';
+        csv += (data.usedCount || 0) + ',';
+        csv += data.maxUses + ',';
+        csv += '"' + validity + '",';
+        csv += '"' + status + '",';
+        csv += '"' + (data.createdBy || 'N/A') + '",';
+        csv += '"' + (data.created ? new Date(data.created).toLocaleString('pt-PT') : 'N/A') + '",';
+        csv += '"' + (data.usedBy || 'N/A') + '",';
+        csv += '"' + (data.usedDate ? new Date(data.usedDate).toLocaleString('pt-PT') : 'N/A') + '"';
+        csv += '\n';
+    });
+    
+    // Criar e fazer download do arquivo
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'chaves_ativacao_' + new Date().toISOString().split('T')[0] + '.csv');
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showXP('📥 CSV exportado com sucesso');
 }
 // ==================== FUNÇÕES UTILITÁRIAS ====================
 
