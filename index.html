@@ -27,6 +27,7 @@
             <button onclick="goToAdmin()" id="btnAdmin" style="display:none">👑 Admin</button>
             <button onclick="logout()" class="logout-btn">🚪 Sair</button>
             <button onclick="showHelp()" id="btnHelp" style="background:#64748b">❓ Ajuda</button>
+            <button onclick="viewAllKeys()" style="background:#64748b;padding:0.8rem 1.5rem">👁️ Ver Chaves Existentes</button>
         </div>
     </header>
 
@@ -305,17 +306,23 @@
             <div class="box" id="keyGeneratorSection" style="background:linear-gradient(135deg,#fffbeb,#fff);border-left:5px solid #f59e0b">
                 <h3 style="margin-bottom:1rem;color:#d97706">🔑 Gerador de Chaves de Ativação</h3>
                 <p style="color:#64748b;margin-bottom:1.5rem">Gere chaves para novos utilizadores</p>
-                
-                <div style="margin:1rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
-                    <select id="keyType" style="padding:0.8rem;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
-                        <option value="basic">Básica (acesso completo)</option>
-                        <option value="premium">Premium (com módulos avançados)</option>
-                        <option value="full">Elite (tudo desbloqueado)</option>
-                    </select>
-                    <input type="number" id="keyUses" placeholder="Nº de utilizações" min="1" max="100" value="1" style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
-                    <button onclick="generateNewKey()" style="background:#10b981;padding:0.8rem 1.5rem">🎫 Gerar Nova Chave</button>
+    
+            <div style="margin:1rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+                <select id="keyType" style="padding:0.8rem;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
+                    <option value="basic">Básica (acesso completo)</option>
+                    <option value="premium">Premium (com módulos avançados)</option>
+                    <option value="full">Elite (tudo desbloqueado)</option>
+                </select>
+        
+                <input type="number" id="keyUses" placeholder="Nº de utilizações" min="1" max="100" value="1" 
+                    style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
+        
+                <input type="number" id="keyDays" placeholder="Dias de validade" min="1" max="365" value="30" 
+                    style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
+        
+                <button onclick="generateNewKey()" style="background:#10b981;padding:0.8rem 1.5rem">🎫 Gerar Nova Chave</button>
                 </div>
-                <div id="newKeyResult" style="margin-top:1rem"></div>
+                    <div id="newKeyResult" style="margin-top:1rem"></div>
             </div>
 
             <div class="invite-box">
