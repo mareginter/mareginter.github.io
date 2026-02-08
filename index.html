@@ -302,28 +302,30 @@
                 <div id="adminModuleStats"></div>
             </div>
 
-            <!-- GERADOR DE CHAVES DE ATIVAÇÃO -->
-            <div class="box" id="keyGeneratorSection" style="background:linear-gradient(135deg,#fffbeb,#fff);border-left:5px solid #f59e0b">
-                <h3 style="margin-bottom:1rem;color:#d97706">🔑 Gerador de Chaves de Ativação</h3>
-                <p style="color:#64748b;margin-bottom:1.5rem">Gere chaves para novos utilizadores</p>
+        <!-- GERADOR E GESTOR DE CHAVES DE ATIVAÇÃO -->
+<div class="box" id="keyGeneratorSection" style="background:linear-gradient(135deg,#fffbeb,#fff);border-left:5px solid #f59e0b">
+    <h3 style="margin-bottom:1rem;color:#d97706">🔑 Gerador de Chaves de Ativação</h3>
+    <p style="color:#64748b;margin-bottom:1.5rem">Gere chaves para novos utilizadores</p>
     
-            <div style="margin:1rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
-                <select id="keyType" style="padding:0.8rem;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
-                    <option value="basic">Básica (acesso completo)</option>
-                    <option value="premium">Premium (com módulos avançados)</option>
-                    <option value="full">Elite (tudo desbloqueado)</option>
-                </select>
+    <div style="margin:1rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+        <select id="keyType" style="padding:0.8rem;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
+            <option value="basic">Básica (acesso completo)</option>
+            <option value="premium">Premium (com módulos avançados)</option>
+            <option value="full">Elite (tudo desbloqueado)</option>
+        </select>
         
-                <input type="number" id="keyUses" placeholder="Nº de utilizações" min="1" max="100" value="1" 
-                    style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
+        <input type="number" id="keyUses" placeholder="Nº de utilizações" min="1" max="1000" value="1" 
+               style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
         
-                <input type="number" id="keyDays" placeholder="Dias de validade" min="1" max="365" value="30" 
-                    style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
+        <input type="number" id="keyDays" placeholder="Dias de validade" min="1" max="365" value="30" 
+               style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
         
-                <button onclick="generateNewKey()" style="background:#10b981;padding:0.8rem 1.5rem">🎫 Gerar Nova Chave</button>
-                </div>
-                    <div id="newKeyResult" style="margin-top:1rem"></div>
-            </div>
+        <button onclick="generateNewKey()" style="background:#10b981;padding:0.8rem 1.5rem">🎫 Gerar Nova Chave</button>
+        <button onclick="viewAllKeys()" style="background:#3b82f6;padding:0.8rem 1.5rem">👁️ Ver Todas as Chaves</button>
+        <button onclick="viewKeyStats()" style="background:#8b5cf6;padding:0.8rem 1.5rem">📊 Estatísticas</button>
+    </div>
+    <div id="newKeyResult" style="margin-top:1rem"></div>
+</div>
 
             <div class="invite-box">
                 <h3 style="margin-bottom:1rem">📧 Convite para Colaboradores</h3>
@@ -368,6 +370,80 @@
             </div>
         </div>
     </main>
+
+    <!-- PAINEL DE GESTÃO DE CHAVES -->
+<div class="box" id="keyManagementSection" style="background:linear-gradient(135deg,#f8fafc,#fff);border-left:5px solid #3b82f6;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+        <h3 style="color:#1e293b">🗝️ Gestão de Chaves de Ativação</h3>
+        <div>
+            <button onclick="refreshKeyList()" style="background:#64748b;padding:0.5rem 1rem">🔄 Atualizar</button>
+            <button onclick="hideKeyManagement()" style="background:#ef4444;padding:0.5rem 1rem;margin-left:0.5rem">✕ Fechar</button>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div style="background:#fff;padding:1rem;border-radius:8px;margin-bottom:1.5rem;border:2px solid #e2e8f0">
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+            <div>
+                <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Tipo:</label>
+                <select id="filterType" onchange="filterKeys()" style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0">
+                    <option value="all">Todos</option>
+                    <option value="basic">Básica</option>
+                    <option value="premium">Premium</option>
+                    <option value="full">Elite</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Estado:</label>
+                <select id="filterStatus" onchange="filterKeys()" style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0">
+                    <option value="all">Todos</option>
+                    <option value="active">Ativas</option>
+                    <option value="used">Usadas</option>
+                    <option value="expired">Expiradas</option>
+                    <option value="invalid">Inválidas</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Pesquisar:</label>
+                <input type="text" id="filterSearch" placeholder="Chave ou email..." onkeyup="filterKeys()" 
+                       style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0;width:200px">
+            </div>
+            
+            <div style="margin-left:auto">
+                <button onclick="exportKeysToCSV()" style="background:#10b981;padding:0.5rem 1rem">📥 Exportar CSV</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estatísticas rápidas -->
+    <div id="keyStats" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.5rem"></div>
+    
+    <!-- Lista de chaves -->
+    <div style="max-height:500px;overflow-y:auto">
+        <table id="keysTable" style="width:100%;border-collapse:collapse">
+            <thead>
+                <tr style="background:#f1f5f9">
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Chave</th>
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Tipo</th>
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Utilizações</th>
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Validade</th>
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Estado</th>
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Criada</th>
+                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="keysList">
+                <!-- As chaves serão carregadas aqui -->
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="text-align:center;margin-top:1.5rem;color:#64748b;font-size:0.9rem">
+        <p>Total de chaves: <span id="totalKeysCount">0</span> | Mostrando: <span id="showingKeysCount">0</span></p>
+    </div>
+</div>
 
     <!-- POPUP DE BOAS-VINDAS MELHORADO -->
     <div id="welcomeOverlay" class="welcome-overlay hidden"></div>
