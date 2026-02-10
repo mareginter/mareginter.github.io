@@ -270,118 +270,6 @@ var PREMIUM_MODULES = [
                 ],
                 correct: 1,
                 source: 'Departamento de Saúde EUA, 2020'
-            },
-            {
-                id: 'case4',
-                title: 'Business Email Compromise - Caso Imobiliário',
-                company: 'Agência Imobiliária (2021)',
-                scenario: 'Cliente a comprar casa recebeu email do "advogado" com instruções para transferir sinal de €85.000. O email do advogado tinha sido hackeado dias antes.',
-                whatHappened: 'O cliente transferiu o dinheiro para conta fraudulenta. Só descobriu no dia da escritura quando o advogado real perguntou sobre o pagamento.',
-                redFlags: [
-                    'Email sobre pagamento sem referência a detalhes específicos discutidos',
-                    'Conta bancária em banco diferente do habitual',
-                    'Assinatura de email incompleta',
-                    'Tom mais impessoal que o normal'
-                ],
-                prevention: [
-                    'Verificação telefónica para confirmação de dados bancários',
-                    'Uso de frases de código previamente combinadas',
-                    'Comunicação através de plataforma segura com verificação de identidade',
-                    'Educação dos clientes sobre estes riscos'
-                ],
-                question: 'Que medida poderia ter prevenido esta fraude?',
-                opts: [
-                    'Usar apenas transferências bancárias',
-                    'Estabelecer frase de código com clientes para confirmar mudanças',
-                    'Não discutir negócios por email',
-                    'Pedir cópia do cartão de cidadão'
-                ],
-                correct: 1,
-                source: 'APAV - Associação Portuguesa de Apoio à Vítima'
-            },
-            {
-                id: 'case5',
-                title: 'W-2 Phishing - Dados Fiscais',
-                company: 'Escola Pública (2018)',
-                scenario: 'Email aparentando vir do diretor para assistente administrativo: "Preciso dos W-2 de todos os funcionários para revisão urgente. Envie hoje."',
-                whatHappened: 'A assistente enviou os formulários W-2 (com números de segurança social, salários, endereços) de 2.000 funcionários. Dados usados para fraude fiscal em larga escala.',
-                redFlags: [
-                    'Pedido fora do ciclo normal (W-2 normalmente em Janeiro)',
-                    'Email enviado fora de horas',
-                    'Tom mais direto que o estilo habitual do diretor',
-                    'Pedido para ignorar procedimentos normais'
-                ],
-                prevention: [
-                    'Política clara sobre partilha de dados sensíveis',
-                    'Verificação obrigatória para pedidos de dados confidenciais',
-                    'Treino específico para funcionários com acesso a dados pessoais',
-                    'Classificação e proteção de dados por sensibilidade'
-                ],
-                question: 'Como lidar com pedido urgente de dados sensíveis?',
-                opts: [
-                    'Obedecer imediatamente por ser superior hierárquico',
-                    'Verificar através de canal secundário (telefone, presencial)',
-                    'Enviar mas pedir confirmação depois',
-                    'Pedir autorização por escrito'
-                ],
-                correct: 1,
-                source: 'IRS Alert SA-2018-2'
-            },
-            {
-                id: 'case6',
-                title: 'Phishing em Setor Bancário',
-                company: 'Banco Europeu (2022)',
-                scenario: 'Clientes receberam SMS aparentando ser do banco: "Detetamos acesso suspeito à sua conta. Clique para verificar: banco-verificacao[.]com". O link levava a site idêntico ao do banco.',
-                whatHappened: 'Centenas de clientes introduziram credenciais bancárias. Perdas estimadas em €1.2 milhões antes do bloqueio.',
-                redFlags: [
-                    'URL diferente do domínio oficial do banco',
-                    'SMS com link em vez de app ou portal',
-                    'Pressão emocional ("acesso suspeito")',
-                    'Falta de identificação única do cliente'
-                ],
-                prevention: [
-                    'Comunicação oficial apenas através de app bancária',
-                    'Educação sobre nunca clicar em links de SMS bancários',
-                    'Verificação em duas etapas obrigatória',
-                    'Monitorização de domínios parecidos'
-                ],
-                question: 'Como identificar comunicação legítima do banco?',
-                opts: [
-                    'Confiar em qualquer SMS do banco',
-                    'Sempre aceder através da app oficial ou site conhecido',
-                    'Verificar se o email tem logo do banco',
-                    'Confiar se tiver seu nome completo'
-                ],
-                correct: 1,
-                source: 'Relatório Banco de Portugal 2022'
-            },
-            {
-                id: 'case7',
-                title: 'Ataque a Pequeno Comércio',
-                company: 'Loja Online Portuguesa (2023)',
-                scenario: 'Proprietário recebeu email da "equipa de suporte da plataforma de e-commerce" pedindo para atualizar dados de pagamento devido a "mudanças de segurança".',
-                whatHappened: 'O proprietário atualizou dados e os próximos pagamentos de clientes foram desviados. Prejuízo de €15.000 antes da deteção.',
-                redFlags: [
-                    'Email genérico em vez de ticket de suporte',
-                    'Solicitação fora do canal normal de suporte',
-                    'Urgência artificial ("atualize em 24h")',
-                    'Link para formulário não oficial'
-                ],
-                prevention: [
-                    'Canais oficiais de suporte documentados',
-                    'Verificação por telefone para mudanças críticas',
-                    'Treino específico para pequenos empresários',
-                    'Monitorização de transações incomuns'
-                ],
-                question: 'Como validar solicitação de suporte técnico?',
-                opts: [
-                    'Confiar se o email parece profissional',
-                    'Contactar através de canal oficial conhecido',
-                    'Responder ao email pedindo confirmação',
-                    'Pedir para colega verificar'
-                ],
-                correct: 1,
-                source: 'APDC - Associação Portuguesa para o Desenvolvimento das Comunicações'
             }
         ]
     },
@@ -559,7 +447,7 @@ var PHISHING_EMAILS = [
         id: 'em4',
         from: 'admin@microsoft.com',
         subject: 'Licença Office 365',
-        body: 'Sua licença expira em breve.\nRenovar: https://office.microsoft.com/renew',
+        body: 'Sua licença expira em breve.\nRenover: https://office.microsoft.com/renew',
         isPhishing: false,
         xp: 50,
         explanation: 'Legítimo! Domínio oficial Microsoft, HTTPS, URL consistente.'
@@ -572,33 +460,6 @@ var PHISHING_EMAILS = [
         isPhishing: true,
         xp: 50,
         explanation: 'Phishing! Ameaças, urgência extrema, domínio .xyz suspeito.'
-    },
-    {
-        id: 'em6',
-        from: 'ti@suaempresa.pt',
-        subject: 'Atualização de Segurança',
-        body: 'Instalação de nova ferramenta de segurança.\nBaixe: https://suaempresa.pt/tools/security.exe',
-        isPhishing: false,
-        xp: 50,
-        explanation: 'Legítimo! Email de TI interno, domínio correto da empresa.'
-    },
-    {
-        id: 'em7',
-        from: 'secure@go0gle.com',
-        subject: 'Atividade Suspeita Detectada',
-        body: 'Alguém tentou acessar sua conta Google.\nVerifique: http://google-security.ru',
-        isPhishing: true,
-        xp: 50,
-        explanation: 'Phishing! "0" em vez de "o" no Google, domínio .ru russo suspeito.'
-    },
-    {
-        id: 'em8',
-        from: 'covid-update@health-gov.net',
-        subject: 'Nova Variante COVID - Teste Obrigatório',
-        body: 'Teste obrigatório para todos.\nAgendar: http://covid-test-urgente.tk\nTraga cartão de crédito.',
-        isPhishing: true,
-        xp: 50,
-        explanation: 'Phishing! Explora medo do COVID, pede cartão de crédito, domínio .tk.'
     }
 ];
 
@@ -1025,6 +886,13 @@ function showLoginType(type) {
         document.getElementById('btnLoginUser').style.background = '#64748b';
         document.getElementById('btnLoginAdmin').style.background = '#8b5cf6';
         
+        // Criar campo de código de convite se não existir
+        setTimeout(function() {
+            if (!document.getElementById('adminInviteCode')) {
+                createInviteCodeField();
+            }
+        }, 100);
+        
         var email = document.getElementById('adminEmail').value.trim();
         if(email) {
             checkAdminExists(email);
@@ -1035,24 +903,288 @@ function showLoginType(type) {
 async function checkAdminExists(email) {
     try {
         var adminExtraFields = document.getElementById('adminExtraFields');
-        var adminSnapshot = await database.ref('admins/' + email.replace(/\./g, '_')).once('value');
+        
+        if (!adminExtraFields) {
+            console.log('⚠️ adminExtraFields não encontrado');
+            return;
+        }
+        
+        var adminEmailKey = email.replace(/[.#$[\]]/g, '_');
+        var adminSnapshot = await database.ref('admins/' + adminEmailKey).once('value');
         
         if(!adminSnapshot.exists()) {
+            // Novo admin - mostrar campos extras e campo de convite
             adminExtraFields.style.display = 'block';
+            
+            // Garantir que o campo de convite existe
+            if (!document.getElementById('adminInviteCode')) {
+                createInviteCodeField();
+            }
+            
+            // Mostrar mensagem informativa
+            document.getElementById('adminMsg').innerHTML = 
+                '<span style="color:#ef4444">⚠️ Primeiro acesso? Preencha todos os campos incluindo código de convite.</span>';
         } else {
+            // Admin existente - ocultar campos extras
             adminExtraFields.style.display = 'none';
+            
+            // Ocultar campo de convite se existir
+            var inviteContainer = document.getElementById('inviteCodeContainer');
+            if (inviteContainer) {
+                inviteContainer.style.display = 'none';
+            }
+            
+            document.getElementById('adminMsg').innerHTML = 
+                '<span style="color:#10b981">✅ Administrador encontrado. Faça login.</span>';
         }
     } catch (error) {
         console.error('Erro ao verificar admin:', error);
+        document.getElementById('adminMsg').innerHTML = 
+            '<span style="color:#ef4444">❌ Erro ao verificar conta.</span>';
     }
 }
 
-document.getElementById('adminEmail').addEventListener('blur', function() {
-    var email = this.value.trim();
-    if(email && document.getElementById('adminLogin').style.display !== 'none') {
-        checkAdminExists(email);
+// ============================================
+// FUNÇÃO PARA CRIAR CAMPO DE CÓDIGO DE CONVITE
+// ============================================
+
+function createInviteCodeField() {
+    // Verificar se o campo já existe
+    if (document.getElementById('adminInviteCode')) {
+        console.log('✅ Campo adminInviteCode já existe');
+        return;
     }
-});
+    
+    // Encontrar o formulário de login do admin
+    const adminForm = document.getElementById('adminLogin');
+    if (!adminForm) {
+        console.log('⚠️ Formulário de admin não encontrado');
+        return;
+    }
+    
+    // Encontrar o campo de senha do admin
+    const adminPassField = document.getElementById('adminPass');
+    if (!adminPassField) {
+        console.log('⚠️ Campo de senha do admin não encontrado');
+        return;
+    }
+    
+    // Criar o container do campo de convite
+    const inviteContainer = document.createElement('div');
+    inviteContainer.id = 'inviteCodeContainer';
+    inviteContainer.style.marginTop = '1rem';
+    inviteContainer.style.paddingTop = '1rem';
+    inviteContainer.style.borderTop = '2px dashed #e2e8f0';
+    
+    // Criar o campo de input
+    const inviteInput = document.createElement('input');
+    inviteInput.type = 'password';
+    inviteInput.id = 'adminInviteCode';
+    inviteInput.name = 'adminInviteCode';
+    inviteInput.placeholder = 'Código de Convite (somente primeiro acesso)';
+    inviteInput.style.width = '100%';
+    inviteInput.style.padding = '0.8rem';
+    inviteInput.style.borderRadius = '6px';
+    inviteInput.style.border = '2px solid #e2e8f0';
+    inviteInput.style.backgroundColor = '#fff';
+    inviteInput.style.marginBottom = '0.5rem';
+    
+    // Criar mensagem de ajuda
+    const helpText = document.createElement('p');
+    helpText.style.fontSize = '0.85rem';
+    helpText.style.color = '#64748b';
+    helpText.style.marginTop = '0.5rem';
+    helpText.innerHTML = '⚠️ Necessário apenas para criar uma conta de administrador pela primeira vez. Se já é admin, deixe em branco.';
+    
+    // Adicionar ao container
+    inviteContainer.appendChild(inviteInput);
+    inviteContainer.appendChild(helpText);
+    
+    // Inserir após o campo de senha e antes dos campos extras
+    adminPassField.parentNode.insertBefore(inviteContainer, document.getElementById('adminExtraFields'));
+    
+    console.log('✅ Campo adminInviteCode criado com sucesso!');
+}
+
+// ============================================
+// SISTEMA DE CÓDIGOS DE CONVITE DE ADMIN
+// ============================================
+
+const ADMIN_INVITE_CODES = {
+    // Códigos padrão para criar conta de admin
+    'ADMIN-2024-MASTER': { valid: true, level: 'super-admin' },
+    'SUPER-ACCESS-999': { valid: true, level: 'admin' },
+    'ELITE-MAREGINTER': { valid: true, level: 'admin' },
+    'PHISHING-PROTECT': { valid: true, level: 'admin' },
+    // Códigos de teste
+    'TEST-ADMIN-1234': { valid: true, level: 'admin' }
+};
+
+// Função para verificar código de convite de admin
+function verificarCodigoConviteAdmin(codigo) {
+    if (!codigo) {
+        return {
+            valido: false,
+            mensagem: 'Código de convite é necessário para criar conta de administrador.'
+        };
+    }
+    
+    const codigoUpper = codigo.toUpperCase();
+    const codigoInfo = ADMIN_INVITE_CODES[codigoUpper];
+    
+    if (codigoInfo && codigoInfo.valid) {
+        console.log(`✅ Código de convite admin válido: ${codigo}`);
+        return {
+            valido: true,
+            nivelAcesso: codigoInfo.level,
+            mensagem: 'Código de convite válido! Conta de administrador será criada.'
+        };
+    } else {
+        console.log(`❌ Código de convite admin inválido: ${codigo}`);
+        return {
+            valido: false,
+            mensagem: 'Código de convite inválido ou expirado.'
+        };
+    }
+}
+
+// ============================================
+// FUNÇÃO DE LOGIN DE ADMINISTRADOR ATUALIZADA
+// ============================================
+
+async function doAdminLogin() {
+    var email = document.getElementById('adminEmail').value.trim();
+    var password = document.getElementById('adminPass').value;
+    var name = document.getElementById('adminName') ? document.getElementById('adminName').value.trim() : '';
+    var companyName = document.getElementById('companyName') ? document.getElementById('companyName').value.trim() : '';
+    var inviteCode = document.getElementById('adminInviteCode') ? document.getElementById('adminInviteCode').value.trim() : '';
+    
+    // Validar email e senha
+    if (!email || !password) {
+        alert('Por favor, preencha email e senha');
+        return;
+    }
+    
+    try {
+        // Primeiro, verificar se já existe admin com este email
+        var adminEmailKey = email.replace(/[.#$[\]]/g, '_');
+        var adminSnapshot = await database.ref('admins/' + adminEmailKey).once('value');
+        
+        if (adminSnapshot.exists()) {
+            // ADMIN EXISTENTE - fazer login normal
+            var adminData = adminSnapshot.val();
+            
+            // Verificar senha (simplificado - em produção usar hash)
+            if (adminData.password === password) {
+                console.log('✅ Login de admin bem-sucedido:', email);
+                
+                // Configurar usuário como admin
+                USER.id = 'admin_' + adminEmailKey;
+                USER.name = adminData.name;
+                USER.email = email;
+                USER.isAdmin = true;
+                USER.companyCode = adminData.companyCode || 'ADMIN';
+                COMPANY.code = adminData.companyCode || 'ADMIN';
+                COMPANY.name = adminData.companyName || 'Administração';
+                COMPANY.adminEmail = email;
+                COMPANY.adminName = adminData.name;
+                
+                // Iniciar app como admin
+                localStorage.setItem('last_user_email', email);
+                startApp();
+                
+                return;
+            } else {
+                alert('Senha incorreta');
+                return;
+            }
+        } else {
+            // NOVO ADMIN - precisa de código de convite
+            var adminExtraFields = document.getElementById('adminExtraFields');
+            
+            if (!adminExtraFields || adminExtraFields.style.display === 'none') {
+                // Se não mostra campos extras, então o admin já existe
+                alert('❌ Administrador não encontrado. Para criar nova conta de admin é necessário código de convite.');
+                
+                // Mostrar campos extras
+                adminExtraFields.style.display = 'block';
+                
+                // Criar campo de código de convite se não existir
+                if (!document.getElementById('adminInviteCode')) {
+                    createInviteCodeField();
+                }
+                
+                return;
+            }
+            
+            // Verificar campos obrigatórios para novo admin
+            if (!name || !companyName) {
+                alert('Para criar nova conta de administrador, preencha todos os campos obrigatórios.');
+                return;
+            }
+            
+            // Verificar código de convite
+            var resultado = verificarCodigoConviteAdmin(inviteCode);
+            
+            if (!resultado.valido) {
+                alert('❌ ' + resultado.mensagem);
+                return;
+            }
+            
+            // Criar novo admin
+            var companyCode = generateCompanyCode();
+            
+            // Salvar dados do admin
+            var adminData = {
+                email: email,
+                name: name,
+                password: password, // Em produção, usar hash!
+                companyCode: companyCode,
+                companyName: companyName,
+                level: resultado.nivelAcesso || 'admin',
+                created: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                inviteCodeUsed: inviteCode
+            };
+            
+            await database.ref('admins/' + adminEmailKey).set(adminData);
+            
+            // Criar empresa
+            var companyData = {
+                code: companyCode,
+                name: companyName,
+                adminEmail: email,
+                adminName: name,
+                created: new Date().toISOString(),
+                employees: []
+            };
+            
+            await database.ref('companies/' + companyCode).set(companyData);
+            
+            // Configurar usuário
+            USER.id = 'admin_' + adminEmailKey;
+            USER.name = name;
+            USER.email = email;
+            USER.isAdmin = true;
+            USER.companyCode = companyCode;
+            COMPANY = companyData;
+            
+            console.log('✅ Nova conta de admin criada:', email);
+            
+            // Mostrar mensagem de sucesso
+            alert('✅ Conta de administrador criada com sucesso!\n\nCódigo da empresa: ' + companyCode + 
+                  '\n\nPartilhe este código com os seus colaboradores.');
+            
+            // Iniciar app
+            localStorage.setItem('last_user_email', email);
+            startApp();
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro no login de admin:', error);
+        alert('Erro: ' + error.message);
+    }
+}
 
 async function doLogin() {
     var name = document.getElementById('userName').value.trim();
@@ -1195,96 +1327,6 @@ async function doLogin() {
     
     checkBadges();
     startApp();
-}
-
-async function doAdminLogin() {
-    var email = document.getElementById('adminEmail').value.trim();
-    var pass = document.getElementById('adminPass').value;
-    var name = document.getElementById('adminName').value.trim();
-    var companyName = document.getElementById('companyName').value.trim();
-    
-    if(!email || !pass) {
-        alert('Email e senha obrigatórios');
-        return;
-    }
-    
-    if(pass.length < 6) {
-        alert('Senha mínimo 6 caracteres');
-        return;
-    }
-    
-    var adminKey = email.replace(/\./g, '_');
-    
-    try {
-        var adminSnapshot = await database.ref('admins/' + adminKey).once('value');
-        
-        if(adminSnapshot.exists()) {
-            var adminData = adminSnapshot.val();
-            
-            if(adminData.password !== pass) {
-                alert('❌ Senha incorreta');
-                return;
-            }
-            
-            USER.id = adminData.id;
-            USER.name = adminData.name;
-            USER.email = email;
-            USER.isAdmin = true;
-            USER.companyCode = adminData.companyCode;
-            
-            COMPANY.code = adminData.companyCode;
-            COMPANY.name = adminData.companyName;
-            COMPANY.adminEmail = email;
-            COMPANY.adminName = adminData.name;
-            
-            await loadCompanyEmployees();
-            startApp();
-            
-        } else {
-            if(!name || !companyName) {
-                alert('⚠️ Primeira vez? Preencha Nome e Empresa');
-                document.getElementById('adminExtraFields').style.display = 'block';
-                return;
-            }
-            
-            var companyCode = generateCompanyCode();
-            
-            USER.id = 'admin_' + Date.now();
-            USER.name = name;
-            USER.email = email;
-            USER.isAdmin = true;
-            USER.companyCode = companyCode;
-            
-            COMPANY.code = companyCode;
-            COMPANY.name = companyName;
-            COMPANY.adminEmail = email;
-            COMPANY.adminName = name;
-            COMPANY.employees = [];
-            
-            var adminData = {
-                id: USER.id,
-                name: name,
-                password: pass,
-                companyCode: companyCode,
-                companyName: companyName,
-                created: new Date().toISOString()
-            };
-            
-            // Salva admin no Firebase
-            await database.ref('admins/' + adminKey).set(adminData);
-            
-            // Salva empresa no Firebase
-            await database.ref('companies/' + companyCode).set(COMPANY);
-            
-            startApp();
-            alert('✅ Admin criado!\n\nCódigo da Empresa: ' + companyCode);
-        }
-        
-        await saveDataToFirebase();
-    } catch (error) {
-        console.error('Erro no login admin:', error);
-        alert('Erro ao fazer login: ' + error.message);
-    }
 }
 
 function generateCompanyCode() {
@@ -3824,7 +3866,7 @@ function filterEmployees(term) {
 }
 
 // ==================== INICIALIZAÇÃO ====================
-document.getElementById('adminEmail')?.addEventListener('blur', function() {
+document.getElementById('adminEmail').addEventListener('blur', function() {
     var email = this.value.trim();
     if(email && document.getElementById('adminLogin').style.display !== 'none') {
         checkAdminExists(email);
@@ -3848,4 +3890,19 @@ window.onload = function() {
     
     console.log('✅ Academia Anti-Phishing Elite | Mareginter - Sistema Completo com Chaves de Ativação 🔑');
     console.log('🔑 Chaves de teste disponíveis: TEST-1234, BASIC-2024-DEF456, PREMIUM-XYZ789, ELITE-2024-ABC123');
+    
+    // Inicialização automática do campo de código de convite
+    setTimeout(function() {
+        // Verificar se estamos na página de login de admin
+        if (document.getElementById('adminLogin') && 
+            document.getElementById('adminLogin').style.display !== 'none') {
+            
+            console.log('🛠️ Verificando campo adminInviteCode...');
+            
+            if (!document.getElementById('adminInviteCode')) {
+                console.log('🛠️ Criando campo adminInviteCode automaticamente...');
+                createInviteCodeField();
+            }
+        }
+    }, 1500);
 };
