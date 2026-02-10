@@ -19,6 +19,8 @@ try {
 }
 const database = firebase.database();
 
+
+
 // DADOS GLOBAIS
 var USER = {
     id: '',
@@ -48,6 +50,7 @@ var COMPANY = {
     employees: []
 };
 
+/*
 // SISTEMA DE CHAVES DE ATIVAÇÃO
 var ACTIVATION_SYSTEM = {
     // Configuração: permite acesso sem chave? true = sim, false = não
@@ -61,6 +64,7 @@ var ACTIVATION_SYSTEM = {
         'TEST-1234': { valid: true, used: false, type: 'basic' }
     }
 };
+*/
 
 // ==================== DADOS DOS MÓDULOS ====================
 
@@ -179,10 +183,11 @@ var PREMIUM_MODULES = [
             {q:'Comunicação durante incidente deve ser:',opts:['Interna e controlada','Pública imediatamente','Somente oral','Inexistente'],correct:0}
         ]
     },
+    // NOVO MÓDULO STORYTELLING - CORRIGIDO
     {
         id: 'prem4',
         title: '📖 Histórias Reais de Phishing',
-        desc: 'Casos reais que aconteceram e como poderiam ter sido evitados',
+        desc: '5 casos reais que aconteceram e como poderiam ter sido evitados',
         xp: 350,
         isPremium: true,
         stories: true,
@@ -270,122 +275,64 @@ var PREMIUM_MODULES = [
                 ],
                 correct: 1,
                 source: 'Departamento de Saúde EUA, 2020'
+            },
+            {
+                id: 'case4',
+                title: 'Business Email Compromise - Caso Imobiliário',
+                company: 'Agência Imobiliária (2021)',
+                scenario: 'Cliente a comprar casa recebeu email do "advogado" com instruções para transferir sinal de €85.000. O email do advogado tinha sido hackeado dias antes.',
+                whatHappened: 'O cliente transferiu o dinheiro para conta fraudulenta. Só descobriu no dia da escritura quando o advogado real perguntou sobre o pagamento.',
+                redFlags: [
+                    'Email sobre pagamento sem referência a detalhes específicos discutidos',
+                    'Conta bancária em banco diferente do habitual',
+                    'Assinatura de email incompleta',
+                    'Tom mais impessoal que o normal'
+                ],
+                prevention: [
+                    'Verificação telefónica para confirmação de dados bancários',
+                    'Uso de frases de código previamente combinadas',
+                    'Comunicação através de plataforma segura com verificação de identidade',
+                    'Educação dos clientes sobre estes riscos'
+                ],
+                question: 'Que medida poderia ter prevenido esta fraude?',
+                opts: [
+                    'Usar apenas transferências bancárias',
+                    'Estabelecer frase de código com clientes para confirmar mudanças',
+                    'Não discutir negócios por email',
+                    'Pedir cópia do cartão de cidadão'
+                ],
+                correct: 1,
+                source: 'APAV - Associação Portuguesa de Apoio à Vítima'
+            },
+            {
+                id: 'case5',
+                title: 'W-2 Phishing - Dados Fiscais',
+                company: 'Escola Pública (2018)',
+                scenario: 'Email aparentando vir do diretor para assistente administrativo: "Preciso dos W-2 de todos os funcionários para revisão urgente. Envie hoje."',
+                whatHappened: 'A assistente enviou os formulários W-2 (com números de segurança social, salários, endereços) de 2.000 funcionários. Dados usados para fraude fiscal em larga escala.',
+                redFlags: [
+                    'Pedido fora do ciclo normal (W-2 normalmente em Janeiro)',
+                    'Email enviado fora de horas',
+                    'Tom mais direto que o estilo habitual do diretor',
+                    'Pedido para ignorar procedimentos normais'
+                ],
+                prevention: [
+                    'Política clara sobre partilha de dados sensíveis',
+                    'Verificação obrigatória para pedidos de dados confidenciais',
+                    'Treino específico para funcionários com acesso a dados pessoais',
+                    'Classificação e proteção de dados por sensibilidade'
+                ],
+                question: 'Como lidar com pedido urgente de dados sensíveis?',
+                opts: [
+                    'Obedecer imediatamente por ser superior hierárquico',
+                    'Verificar através de canal secundário (telefone, presencial)',
+                    'Enviar mas pedir confirmação depois',
+                    'Pedir autorização por escrito'
+                ],
+                correct: 1,
+                source: 'IRS Alert SA-2018-2'
             }
         ]
-    },
-    {
-        id: 'prem5',
-        title: '⚖️ Legislação e Conformidade',
-        desc: 'GDPR, LGPD e outras regulamentações de segurança de dados',
-        xp: 400,
-        isPremium: true,
-        questions: [
-            {
-                q: 'O que significa GDPR?',
-                opts: [
-                    'General Data Protection Regulation',
-                    'Global Digital Protection Rules',
-                    'Government Data Privacy Rights',
-                    'General Digital Privacy Regulation'
-                ],
-                correct: 0
-            },
-            {
-                q: 'Qual o valor máximo de multa por violação do GDPR?',
-                opts: [
-                    '€10 milhões ou 2% do faturamento',
-                    '€20 milhões ou 4% do faturamento global',
-                    '€50 milhões',
-                    'Não há limite de multa'
-                ],
-                correct: 1
-            },
-            {
-                q: 'O que são "dados pessoais" segundo o GDPR?',
-                opts: [
-                    'Apenas nome e email',
-                    'Qualquer informação relacionada a pessoa identificável',
-                    'Apenas dados financeiros',
-                    'Apenas dados de saúde'
-                ],
-                correct: 1
-            },
-            {
-                q: 'O princípio de "minimização de dados" significa:',
-                opts: [
-                    'Coletar o máximo de dados possível',
-                    'Coletar apenas dados necessários para a finalidade',
-                    'Eliminar todos os dados após 6 meses',
-                    'Não coletar dados de menores'
-                ],
-                correct: 1
-            },
-            {
-                q: 'Em caso de violação de dados, a empresa deve notificar:',
-                opts: [
-                    'Apenas os afetados',
-                    'Apenas a autoridade supervisora',
-                    'Autoridade supervisora em 72h e afetados se alto risco',
-                    'Ninguém, apenas resolver internamente'
-                ],
-                correct: 2
-            }
-        ],
-        legislationContent: `
-            <div style="margin:1.5rem 0">
-                <h4 style="color:#3b82f6;margin-bottom:1rem">📜 GDPR - Regulamento Geral de Proteção de Dados</h4>
-                
-                <div style="background:#f8fafc;padding:1.5rem;border-radius:8px;margin:1rem 0">
-                    <h5 style="color:#1e293b;margin-bottom:0.5rem">📋 Princípios Fundamentais</h5>
-                    <ul style="margin-left:1.5rem;line-height:1.8">
-                        <li><strong>Legalidade, lealdade e transparência:</strong> Processar dados de forma legal e transparente</li>
-                        <li><strong>Limitação da finalidade:</strong> Coletar dados para finalidades específicas e legítimas</li>
-                        <li><strong>Minimização de dados:</strong> Coletar apenas dados necessários</li>
-                        <li><strong>Exatidão:</strong> Manter dados atualizados e corretos</li>
-                        <li><strong>Limitação da conservação:</strong> Manter dados apenas pelo tempo necessário</li>
-                        <li><strong>Integridade e confidencialidade:</strong> Garantir segurança dos dados</li>
-                    </ul>
-                </div>
-                
-                <div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:1rem 0">
-                    <h5 style="color:#4f46e5;margin-bottom:0.5rem">👤 Direitos dos Titulares</h5>
-                    <ul style="margin-left:1.5rem;line-height:1.8">
-                        <li><strong>Direito de acesso:</strong> Saber que dados são processados</li>
-                        <li><strong>Direito de retificação:</strong> Corrigir dados incorretos</li>
-                        <li><strong>Direito ao apagamento ("direito ao esquecimento"):</strong> Remover dados</li>
-                        <li><strong>Direito à limitação do tratamento:</strong> Restringir processamento</li>
-                        <li><strong>Direito à portabilidade:</strong> Receber dados em formato estruturado</li>
-                        <li><strong>Direito de oposição:</strong> Opor-se ao processamento</li>
-                    </ul>
-                </div>
-                
-                <div style="background:#fffbeb;padding:1.5rem;border-radius:8px;margin:1rem 0">
-                    <h5 style="color:#d97706;margin-bottom:0.5rem">🏢 Obrigações das Empresas</h5>
-                    <ul style="margin-left:1.5rem;line-height:1.8">
-                        <li><strong>Registo de atividades de tratamento:</strong> Documentar processamento de dados</li>
-                        <li><strong>Avaliação de impacto (DPIA):</strong> Para processamentos de alto risco</li>
-                        <li><strong>Notificação de violações:</strong> 72h para autoridade, afetados se alto risco</li>
-                        <li><strong>Nomear DPO:</strong> Encarregado de proteção de dados se necessário</li>
-                        <li><strong>Contratos com processadores:</strong> Acordos escritos com fornecedores</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-                <h5 style="color:#065f46;margin-bottom:1rem">🇵🇹 LGPD - Lei Geral de Proteção de Dados (Brasil)</h5>
-                <p>Inspirada no GDPR europeu, a LGPD brasileira estabelece:</p>
-                <ul style="margin-left:1.5rem;line-height:1.8;margin-top:0.5rem">
-                    <li>Multas até 2% do faturamento (máx. R$ 50 milhões)</li>
-                    <li>Vigência desde setembro de 2020</li>
-                    <li>Autoridade Nacional (ANPD)</li>
-                    <li>Direitos similares ao GDPR</li>
-                </ul>
-            </div>
-            
-            <div style="background:#f1f5f9;padding:1rem;border-radius:6px;margin:1rem 0;text-align:center">
-                <p style="color:#64748b;font-size:0.9rem"><strong>⚠️ Importante:</strong> Esta é uma visão geral. Consulte um especialista legal para conformidade específica.</p>
-            </div>
-        `
     }
 ];
 
@@ -407,7 +354,6 @@ var BADGES = [
     {id:'prem1',name:'🧠 Engenheiro Social',desc:'Completou módulo Engenharia Social',check:function(){return USER.scores['prem1'] !== undefined}},
     {id:'prem2',name:'🔐 Criptógrafo',desc:'Completou módulo Criptografia',check:function(){return USER.scores['prem2'] !== undefined}},
     {id:'prem3',name:'🛡️ Incident Commander',desc:'Completou módulo Resposta a Incidentes',check:function(){return USER.scores['prem3'] !== undefined}},
-    {id:'prem5',name:'⚖️ Especialista em Conformidade',desc:'Completou módulo de Legislação e GDPR',check:function(){return USER.scores['prem5'] !== undefined}},
     {id:'story_master',name:'📖 Mestre das Histórias',desc:'Completou todos os casos reais de phishing',check:function(){
         var storyModule = PREMIUM_MODULES.find(m => m.stories);
         if(!storyModule) return false;
@@ -447,7 +393,7 @@ var PHISHING_EMAILS = [
         id: 'em4',
         from: 'admin@microsoft.com',
         subject: 'Licença Office 365',
-        body: 'Sua licença expira em breve.\nRenover: https://office.microsoft.com/renew',
+        body: 'Sua licença expira em breve.\nRenovar: https://office.microsoft.com/renew',
         isPhishing: false,
         xp: 50,
         explanation: 'Legítimo! Domínio oficial Microsoft, HTTPS, URL consistente.'
@@ -460,6 +406,33 @@ var PHISHING_EMAILS = [
         isPhishing: true,
         xp: 50,
         explanation: 'Phishing! Ameaças, urgência extrema, domínio .xyz suspeito.'
+    },
+    {
+        id: 'em6',
+        from: 'ti@suaempresa.pt',
+        subject: 'Atualização de Segurança',
+        body: 'Instalação de nova ferramenta de segurança.\nBaixe: https://suaempresa.pt/tools/security.exe',
+        isPhishing: false,
+        xp: 50,
+        explanation: 'Legítimo! Email de TI interno, domínio correto da empresa.'
+    },
+    {
+        id: 'em7',
+        from: 'secure@go0gle.com',
+        subject: 'Atividade Suspeita Detectada',
+        body: 'Alguém tentou acessar sua conta Google.\nVerifique: http://google-security.ru',
+        isPhishing: true,
+        xp: 50,
+        explanation: 'Phishing! "0" em vez de "o" no Google, domínio .ru russo suspeito.'
+    },
+    {
+        id: 'em8',
+        from: 'covid-update@health-gov.net',
+        subject: 'Nova Variante COVID - Teste Obrigatório',
+        body: 'Teste obrigatório para todos.\nAgendar: http://covid-test-urgente.tk\nTraga cartão de crédito.',
+        isPhishing: true,
+        xp: 50,
+        explanation: 'Phishing! Explora medo do COVID, pede cartão de crédito, domínio .tk.'
     }
 ];
 
@@ -886,13 +859,6 @@ function showLoginType(type) {
         document.getElementById('btnLoginUser').style.background = '#64748b';
         document.getElementById('btnLoginAdmin').style.background = '#8b5cf6';
         
-        // Criar campo de código de convite se não existir
-        setTimeout(function() {
-            if (!document.getElementById('adminInviteCode')) {
-                createInviteCodeField();
-            }
-        }, 100);
-        
         var email = document.getElementById('adminEmail').value.trim();
         if(email) {
             checkAdminExists(email);
@@ -903,288 +869,24 @@ function showLoginType(type) {
 async function checkAdminExists(email) {
     try {
         var adminExtraFields = document.getElementById('adminExtraFields');
-        
-        if (!adminExtraFields) {
-            console.log('⚠️ adminExtraFields não encontrado');
-            return;
-        }
-        
-        var adminEmailKey = email.replace(/[.#$[\]]/g, '_');
-        var adminSnapshot = await database.ref('admins/' + adminEmailKey).once('value');
+        var adminSnapshot = await database.ref('admins/' + email.replace(/\./g, '_')).once('value');
         
         if(!adminSnapshot.exists()) {
-            // Novo admin - mostrar campos extras e campo de convite
             adminExtraFields.style.display = 'block';
-            
-            // Garantir que o campo de convite existe
-            if (!document.getElementById('adminInviteCode')) {
-                createInviteCodeField();
-            }
-            
-            // Mostrar mensagem informativa
-            document.getElementById('adminMsg').innerHTML = 
-                '<span style="color:#ef4444">⚠️ Primeiro acesso? Preencha todos os campos incluindo código de convite.</span>';
         } else {
-            // Admin existente - ocultar campos extras
             adminExtraFields.style.display = 'none';
-            
-            // Ocultar campo de convite se existir
-            var inviteContainer = document.getElementById('inviteCodeContainer');
-            if (inviteContainer) {
-                inviteContainer.style.display = 'none';
-            }
-            
-            document.getElementById('adminMsg').innerHTML = 
-                '<span style="color:#10b981">✅ Administrador encontrado. Faça login.</span>';
         }
     } catch (error) {
         console.error('Erro ao verificar admin:', error);
-        document.getElementById('adminMsg').innerHTML = 
-            '<span style="color:#ef4444">❌ Erro ao verificar conta.</span>';
     }
 }
 
-// ============================================
-// FUNÇÃO PARA CRIAR CAMPO DE CÓDIGO DE CONVITE
-// ============================================
-
-function createInviteCodeField() {
-    // Verificar se o campo já existe
-    if (document.getElementById('adminInviteCode')) {
-        console.log('✅ Campo adminInviteCode já existe');
-        return;
+document.getElementById('adminEmail').addEventListener('blur', function() {
+    var email = this.value.trim();
+    if(email && document.getElementById('adminLogin').style.display !== 'none') {
+        checkAdminExists(email);
     }
-    
-    // Encontrar o formulário de login do admin
-    const adminForm = document.getElementById('adminLogin');
-    if (!adminForm) {
-        console.log('⚠️ Formulário de admin não encontrado');
-        return;
-    }
-    
-    // Encontrar o campo de senha do admin
-    const adminPassField = document.getElementById('adminPass');
-    if (!adminPassField) {
-        console.log('⚠️ Campo de senha do admin não encontrado');
-        return;
-    }
-    
-    // Criar o container do campo de convite
-    const inviteContainer = document.createElement('div');
-    inviteContainer.id = 'inviteCodeContainer';
-    inviteContainer.style.marginTop = '1rem';
-    inviteContainer.style.paddingTop = '1rem';
-    inviteContainer.style.borderTop = '2px dashed #e2e8f0';
-    
-    // Criar o campo de input
-    const inviteInput = document.createElement('input');
-    inviteInput.type = 'password';
-    inviteInput.id = 'adminInviteCode';
-    inviteInput.name = 'adminInviteCode';
-    inviteInput.placeholder = 'Código de Convite (somente primeiro acesso)';
-    inviteInput.style.width = '100%';
-    inviteInput.style.padding = '0.8rem';
-    inviteInput.style.borderRadius = '6px';
-    inviteInput.style.border = '2px solid #e2e8f0';
-    inviteInput.style.backgroundColor = '#fff';
-    inviteInput.style.marginBottom = '0.5rem';
-    
-    // Criar mensagem de ajuda
-    const helpText = document.createElement('p');
-    helpText.style.fontSize = '0.85rem';
-    helpText.style.color = '#64748b';
-    helpText.style.marginTop = '0.5rem';
-    helpText.innerHTML = '⚠️ Necessário apenas para criar uma conta de administrador pela primeira vez. Se já é admin, deixe em branco.';
-    
-    // Adicionar ao container
-    inviteContainer.appendChild(inviteInput);
-    inviteContainer.appendChild(helpText);
-    
-    // Inserir após o campo de senha e antes dos campos extras
-    adminPassField.parentNode.insertBefore(inviteContainer, document.getElementById('adminExtraFields'));
-    
-    console.log('✅ Campo adminInviteCode criado com sucesso!');
-}
-
-// ============================================
-// SISTEMA DE CÓDIGOS DE CONVITE DE ADMIN
-// ============================================
-
-const ADMIN_INVITE_CODES = {
-    // Códigos padrão para criar conta de admin
-    'ADMIN-2024-MASTER': { valid: true, level: 'super-admin' },
-    'SUPER-ACCESS-999': { valid: true, level: 'admin' },
-    'ELITE-MAREGINTER': { valid: true, level: 'admin' },
-    'PHISHING-PROTECT': { valid: true, level: 'admin' },
-    // Códigos de teste
-    'TEST-ADMIN-1234': { valid: true, level: 'admin' }
-};
-
-// Função para verificar código de convite de admin
-function verificarCodigoConviteAdmin(codigo) {
-    if (!codigo) {
-        return {
-            valido: false,
-            mensagem: 'Código de convite é necessário para criar conta de administrador.'
-        };
-    }
-    
-    const codigoUpper = codigo.toUpperCase();
-    const codigoInfo = ADMIN_INVITE_CODES[codigoUpper];
-    
-    if (codigoInfo && codigoInfo.valid) {
-        console.log(`✅ Código de convite admin válido: ${codigo}`);
-        return {
-            valido: true,
-            nivelAcesso: codigoInfo.level,
-            mensagem: 'Código de convite válido! Conta de administrador será criada.'
-        };
-    } else {
-        console.log(`❌ Código de convite admin inválido: ${codigo}`);
-        return {
-            valido: false,
-            mensagem: 'Código de convite inválido ou expirado.'
-        };
-    }
-}
-
-// ============================================
-// FUNÇÃO DE LOGIN DE ADMINISTRADOR ATUALIZADA
-// ============================================
-
-async function doAdminLogin() {
-    var email = document.getElementById('adminEmail').value.trim();
-    var password = document.getElementById('adminPass').value;
-    var name = document.getElementById('adminName') ? document.getElementById('adminName').value.trim() : '';
-    var companyName = document.getElementById('companyName') ? document.getElementById('companyName').value.trim() : '';
-    var inviteCode = document.getElementById('adminInviteCode') ? document.getElementById('adminInviteCode').value.trim() : '';
-    
-    // Validar email e senha
-    if (!email || !password) {
-        alert('Por favor, preencha email e senha');
-        return;
-    }
-    
-    try {
-        // Primeiro, verificar se já existe admin com este email
-        var adminEmailKey = email.replace(/[.#$[\]]/g, '_');
-        var adminSnapshot = await database.ref('admins/' + adminEmailKey).once('value');
-        
-        if (adminSnapshot.exists()) {
-            // ADMIN EXISTENTE - fazer login normal
-            var adminData = adminSnapshot.val();
-            
-            // Verificar senha (simplificado - em produção usar hash)
-            if (adminData.password === password) {
-                console.log('✅ Login de admin bem-sucedido:', email);
-                
-                // Configurar usuário como admin
-                USER.id = 'admin_' + adminEmailKey;
-                USER.name = adminData.name;
-                USER.email = email;
-                USER.isAdmin = true;
-                USER.companyCode = adminData.companyCode || 'ADMIN';
-                COMPANY.code = adminData.companyCode || 'ADMIN';
-                COMPANY.name = adminData.companyName || 'Administração';
-                COMPANY.adminEmail = email;
-                COMPANY.adminName = adminData.name;
-                
-                // Iniciar app como admin
-                localStorage.setItem('last_user_email', email);
-                startApp();
-                
-                return;
-            } else {
-                alert('Senha incorreta');
-                return;
-            }
-        } else {
-            // NOVO ADMIN - precisa de código de convite
-            var adminExtraFields = document.getElementById('adminExtraFields');
-            
-            if (!adminExtraFields || adminExtraFields.style.display === 'none') {
-                // Se não mostra campos extras, então o admin já existe
-                alert('❌ Administrador não encontrado. Para criar nova conta de admin é necessário código de convite.');
-                
-                // Mostrar campos extras
-                adminExtraFields.style.display = 'block';
-                
-                // Criar campo de código de convite se não existir
-                if (!document.getElementById('adminInviteCode')) {
-                    createInviteCodeField();
-                }
-                
-                return;
-            }
-            
-            // Verificar campos obrigatórios para novo admin
-            if (!name || !companyName) {
-                alert('Para criar nova conta de administrador, preencha todos os campos obrigatórios.');
-                return;
-            }
-            
-            // Verificar código de convite
-            var resultado = verificarCodigoConviteAdmin(inviteCode);
-            
-            if (!resultado.valido) {
-                alert('❌ ' + resultado.mensagem);
-                return;
-            }
-            
-            // Criar novo admin
-            var companyCode = generateCompanyCode();
-            
-            // Salvar dados do admin
-            var adminData = {
-                email: email,
-                name: name,
-                password: password, // Em produção, usar hash!
-                companyCode: companyCode,
-                companyName: companyName,
-                level: resultado.nivelAcesso || 'admin',
-                created: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                inviteCodeUsed: inviteCode
-            };
-            
-            await database.ref('admins/' + adminEmailKey).set(adminData);
-            
-            // Criar empresa
-            var companyData = {
-                code: companyCode,
-                name: companyName,
-                adminEmail: email,
-                adminName: name,
-                created: new Date().toISOString(),
-                employees: []
-            };
-            
-            await database.ref('companies/' + companyCode).set(companyData);
-            
-            // Configurar usuário
-            USER.id = 'admin_' + adminEmailKey;
-            USER.name = name;
-            USER.email = email;
-            USER.isAdmin = true;
-            USER.companyCode = companyCode;
-            COMPANY = companyData;
-            
-            console.log('✅ Nova conta de admin criada:', email);
-            
-            // Mostrar mensagem de sucesso
-            alert('✅ Conta de administrador criada com sucesso!\n\nCódigo da empresa: ' + companyCode + 
-                  '\n\nPartilhe este código com os seus colaboradores.');
-            
-            // Iniciar app
-            localStorage.setItem('last_user_email', email);
-            startApp();
-        }
-        
-    } catch (error) {
-        console.error('❌ Erro no login de admin:', error);
-        alert('Erro: ' + error.message);
-    }
-}
+});
 
 async function doLogin() {
     var name = document.getElementById('userName').value.trim();
@@ -1327,6 +1029,96 @@ async function doLogin() {
     
     checkBadges();
     startApp();
+}
+
+async function doAdminLogin() {
+    var email = document.getElementById('adminEmail').value.trim();
+    var pass = document.getElementById('adminPass').value;
+    var name = document.getElementById('adminName').value.trim();
+    var companyName = document.getElementById('companyName').value.trim();
+    
+    if(!email || !pass) {
+        alert('Email e senha obrigatórios');
+        return;
+    }
+    
+    if(pass.length < 6) {
+        alert('Senha mínimo 6 caracteres');
+        return;
+    }
+    
+    var adminKey = email.replace(/\./g, '_');
+    
+    try {
+        var adminSnapshot = await database.ref('admins/' + adminKey).once('value');
+        
+        if(adminSnapshot.exists()) {
+            var adminData = adminSnapshot.val();
+            
+            if(adminData.password !== pass) {
+                alert('❌ Senha incorreta');
+                return;
+            }
+            
+            USER.id = adminData.id;
+            USER.name = adminData.name;
+            USER.email = email;
+            USER.isAdmin = true;
+            USER.companyCode = adminData.companyCode;
+            
+            COMPANY.code = adminData.companyCode;
+            COMPANY.name = adminData.companyName;
+            COMPANY.adminEmail = email;
+            COMPANY.adminName = adminData.name;
+            
+            await loadCompanyEmployees();
+            startApp();
+            
+        } else {
+            if(!name || !companyName) {
+                alert('⚠️ Primeira vez? Preencha Nome e Empresa');
+                document.getElementById('adminExtraFields').style.display = 'block';
+                return;
+            }
+            
+            var companyCode = generateCompanyCode();
+            
+            USER.id = 'admin_' + Date.now();
+            USER.name = name;
+            USER.email = email;
+            USER.isAdmin = true;
+            USER.companyCode = companyCode;
+            
+            COMPANY.code = companyCode;
+            COMPANY.name = companyName;
+            COMPANY.adminEmail = email;
+            COMPANY.adminName = name;
+            COMPANY.employees = [];
+            
+            var adminData = {
+                id: USER.id,
+                name: name,
+                password: pass,
+                companyCode: companyCode,
+                companyName: companyName,
+                created: new Date().toISOString()
+            };
+            
+            // Salva admin no Firebase
+            await database.ref('admins/' + adminKey).set(adminData);
+            
+            // Salva empresa no Firebase
+            await database.ref('companies/' + companyCode).set(COMPANY);
+            
+            startApp();
+            alert('✅ Admin criado!\n\nCódigo da Empresa: ' + companyCode);
+        }
+        
+        await saveDataToFirebase();
+    } catch (error) {
+        console.error('Erro no login admin:', error);
+        alert('Erro ao fazer login: ' + error.message);
+    }
 }
 
 function generateCompanyCode() {
@@ -1473,413 +1265,15 @@ async function logout() {
     await saveDataToFirebase();
     window.location.reload();
 }
-
-// ==================== MODO DE REVISÃO ====================
-
-function showReviewMode() {
-    var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
-    html += '<h2>📚 Modo de Revisão</h2>';
-    html += '<p style="color:#64748b;margin-bottom:2rem">Reveja conteúdos já estudados</p>';
+function showPage(pageId) {
+    closeAllPopups(); // ← ADICIONE ESTA LINHA AQUI!
     
-    // Revisão de módulos básicos
-    html += '<div class="box" style="background:#f0fdf4;margin-bottom:2rem">';
-    html += '<h3 style="color:#065f46;margin-bottom:1rem">📘 Módulos Básicos</h3>';
-    
-    MODULES.forEach(function(mod) {
-        var completed = USER.scores[mod.id] !== undefined;
-        var score = USER.scores[mod.id] || 0;
-        
-        if(completed) {
-            html += '<div class="module completed" style="margin-bottom:1rem">';
-            html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-            html += '<div>';
-            html += '<h4 style="margin-bottom:0.5rem">' + mod.title + '</h4>';
-            html += '<p style="color:#64748b">Nota: ' + score + '/5 (' + (score/5*100) + '%)</p>';
-            html += '</div>';
-            html += '<div>';
-            html += '<button onclick="reviewModule(\'' + mod.id + '\', false)" style="background:#3b82f6;margin-right:0.5rem">📖 Rever Conteúdo</button>';
-            html += '<button onclick="retakeQuiz(\'' + mod.id + '\', false)" style="background:#10b981">🔄 Refazer Quiz</button>';
-            html += '</div>';
-            html += '</div>';
-            html += '</div>';
-        }
+    var pages = ['dashboardPage','modulesPage','quizPage','simulatorPage','badgesPage','libraryPage','certificatePage','adminPage'];
+    pages.forEach(function(p) {
+        document.getElementById(p).classList.add('hidden');
     });
-    
-    html += '</div>';
-    
-    // Revisão de módulos premium (se tiver acesso)
-    if(hasPremiumAccess()) {
-        html += '<div class="box" style="background:#f5f3ff;margin-bottom:2rem">';
-        html += '<h3 style="color:#7c3aed;margin-bottom:1rem">⭐ Módulos Premium</h3>';
-        
-        PREMIUM_MODULES.forEach(function(mod) {
-            var completed = USER.scores[mod.id] !== undefined;
-            var score = USER.scores[mod.id] || 0;
-            
-            if(completed) {
-                html += '<div class="module premium" style="margin-bottom:1rem">';
-                html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-                html += '<div>';
-                html += '<h4 style="margin-bottom:0.5rem">' + mod.title + '</h4>';
-                html += '<p style="color:#64748b">';
-                if(mod.stories) {
-                    html += 'Casos estudados: ' + (score || 0) + '/' + mod.cases.length;
-                } else {
-                    html += 'Nota: ' + score + '/5 (' + (score/5*100) + '%)';
-                }
-                html += '</p>';
-                html += '</div>';
-                html += '<div>';
-                if(mod.stories) {
-                    html += '<button onclick="reviewModule(\'' + mod.id + '\', true)" style="background:#8b5cf6">📖 Rever Casos</button>';
-                } else {
-                    html += '<button onclick="reviewModule(\'' + mod.id + '\', true)" style="background:#8b5cf6;margin-right:0.5rem">📖 Rever Conteúdo</button>';
-                    html += '<button onclick="retakeQuiz(\'' + mod.id + '\', true)" style="background:#10b981">🔄 Refazer Quiz</button>';
-                }
-                html += '</div>';
-                html += '</div>';
-                html += '</div>';
-            }
-        });
-        
-        html += '</div>';
-    }
-    
-    // Revisão de simulador
-    html += '<div class="box" style="background:#fffbeb">';
-    html += '<h3 style="color:#d97706;margin-bottom:1rem">🎮 Simulador de Phishing</h3>';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-    html += '<div>';
-    html += '<p style="color:#64748b">Email analisados: ' + USER.simCompleted.length + '/' + PHISHING_EMAILS.length + '</p>';
-    html += '<p style="color:#64748b">Pontuação: ' + USER.simScore + '/' + PHISHING_EMAILS.length + '</p>';
-    html += '</div>';
-    html += '<div>';
-    html += '<button onclick="reviewSimulator()" style="background:#f59e0b">📖 Rever Emails</button>';
-    if(USER.simCompleted.length === PHISHING_EMAILS.length) {
-        html += '<button onclick="retakeSimulator()" style="background:#ef4444;margin-left:0.5rem">🔄 Refazer Simulador</button>';
-    }
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
-    
-    document.getElementById('quizContent').innerHTML = html;
-    showPage('quizPage');
+    document.getElementById(pageId).classList.remove('hidden');
 }
-
-function reviewModule(modId, isPremium) {
-    var module = isPremium ? 
-        PREMIUM_MODULES.find(m => m.id === modId) : 
-        MODULES.find(m => m.id === modId);
-    
-    if(!module) return;
-    
-    CURRENT_MODULE = module;
-    
-    if(module.stories) {
-        // Modo de revisão para storytelling
-        reviewStoryModule();
-    } else if (module.legislationContent) {
-        // Modo de revisão para legislação
-        reviewLegislationModule();
-    } else {
-        // Modo de revisão para módulos normais
-        var html = '<button onclick="showReviewMode()" style="background:#64748b;margin-bottom:1rem">← Voltar ao Modo de Revisão</button>';
-        html += '<h2>📖 Revisão: ' + module.title + '</h2>';
-        
-        // Mostrar todas as perguntas com respostas corretas
-        module.questions.forEach(function(q, i) {
-            var userAnswer = USER.answers && USER.answers[module.id] ? USER.answers[module.id][i] : null;
-            var isCorrect = userAnswer === q.correct;
-            
-            html += '<div style="background:' + (isCorrect ? '#f0fdf4' : '#fef2f2') + ';padding:1.5rem;margin:1rem 0;border-radius:8px;border:2px solid ' + (isCorrect ? '#10b981' : '#ef4444') + '">';
-            html += '<h4 style="margin-bottom:1rem">' + (i + 1) + '. ' + q.q + '</h4>';
-            
-            q.opts.forEach(function(opt, j) {
-                var style = 'display:block;margin:0.5rem 0;padding:0.75rem;border-radius:6px;';
-                
-                if(j === q.correct) {
-                    style += 'background:#d1fae5;border:2px solid #10b981;';
-                } else if(j === userAnswer) {
-                    style += 'background:#fee2e2;border:2px solid #ef4444;';
-                } else {
-                    style += 'background:#f8fafc;border:1px solid #e2e8f0;';
-                }
-                
-                html += '<div style="' + style + '">';
-                if(j === q.correct) html += '✅ ';
-                if(j === userAnswer && j !== q.correct) html += '❌ ';
-                html += opt;
-                if(j === q.correct) html += ' <small style="color:#065f46;margin-left:0.5rem">(Resposta correta)</small>';
-                if(j === userAnswer && j !== q.correct) html += ' <small style="color:#b91c1c;margin-left:0.5rem">(Sua resposta)</small>';
-                html += '</div>';
-            });
-            
-            html += '</div>';
-        });
-        
-        html += '<div style="text-align:center;margin-top:2rem">';
-        html += '<button onclick="retakeQuiz(\'' + modId + '\', ' + isPremium + ')" style="background:#10b981">🔄 Refazer Este Quiz</button>';
-        html += '</div>';
-        
-        document.getElementById('quizContent').innerHTML = html;
-        showPage('quizPage');
-    }
-}
-
-function reviewLegislationModule() {
-    if(!CURRENT_MODULE) return;
-    
-    var html = '<button onclick="showReviewMode()" style="background:#64748b;margin-bottom:1rem">← Voltar ao Modo de Revisão</button>';
-    html += '<h2>📖 Revisão: ' + CURRENT_MODULE.title + '</h2>';
-    html += '<p style="color:#64748b;margin-bottom:2rem">' + CURRENT_MODULE.desc + '</p>';
-    
-    // Mostrar conteúdo legislativo
-    html += CURRENT_MODULE.legislationContent;
-    
-    // Mostrar perguntas com respostas corretas
-    html += '<div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:2rem 0">';
-    html += '<h4 style="color:#4f46e5;margin-bottom:1rem">🧠 Suas Respostas</h4>';
-    
-    CURRENT_MODULE.questions.forEach(function(q, i) {
-        var userAnswer = USER.answers && USER.answers[CURRENT_MODULE.id] ? USER.answers[CURRENT_MODULE.id][i] : null;
-        var isCorrect = userAnswer === q.correct;
-        
-        html += '<div style="background:' + (isCorrect ? '#f0fdf4' : '#fef2f2') + ';padding:1.5rem;margin:1rem 0;border-radius:8px;border:2px solid ' + (isCorrect ? '#10b981' : '#ef4444') + '">';
-        html += '<h4 style="margin-bottom:1rem">' + (i + 1) + '. ' + q.q + '</h4>';
-        
-        q.opts.forEach(function(opt, j) {
-            var style = 'display:block;margin:0.5rem 0;padding:0.75rem;border-radius:6px;';
-            
-            if(j === q.correct) {
-                style += 'background:#d1fae5;border:2px solid #10b981;';
-            } else if(j === userAnswer) {
-                style += 'background:#fee2e2;border:2px solid #ef4444;';
-            } else {
-                style += 'background:#f8fafc;border:1px solid #e2e8f0;';
-            }
-            
-            html += '<div style="' + style + '">';
-            if(j === q.correct) html += '✅ ';
-            if(j === userAnswer && j !== q.correct) html += '❌ ';
-            html += opt;
-            if(j === q.correct) html += ' <small style="color:#065f46;margin-left:0.5rem">(Resposta correta)</small>';
-            if(j === userAnswer && j !== q.correct) html += ' <small style="color:#b91c1c;margin-left:0.5rem">(Sua resposta)</small>';
-            html += '</div>';
-        });
-        
-        html += '</div>';
-    });
-    
-    html += '<div style="text-align:center;margin-top:1.5rem">';
-    html += '<button onclick="retakeQuiz(\'' + CURRENT_MODULE.id + '\', true)" style="background:#10b981">🔄 Refazer Este Quiz</button>';
-    html += '</div>';
-    html += '</div>';
-    
-    document.getElementById('quizContent').innerHTML = html;
-    showPage('quizPage');
-}
-
-function retakeQuiz(modId, isPremium) {
-    // Limpar pontuação anterior para permitir refazer
-    delete USER.scores[modId];
-    
-    // Iniciar o módulo normalmente
-    startModule(modId, isPremium);
-}
-
-function reviewSimulator() {
-    var html = '<button onclick="showReviewMode()" style="background:#64748b;margin-bottom:1rem">← Voltar ao Modo de Revisão</button>';
-    html += '<h2>📖 Revisão do Simulador</h2>';
-    html += '<p style="color:#64748b;margin-bottom:2rem">Emails já analisados</p>';
-    
-    PHISHING_EMAILS.forEach(function(email, index) {
-        var completed = USER.simCompleted.includes(email.id);
-        
-        if(completed) {
-            html += '<div class="simulator-email" style="margin-bottom:1.5rem">';
-            html += '<div class="email-header">';
-            html += '<div><strong>De:</strong> ' + email.from + '</div>';
-            html += '<div><strong>Assunto:</strong> ' + email.subject + '</div>';
-            html += '</div>';
-            html += '<div style="white-space:pre-wrap;margin:1rem 0">' + email.body + '</div>';
-            html += '<div style="background:#f0fdf4;padding:1rem;border-radius:6px;margin-top:1rem">';
-            html += '<p><strong>' + (email.isPhishing ? '🚨 É PHISHING' : '✅ É LEGÍTIMO') + '</strong></p>';
-            html += '<p style="color:#64748b;margin-top:0.5rem">' + email.explanation + '</p>';
-            html += '</div>';
-            html += '</div>';
-        }
-    });
-    
-    document.getElementById('simulatorContent').innerHTML = html;
-    showPage('simulatorPage');
-}
-
-// ==================== SISTEMA DE LEMBRETES ====================
-
-function getReminders() {
-    var reminders = [];
-    
-    // Verificar módulos não iniciados
-    MODULES.forEach(function(mod) {
-        if(!USER.scores[mod.id]) {
-            reminders.push({
-                type: 'module',
-                priority: 'high',
-                title: 'Iniciar módulo: ' + mod.title,
-                desc: mod.desc,
-                action: function() { startModule(mod.id, false); }
-            });
-        }
-    });
-    
-    // Verificar módulos com nota baixa (< 4/5)
-    MODULES.forEach(function(mod) {
-        if(USER.scores[mod.id] && USER.scores[mod.id] < 4) {
-            reminders.push({
-                type: 'review',
-                priority: 'medium',
-                title: 'Melhorar nota: ' + mod.title,
-                desc: 'Nota atual: ' + USER.scores[mod.id] + '/5',
-                action: function() { reviewModule(mod.id, false); }
-            });
-        }
-    });
-    
-    // Verificar módulos premium disponíveis
-    if(hasPremiumAccess()) {
-        PREMIUM_MODULES.forEach(function(mod) {
-            if(!USER.scores[mod.id]) {
-                reminders.push({
-                    type: 'premium',
-                    priority: 'medium',
-                    title: 'Conteúdo premium: ' + mod.title,
-                    desc: mod.desc,
-                    action: function() { startModule(mod.id, true); }
-                });
-            }
-        });
-    }
-    
-    // Verificar simulador não iniciado/completo
-    if(USER.simCompleted.length === 0) {
-        reminders.push({
-            type: 'simulator',
-            priority: 'high',
-            title: 'Experimentar simulador',
-            desc: 'Teste suas habilidades com emails reais',
-            action: goToSimulator
-        });
-    } else if(USER.simCompleted.length < PHISHING_EMAILS.length) {
-        reminders.push({
-            type: 'simulator',
-            priority: 'medium',
-            title: 'Continuar simulador',
-            desc: USER.simCompleted.length + '/' + PHISHING_EMAILS.length + ' emails analisados',
-            action: goToSimulator
-        });
-    }
-    
-    // Verificar certificado disponível
-    var completedBasic = Object.keys(USER.scores).filter(k => 
-        k.startsWith('mod') && !k.startsWith('prem')
-    ).length;
-    
-    if(completedBasic === TOTAL_MODULES && !USER.completionDate) {
-        reminders.push({
-            type: 'certificate',
-            priority: 'high',
-            title: '🎉 Certificado disponível!',
-            desc: 'Parabéns! Pode emitir seu certificado profissional',
-            action: goToCert
-        });
-    }
-    
-    return reminders;
-}
-
-function renderReminders() {
-    var reminders = getReminders();
-    
-    if(reminders.length === 0) {
-        return '<div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;text-align:center">' +
-               '<p style="color:#065f46">🎉 Está em dia com sua formação!</p>' +
-               '<p style="color:#047857;font-size:0.9rem;margin-top:0.5rem">Continue estudando ou revise conteúdos</p>' +
-               '</div>';
-    }
-    
-    var html = '<div style="margin-bottom:1.5rem">';
-    html += '<h4 style="margin-bottom:1rem">📋 Suas Tarefas Pendentes</h4>';
-    
-    // Ordenar por prioridade
-    reminders.sort(function(a, b) {
-        var priorityOrder = { high: 1, medium: 2, low: 3 };
-        return priorityOrder[a.priority] - priorityOrder[b.priority];
-    });
-    
-    reminders.forEach(function(reminder, index) {
-        var priorityColor = {
-            high: '#ef4444',
-            medium: '#f59e0b',
-            low: '#3b82f6'
-        }[reminder.priority];
-        
-        var icon = {
-            module: '📚',
-            review: '🔄',
-            premium: '⭐',
-            simulator: '🎮',
-            certificate: '🏆'
-        }[reminder.type] || '📋';
-        
-        html += '<div style="background:#fff;border-left:4px solid ' + priorityColor + ';padding:1rem;margin:0.5rem 0;border-radius:6px;display:flex;justify-content:space-between;align-items:center">';
-        html += '<div>';
-        html += '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">';
-        html += '<span>' + icon + '</span>';
-        html += '<strong>' + reminder.title + '</strong>';
-        html += '</div>';
-        html += '<p style="color:#64748b;font-size:0.9rem;margin:0">' + reminder.desc + '</p>';
-        html += '</div>';
-        html += '<button onclick="reminders[' + index + '].action()" style="padding:0.5rem 1rem;font-size:0.9rem">▶ Ir</button>';
-        html += '</div>';
-    });
-    
-    html += '</div>';
-    return html;
-}
-
-function retakeSimulator() {
-    if(!confirm('Refazer simulador? Isto irá reiniciar o seu progresso no simulador.')) return;
-    
-    USER.simCompleted = [];
-    USER.simScore = 0;
-    USER.simXP = 0;
-    
-    saveDataToFirebase();
-    renderSimulator();
-    showXP('🔄 Simulador reiniciado');
-}
-
-// Adicione esta função para esconder elementos de admin periodicamente
-function hideAdminElements() {
-    if (!USER.isAdmin) {
-        // Esconde o botão Admin no navbar
-        var adminBtn = document.getElementById('btnAdmin');
-        if (adminBtn) adminBtn.style.display = 'none';
-        
-        // Esconde qualquer botão relacionado a chaves
-        var allButtons = document.querySelectorAll('button');
-        allButtons.forEach(function(btn) {
-            if (btn.textContent.includes('Chave') || btn.textContent.includes('Key') || 
-                btn.onclick && btn.onclick.toString().includes('Key')) {
-                btn.style.display = 'none';
-            }
-        });
-    }
-}
-
-// Chame esta função periodicamente
-setInterval(hideAdminElements, 1000);
-
 // ==================== FUNÇÕES DE DASHBOARD ====================
 
 function updateDashboard() {
@@ -1905,30 +1299,14 @@ function updateDashboard() {
     } else {
         document.getElementById('btnCert').style.display = 'none';
     }
-    
-     // REMOVER QUALQUER ELEMENTO RELACIONADO A CHAVES DO DASHBOARD
-    var keyElements = document.querySelectorAll('[id*="Key"], [id*="key"]');
-    keyElements.forEach(function(el) {
-        if (el.id !== 'activationKey' && !USER.isAdmin) { // Mantém o campo de input de chave no login
-            el.style.display = 'none';
-        }
-    });
-
-    // Adicionar lembretes
-    var remindersHtml = renderReminders();
-    var progressSection = document.querySelector('#dashboardPage > div:nth-child(4)');
-    if(progressSection) {
-        progressSection.insertAdjacentHTML('afterend', 
-            '<div style="margin-top:2rem">' +
-            '<h3 style="margin-bottom:1rem">📋 Próximos Passos</h3>' +
-            remindersHtml +
-            '</div>'
-        );
-    }
 }
 
 // ==================== FUNÇÕES DE MÓDULOS ====================
-
+function renderModules() {
+    console.log('🔄 renderModules() chamado. USER:', USER.name, 'Premium access:', hasPremiumAccess());
+    
+    // ... resto do código ...
+}
 function renderModules() {
     var html = '';
     
@@ -1948,9 +1326,9 @@ function renderModules() {
         
         if(completed) {
             html += '<p style="color:#10b981;font-weight:700">✓ Concluído: ' + score + '/5</p>';
-            html += '<button onclick="startModule(\'' + mod.id + '\', false)">🔄 Refazer</button>';
+            html += '<button onclick="startModule(\'' + mod.id + '\')">🔄 Refazer</button>';
         } else {
-            html += '<button onclick="startModule(\'' + mod.id + '\', false)">▶ Iniciar</button>';
+            html += '<button onclick="startModule(\'' + mod.id + '\')">▶ Iniciar</button>';
         }
         
         html += '</div>';
@@ -1977,7 +1355,7 @@ function renderModules() {
             premiumHtml += '<p style="margin:0.5rem 0"><strong>💎 XP:</strong> ' + mod.xp + '</p>';
             
             if(completed) {
-                premiumHtml += '<p style="color:#10b981;font-weight:700">✓ Concluído: ' + (mod.stories ? 'Casos estudados: ' + (score || 0) + '/' + mod.cases.length : score + '/5') + '</p>';
+                premiumHtml += '<p style="color:#10b981;font-weight:700">✓ Concluído: ' + score + '/5</p>';
                 premiumHtml += '<button onclick="startModule(\'' + mod.id + '\', true)">🔄 Refazer</button>';
             } else {
                 premiumHtml += '<button onclick="startModule(\'' + mod.id + '\', true)" style="background:#8b5cf6">⭐ Iniciar Módulo Premium</button>';
@@ -2018,12 +1396,6 @@ function startModule(modId, isPremium) {
         renderStoryModule();
         return;
     }
-    
-    // VERIFICA SE É MÓDULO DE LEGISLAÇÃO
-    if(CURRENT_MODULE.legislationContent) {
-        renderLegislationModule();
-        return;
-    }
 
     var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
     html += '<h2>' + CURRENT_MODULE.title;
@@ -2053,75 +1425,32 @@ function startModule(modId, isPremium) {
     showPage('quizPage');
 }
 
-function renderLegislationModule() {
-    if(!CURRENT_MODULE) return;
-    
-    var html = '<button onclick="goToMods()" style="background:#64748b;margin-bottom:1rem">← Voltar aos Módulos</button>';
-    html += '<h2>' + CURRENT_MODULE.title;
-    html += ' <span style="background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.85rem">⚖️ Legislação</span>';
-    html += '</h2>';
-    html += '<p style="color:#64748b;margin-bottom:2rem">' + CURRENT_MODULE.desc + '</p>';
-    
-    // Conteúdo legislativo
-    html += CURRENT_MODULE.legislationContent;
-    
-    // Quiz após o conteúdo
-    html += '<div style="background:#e0e7ff;padding:1.5rem;border-radius:8px;margin:2rem 0">';
-    html += '<h4 style="color:#4f46e5;margin-bottom:1rem">🧠 Teste Seu Conhecimento</h4>';
-    
-    CURRENT_MODULE.questions.forEach(function(q, i) {
-        html += '<div style="background:#f8fafc;padding:1.5rem;margin:1rem 0;border-radius:8px" id="q' + i + '">';
-        html += '<h4 style="margin-bottom:1rem">' + (i + 1) + '. ' + q.q + '</h4>';
-        
-        q.opts.forEach(function(opt, j) {
-            html += '<label style="display:block;margin:0.5rem 0;padding:0.5rem;border-radius:6px;cursor:pointer;transition:background 0.3s"><input type="radio" name="q' + i + '" value="' + j + '"> ' + opt + '</label>';
-        });
-        
-        html += '</div>';
-    });
-    
-    html += '<div style="text-align:center;margin-top:2rem">';
-    html += '<button onclick="submitQuiz()">✓ Submeter Respostas</button>';
-    html += '</div>';
-    html += '</div>';
-    html += '<div id="quizResult"></div>';
-    
-    document.getElementById('quizContent').innerHTML = html;
-    showPage('quizPage');
-}
-
 async function submitQuiz() {
     if(!CURRENT_MODULE) return;
     
     var score = 0;
-    var total = CURRENT_MODULE.questions ? CURRENT_MODULE.questions.length : 0;
+    var total = CURRENT_MODULE.questions.length;
     
-    if (CURRENT_MODULE.stories) {
-        // Para módulos de storytelling, cada caso vale 1 ponto
-        score = USER.scores[CURRENT_MODULE.id] || 0;
-    } else {
-        // Para módulos normais
-        CURRENT_MODULE.questions.forEach(function(q, i) {
-            var selected = document.querySelector('input[name="q' + i + '"]:checked');
-            var qDiv = document.getElementById('q' + i);
-            
-            if(selected && parseInt(selected.value) === q.correct) {
-                score++;
-                qDiv.style.background = '#f0fdf4';
-                qDiv.style.border = '2px solid #10b981';
-            } else {
-                qDiv.style.background = '#fef2f2';
-                qDiv.style.border = '2px solid #ef4444';
-            }
-        });
-    }
+    CURRENT_MODULE.questions.forEach(function(q, i) {
+        var selected = document.querySelector('input[name="q' + i + '"]:checked');
+        var qDiv = document.getElementById('q' + i);
+        
+        if(selected && parseInt(selected.value) === q.correct) {
+            score++;
+            qDiv.style.background = '#f0fdf4';
+            qDiv.style.border = '2px solid #10b981';
+        } else {
+            qDiv.style.background = '#fef2f2';
+            qDiv.style.border = '2px solid #ef4444';
+        }
+    });
     
     USER.scores[CURRENT_MODULE.id] = score;
     
     var xpEarned = Math.round((score / total) * CURRENT_MODULE.xp);
     USER.xp += xpEarned;
     
-    var pct = total > 0 ? Math.round((score / total) * 100) : 100;
+    var pct = Math.round((score / total) * 100);
     var resultHtml = '<div style="margin-top:2rem;padding:1.5rem;border-radius:8px;text-align:center;' +
         'background:' + (pct >= 80 ? '#d1fae5' : '#fee2e2') + ';' +
         'color:' + (pct >= 80 ? '#065f46' : '#991b1b') + '">';
@@ -2448,7 +1777,7 @@ async function updateAdminDashboard() {
     
     var employees = COMPANY.employees || [];
     var total = employees.length;
-    var storyModule = PREMIUM_MODULES.find(m => m.stories);
+     var storyModule = PREMIUM_MODULES.find(m => m.stories);
     var storyStats = { total: 0, completed: 0 };
     
     if(storyModule) {
@@ -3570,7 +2899,7 @@ function exportKeysToCSV() {
     showXP('📥 CSV exportado com sucesso');
 }
 
-// ==================== FUNÇÕES UTILITÁRIAS ====================
+/// ==================== FUNÇÕES UTILITÁRIAS ====================
 
 async function checkBadges() {
     var unlocked = false;
@@ -3866,14 +3195,14 @@ function filterEmployees(term) {
 }
 
 // ==================== INICIALIZAÇÃO ====================
-document.getElementById('adminEmail').addEventListener('blur', function() {
+document.getElementById('adminEmail')?.addEventListener('blur', function() {
     var email = this.value.trim();
     if(email && document.getElementById('adminLogin').style.display !== 'none') {
         checkAdminExists(email);
     }
 });
-
 window.onload = function() {
+    window.onload = function() {
     var urlParams = new URLSearchParams(window.location.search);
     var code = urlParams.get('company');
     
@@ -3889,20 +3218,15 @@ window.onload = function() {
     }
     
     console.log('✅ Academia Anti-Phishing Elite | Mareginter - Sistema Completo com Chaves de Ativação 🔑');
-    console.log('🔑 Chaves de teste disponíveis: TEST-1234, BASIC-2024-DEF456, PREMIUM-XYZ789, ELITE-2024-ABC123');
+};
+    var urlParams = new URLSearchParams(window.location.search);
+    var code = urlParams.get('company');
     
-    // Inicialização automática do campo de código de convite
-    setTimeout(function() {
-        // Verificar se estamos na página de login de admin
-        if (document.getElementById('adminLogin') && 
-            document.getElementById('adminLogin').style.display !== 'none') {
-            
-            console.log('🛠️ Verificando campo adminInviteCode...');
-            
-            if (!document.getElementById('adminInviteCode')) {
-                console.log('🛠️ Criando campo adminInviteCode automaticamente...');
-                createInviteCodeField();
-            }
-        }
-    }, 1500);
+    if(code) {
+        document.getElementById('companyCode').value = code.toUpperCase();
+        showLoginType('user');
+    }
+    
+    console.log('✅ Academia Anti-Phishing Elite | Mareginter - Sistema Completo com Chaves de Ativação 🔑');
+    console.log('🔑 Chaves de teste disponíveis: TEST-1234, BASIC-2024-DEF456, PREMIUM-XYZ789, ELITE-2024-ABC123');
 };
