@@ -1,532 +1,221 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academia Anti-Phishing Elite | Mareginter</title>
+    <title>PhishGuard Elite | Formação Anti-Phishing</title>
+    <link rel="stylesheet" href="phishguard-elite.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     
-    <!-- Favicon para evitar erro 404 -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
-    
-    <link rel="stylesheet" href="style.css">
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
+    <!-- Header -->
     <header>
-        <h1>🎓 Academia Anti-Phishing Elite | Mareginter</h1>
-        <div class="nav" id="navbar">
-            <button onclick="goToDash()" id="btnDash">📊 Dashboard</button>
-            <button onclick="goToMods()" id="btnMods">📚 Módulos</button>
-            <button onclick="goToSimulator()" id="btnSim">🎮 Simulador</button>
-            <button onclick="goToBadges()" id="btnBadges">🏅 Conquistas</button>
-            <button onclick="goToLibrary()" id="btnLib">📖 Biblioteca</button>
-            <button onclick="goToCert()" id="btnCert" style="display:none">📜 Certificado</button>
-            <button onclick="goToAdmin()" id="btnAdmin" style="display:none">👑 Admin</button>
-            <button onclick="logout()" class="logout-btn">🚪 Sair</button>
-            <button onclick="showHelp()" id="btnHelp" style="background:#64748b">❓ Ajuda</button>
-            <button onclick="viewAllKeys()" style="background:#64748b;padding:0.8rem 1.5rem">👁️ Ver Chaves Existentes</button>
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <div class="logo-text">PhishGuard <span>Elite</span></div>
+            </div>
+            <nav class="nav hidden" id="navbar">
+                <button class="nav-btn" onclick="goToDashboard()" id="btnDash">📊 Dashboard</button>
+                <button class="nav-btn" onclick="goToModules()" id="btnMods">📚 Módulos</button>
+                <button class="nav-btn" onclick="goToSimulator()" id="btnSim">🎮 Simulador</button>
+                <button class="nav-btn" onclick="goToBadges()" id="btnBadges">🏅 Badges</button>
+                <button class="nav-btn" onclick="goToLibrary()" id="btnLib">📖 Biblioteca</button>
+                <button class="nav-btn" onclick="goToCertificate()" id="btnCert" class="hidden">📜 Certificado</button>
+                <button class="nav-btn" onclick="goToAdmin()" id="btnAdmin" class="hidden">👑 Admin</button>
+                <button class="nav-btn logout-btn" onclick="logout()">🚪 Sair</button>
+            </nav>
         </div>
     </header>
 
     <main>
-        <!-- LOGIN -->
-        <div class="box" id="loginPage" style="max-width:500px;margin:4rem auto;text-align:center">
-            <h2>🎯 Bem-vindo</h2>
-            <p style="color:#64748b;margin:1rem 0">Sistema de Formação em Segurança Digital | Mareginter</p>
+        <!-- Login Page -->
+        <div class="login-container card" id="loginPage">
+            <div class="login-header">
+                <h1>🛡️ Bem-vindo</h1>
+                <p>Formação profissional em segurança digital</p>
+            </div>
             
-            <div style="margin-bottom:2rem">
-                <button onclick="showLoginType('user')" id="btnLoginUser" style="margin:0.5rem">👤 Colaborador</button>
-                <button onclick="showLoginType('admin')" id="btnLoginAdmin" style="margin:0.5rem;background:#64748b">👑 Administrador</button>
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="showLoginType('user')" id="tabUser">
+                    👤 Colaborador
+                </button>
+                <button class="login-tab" onclick="showLoginType('admin')" id="tabAdmin">
+                    👑 Administrador
+                </button>
             </div>
 
-            <div id="userLogin">
-                <input type="text" id="userName" placeholder="Nome completo" />
-                <input type="email" id="userEmail" placeholder="Email profissional" />
-                <input type="text" id="companyCode" placeholder="Código da Empresa (opcional)" style="font-family:monospace" />
-                <!-- CAMPO DE CHAVE DE ATIVAÇÃO -->
-                <input type="text" id="activationKey" placeholder="Chave de Ativação (opcional)" style="font-family:monospace" />
-                <br>
-                <button onclick="doLogin()">▶ Entrar</button>
-                <p id="loginMsg" style="margin-top:1rem;color:#64748b;font-size:0.9rem">
-                    ⚠️ Se não tiver chave, contacte o administrador
-                </p>
-            </div>
-
-            <div id="adminLogin" style="display:none">
-                <p style="font-size:0.9rem;color:#64748b;margin-bottom:1rem">
-                    <strong>Login rápido:</strong> Email + Senha
-                </p>
-                
-                <input type="email" id="adminEmail" placeholder="Email Administrador *" style="border-color:#8b5cf6" />
-                <input type="password" id="adminPass" placeholder="Senha *" style="border-color:#8b5cf6" />
-                
-                <div id="adminExtraFields" style="display:none;margin-top:1rem;padding-top:1rem;border-top:2px dashed #e2e8f0">
-                    <p style="font-size:0.85rem;color:#ef4444;margin-bottom:0.5rem;font-weight:700">⚠️ Primeira vez? Preencha também:</p>
-                    <input type="text" id="adminName" placeholder="Nome do Administrador *" />
-                    <input type="text" id="companyName" placeholder="Nome da Empresa *" />
+            <!-- User Login -->
+            <div id="userLoginForm">
+                <div class="form-group">
+                    <label class="form-label">Nome completo</label>
+                    <input type="text" class="form-input" id="userName" placeholder="João Silva" required />
                 </div>
                 
-                <br>
-                <button onclick="doAdminLogin()" style="background:#8b5cf6">▶ Entrar como Admin</button>
-                <p id="adminMsg" style="margin-top:1rem;color:#64748b;font-size:0.9rem"></p>
+                <div class="form-group">
+                    <label class="form-label">Email profissional</label>
+                    <input type="email" class="form-input" id="userEmail" placeholder="joao@empresa.pt" required />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Chave de ativação <span class="form-hint">(opcional)</span></label>
+                    <input type="text" class="form-input" id="activationKey" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-family: var(--font-mono);" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Código da empresa <span class="form-hint">(opcional)</span></label>
+                    <input type="text" class="form-input" id="companyCode" placeholder="ABC123" style="font-family: var(--font-mono);" />
+                </div>
+                
+                <button class="btn btn-primary btn-lg" onclick="doUserLogin()" style="width: 100%;">
+                    Entrar na Formação
+                </button>
+                
+                <p class="text-center form-hint" style="margin-top: var(--space-4);">
+                    💡 Sem chave? Contacte o administrador da sua empresa
+                </p>
+            </div>
+
+            <!-- Admin Login -->
+            <div id="adminLoginForm" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="adminEmail" placeholder="admin@empresa.pt" required />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" class="form-input" id="adminPass" placeholder="••••••••" required />
+                </div>
+                
+                <div id="adminExtraFields" class="hidden" style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--gray-300);">
+                    <p class="alert alert-warning" style="margin-bottom: var(--space-4);">
+                        ⚠️ Primeiro acesso? Preencha os dados da empresa
+                    </p>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nome do administrador</label>
+                        <input type="text" class="form-input" id="adminName" placeholder="Ana Santos" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nome da empresa</label>
+                        <input type="text" class="form-input" id="companyName" placeholder="Empresa, Lda" />
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-lg" onclick="doAdminLogin()" style="width: 100%;">
+                    Entrar como Administrador
+                </button>
             </div>
         </div>
 
-        <!-- DASHBOARD -->
-        <div class="box hidden" id="dashboardPage">
-            <h2>📊 Painel de Controlo</h2>
-            <div style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:1.5rem;border-radius:8px;margin:1.5rem 0">
-                <h3 style="margin-bottom:0.5rem">👋 Olá, <span id="dashName"></span>!</h3>
-                <p id="dashCompany" style="opacity:0.9"></p>
+        <!-- Dashboard -->
+        <div class="card hidden" id="dashboardPage">
+            <div class="flex justify-between items-center mb-6">
+                <h2>📊 Dashboard</h2>
+                <span class="badge" style="background: var(--primary-100); color: var(--primary-700); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);">
+                    Código: <span id="dashCompany">---</span>
+                </span>
+            </div>
+            
+            <div class="card" style="background: linear-gradient(135deg, var(--primary-600), var(--primary-800)); color: white; margin-bottom: var(--space-6);">
+                <h3 style="color: white; margin-bottom: var(--space-1);">👋 Olá, <span id="dashName">Utilizador</span>!</h3>
+                <p style="color: rgba(255,255,255,0.9); margin: 0;">Continue a sua jornada de aprendizagem</p>
             </div>
 
-            <div class="stat-grid">
-                <div class="stat-card" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
-                    <div class="stat-value" id="dashXP">0</div>
+            <div class="stats-grid">
+                <div class="stat-card">
                     <div class="stat-label">XP Total</div>
+                    <div class="stat-value" id="dashXP">0</div>
                 </div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#10b981,#059669)">
-                    <div class="stat-value" id="dashMods">0</div>
-                    <div class="stat-label">Módulos Concluídos</div>
+                <div class="stat-card">
+                    <div class="stat-label">Módulos</div>
+                    <div class="stat-value" id="dashMods">0/5</div>
                 </div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
-                    <div class="stat-value" id="dashBadges">0</div>
+                <div class="stat-card">
                     <div class="stat-label">Badges</div>
+                    <div class="stat-value" id="dashBadges">0/8</div>
                 </div>
-                <div class="stat-card" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">
-                    <div class="stat-value" id="dashSims">0</div>
-                    <div class="stat-label">Simulações</div>
+                <div class="stat-card">
+                    <div class="stat-label">Sucesso</div>
+                    <div class="stat-value" id="dashSuccess">0%</div>
                 </div>
             </div>
 
-            <div style="margin-top:2rem">
-                <h3 style="margin-bottom:1rem">📈 Progresso Global</h3>
-                <div class="progress-bar" style="height:20px">
-                    <div class="progress-fill" id="dashProgress" style="width:0%"></div>
+            <div class="card" style="margin-top: var(--space-6);">
+                <h3 class="card-title">📈 Progresso Global</h3>
+                <div class="progress mt-4">
+                    <div class="progress-bar" id="dashProgress" style="width: 0%"></div>
                 </div>
-                <p style="text-align:center;margin-top:0.5rem;color:#64748b">
+                <p class="text-center mt-2 form-hint">
                     <span id="dashProgressPct">0</span>% concluído
                 </p>
             </div>
 
-            <div style="margin-top:2rem;text-align:center">
-                <button onclick="goToMods()">📚 Continuar Formação</button>
-                <button onclick="goToSimulator()">🎮 Testar Conhecimentos</button>
-                <button onclick="goToLibrary()" style="background:#f59e0b">📖 Biblioteca</button>
+            <div class="flex justify-center gap-4 mt-6">
+                <button class="btn btn-primary" onclick="goToModules()">📚 Continuar Formação</button>
+                <button class="btn btn-outline" onclick="goToSimulator()">🎮 Testar Conhecimentos</button>
             </div>
         </div>
 
-        <!-- MÓDULOS -->
-        <div class="box hidden" id="modulesPage">
-            <h2>📚 Módulos de Formação</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Complete todos os módulos para desbloquear o certificado</p>
-            <div id="modulesList"></div>
-            <div id="premiumModulesSection" style="display:none">
-                <h3 style="margin-top:2rem;border-top:2px solid #e2e8f0;padding-top:2rem">⭐ Módulos Premium</h3>
-                <p style="color:#64748b;margin-bottom:2rem">Conteúdo avançado disponível após completar os 5 módulos básicos com 4/5 ou mais</p>
-                <div id="premiumModulesList"></div>
-            </div>
+        <!-- Modules Page -->
+        <div class="card hidden" id="modulesPage">
+            <h2 class="mb-4">📚 Módulos de Formação</h2>
+            <p class="form-hint mb-6">
+                Complete todos os módulos para desbloquear o certificado profissional
+            </p>
+            <div class="module-grid" id="modulesList"></div>
         </div>
 
-        <!-- QUIZ -->
-        <div class="box hidden" id="quizPage">
-            <div id="quizContent"></div>
-        </div>
-
-        <!-- SIMULADOR -->
-        <div class="box hidden" id="simulatorPage">
-            <h2>🎮 Simulador de Phishing</h2>
-            <p style="color:#64748b;margin-bottom:1rem">Teste suas habilidades em cenários realistas</p>
-            
-            <div style="background:#f8fafc;padding:1rem;border-radius:8px;margin-bottom:2rem;display:flex;justify-content:space-around">
-                <div style="text-align:center">
-                    <div style="font-size:1.5rem;font-weight:900;color:#3b82f6" id="simScore">0</div>
-                    <div style="font-size:0.9rem;color:#64748b">Score</div>
-                </div>
-                <div style="text-align:center">
-                    <div style="font-size:1.5rem;font-weight:900;color:#10b981" id="simXP">0</div>
-                    <div style="font-size:0.9rem;color:#64748b">XP Ganho</div>
-                </div>
-            </div>
-            
-            <div id="simulatorContent"></div>
-        </div>
-
-        <!-- CONQUISTAS -->
-        <div class="box hidden" id="badgesPage">
-            <h2>🏅 Conquistas e Badges</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Desbloqueie badges completando desafios</p>
-            
-            <div style="background:#f8fafc;padding:1.5rem;border-radius:8px;margin-bottom:2rem">
-                <h3 style="margin-bottom:1rem">🎯 Progresso</h3>
-                <div style="display:flex;justify-content:space-around;text-align:center">
-                    <div>
-                        <div style="font-size:2rem;font-weight:900;color:#3b82f6" id="badgesUnlocked">0</div>
-                        <div style="font-size:0.9rem;color:#64748b">Desbloqueados</div>
-                    </div>
-                    <div>
-                        <div style="font-size:2rem;font-weight:900;color:#10b981" id="badgesXP">0</div>
-                        <div style="font-size:0.9rem;color:#64748b">XP Total</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="badgesList"></div>
-        </div>
-
-        <!-- BIBLIOTECA -->
-        <div class="box hidden" id="libraryPage">
-            <h2>📖 Biblioteca de Recursos</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Materiais de referência</p>
-            <div id="libraryContent"></div>
-        </div>
-
-        <!-- CERTIFICADO -->
-        <div class="box hidden" id="certificatePage">
-            <h2>📜 Certificado Profissional</h2>
-            <p style="color:#64748b;margin-bottom:2rem">Parabéns pela conclusão da formação!</p>
-            
-            <div style="text-align:center;margin-bottom:2rem">
-                <div style="display:inline-block;text-align:left;background:#f8fafc;padding:1.5rem;border-radius:8px;margin-bottom:1rem">
-                    <p><strong>👤 Nome:</strong> <span id="certName">-</span></p>
-                    <p><strong>📧 Email:</strong> <span id="certEmail">-</span></p>
-                    <p><strong>🏢 Empresa:</strong> <span id="certCompany">-</span></p>
-                    <p><strong>📅 Data de Conclusão:</strong> <span id="certDate">-</span></p>
-                    <p><strong>⭐ XP Total:</strong> <span id="certXP">-</span></p>
-                    <p><strong>🏅 Badges:</strong> <span id="certBadges">-</span></p>
-                </div>
-            </div>
-            
-            <div style="text-align:center">
-                <canvas id="certCanvas" width="1000" height="850" style="border:8px double #1e293b;border-radius:12px;max-width:100%;height:auto"></canvas>
-                <div style="margin-top:1.5rem">
-                    <button onclick="downloadCert()">⬇ Descarregar Certificado</button>
-                    <button onclick="window.print()">🖨 Imprimir Página</button>
-                    <button onclick="goToDash()" style="background:#64748b">← Voltar ao Dashboard</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- PAINEL ADMIN -->
-        <div class="box hidden" id="adminPage">
-            <div style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;padding:2rem;border-radius:12px;margin-bottom:2rem">
-                <h2 style="margin-bottom:0.5rem">👑 Painel de Administração</h2>
-                <p id="adminWelcome" style="opacity:0.9"></p>
-            </div>
-
-            <div class="admin-metrics">
-                <div class="metric-card">
-                    <div class="metric-label">👥 Total Colaboradores</div>
-                    <div class="metric-value" id="metricTotalUsers">0</div>
-                    <div class="metric-trend up" id="metricUsersTrend">+0 este mês</div>
-                </div>
-
-                <div class="metric-card success">
-                    <div class="metric-label">✅ Formação Completa</div>
-                    <div class="metric-value" id="metricCompleted">0</div>
-                    <div class="metric-trend" id="metricCompletedPct">0%</div>
-                </div>
-
-                <div class="metric-card warning">
-                    <div class="metric-label">⏳ Em Progresso</div>
-                    <div class="metric-value" id="metricInProgress">0</div>
-                    <div class="metric-trend" id="metricProgressPct">0%</div>
-                </div>
-
-                <div class="metric-card danger">
-                    <div class="metric-label">❌ Não Iniciado</div>
-                    <div class="metric-value" id="metricNotStarted">0</div>
-                    <div class="metric-trend" id="metricNotStartedPct">0%</div>
-                </div>
-            </div>
-
-            <div class="admin-metrics">
-                <div class="metric-card">
-                    <div class="metric-label">🎯 Taxa de Conclusão</div>
-                    <div class="metric-value" id="metricCompletionRate">0%</div>
-                    <div class="progress-bar" style="margin-top:0.5rem">
-                        <div class="progress-fill" id="metricCompletionBar" style="width:0%"></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">⭐ XP Médio</div>
-                    <div class="metric-value" id="metricAvgXP">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">pontos por colaborador</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">🏅 Badges Totais</div>
-                    <div class="metric-value" id="metricTotalBadges">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">na empresa</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">🎮 Simulações</div>
-                    <div class="metric-value" id="metricTotalSims">0</div>
-                    <div class="metric-trend" id="metricSimsAvg">média por user</div>
-                </div>
-            </div>
-
-            <div class="admin-metrics">
-                <div class="metric-card premium">
-                    <div class="metric-label">⭐ Colaboradores Premium</div>
-                    <div class="metric-value" id="metricPremiumUsers">0</div>
-                    <div class="metric-trend" id="metricPremiumPct">0%</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">📅 Dias Média de Conclusão</div>
-                    <div class="metric-value" id="metricAvgDays">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">para completar formação</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">📊 Taxa de Aprovação</div>
-                    <div class="metric-value" id="metricPassRate">0%</div>
-                    <div style="font-size:0.85rem;color:#64748b">média 4/5 ou mais</div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-label">⏱️ Atividade Recente</div>
-                    <div class="metric-value" id="metricActive7d">0</div>
-                    <div style="font-size:0.85rem;color:#64748b">últimos 7 dias</div>
-                </div>
-            </div>
-
-            <div class="box" style="background:#f8fafc">
-                <h3 style="margin-bottom:1rem">📊 Desempenho por Módulo</h3>
-                <div id="adminModuleStats"></div>
-            </div>
-
-        <!-- GERADOR E GESTOR DE CHAVES DE ATIVAÇÃO -->
-<div class="box" id="keyGeneratorSection" style="background:linear-gradient(135deg,#fffbeb,#fff);border-left:5px solid #f59e0b">
-    <h3 style="margin-bottom:1rem;color:#d97706">🔑 Gerador de Chaves de Ativação</h3>
-    <p style="color:#64748b;margin-bottom:1.5rem">Gere chaves para novos utilizadores</p>
-    
-    <div style="margin:1rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
-        <select id="keyType" style="padding:0.8rem;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
-            <option value="basic">Básica (acesso completo)</option>
-            <option value="premium">Premium (com módulos avançados)</option>
-            <option value="full">Elite (tudo desbloqueado)</option>
-        </select>
-        
-        <input type="number" id="keyUses" placeholder="Nº de utilizações" min="1" max="1000" value="1" 
-               style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
-        
-        <input type="number" id="keyDays" placeholder="Dias de validade" min="1" max="365" value="30" 
-               style="padding:0.8rem;width:150px;border-radius:6px;border:2px solid #e2e8f0;background:#fff">
-        
-        <button onclick="generateNewKey()" style="background:#10b981;padding:0.8rem 1.5rem">🎫 Gerar Nova Chave</button>
-        <button onclick="viewAllKeys()" style="background:#3b82f6;padding:0.8rem 1.5rem">👁️ Ver Todas as Chaves</button>
-        <button onclick="viewKeyStats()" style="background:#8b5cf6;padding:0.8rem 1.5rem">📊 Estatísticas</button>
-    </div>
-    <div id="newKeyResult" style="margin-top:1rem"></div>
-</div>
-
-            <div class="invite-box">
-                <h3 style="margin-bottom:1rem">📧 Convite para Colaboradores</h3>
-                <p style="opacity:0.95;margin-bottom:1rem">Partilhe este link:</p>
-                <div class="invite-link" id="inviteLink"></div>
-                <button onclick="copyInviteLink()" style="background:#10b981">📋 Copiar Link</button>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">📋 Cronologia da Formação</h3>
-                <div id="adminTimeline"></div>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">🏆 Ranking de Colaboradores</h3>
-                <div id="adminRanking"></div>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">👥 Lista de Colaboradores</h3>
-                <input type="text" placeholder="🔍 Pesquisar..." style="width:100%;max-width:100%;margin-bottom:1rem" onkeyup="filterEmployees(this.value)" />
-                <div id="adminEmployees"></div>
-            </div>
-
-            <div class="box">
-                <h3 style="margin-bottom:1rem">📈 Estatísticas Detalhadas</h3>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Status</th>
-                            <th>Início</th>
-                            <th>Conclusão</th>
-                            <th>Duração</th>
-                            <th>Média</th>
-                            <th>Premium</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminDetailedStats">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <!-- Dynamic Content -->
+        <div id="dynamicContent"></div>
     </main>
 
-    <!-- PAINEL DE GESTÃO DE CHAVES -->
-<div class="box" id="keyManagementSection" style="background:linear-gradient(135deg,#f8fafc,#fff);border-left:5px solid #3b82f6;display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
-        <h3 style="color:#1e293b">🗝️ Gestão de Chaves de Ativação</h3>
-        <div>
-            <button onclick="refreshKeyList()" style="background:#64748b;padding:0.5rem 1rem">🔄 Atualizar</button>
-            <button onclick="hideKeyManagement()" style="background:#ef4444;padding:0.5rem 1rem;margin-left:0.5rem">✕ Fechar</button>
-        </div>
-    </div>
-    
-    <!-- Filtros -->
-    <div style="background:#fff;padding:1rem;border-radius:8px;margin-bottom:1.5rem;border:2px solid #e2e8f0">
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
-            <div>
-                <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Tipo:</label>
-                <select id="filterType" onchange="filterKeys()" style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0">
-                    <option value="all">Todos</option>
-                    <option value="basic">Básica</option>
-                    <option value="premium">Premium</option>
-                    <option value="full">Elite</option>
-                </select>
+    <!-- Welcome Modal -->
+    <div id="welcomeOverlay" class="modal-overlay hidden">
+        <div class="modal" id="welcomePopup">
+            <div class="modal-header">
+                <h3>🛡️ Bem-vindo ao PhishGuard Elite!</h3>
+                <button class="modal-close" onclick="closeWelcomePopup()">×</button>
             </div>
-            
-            <div>
-                <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Estado:</label>
-                <select id="filterStatus" onchange="filterKeys()" style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0">
-                    <option value="all">Todos</option>
-                    <option value="active">Ativas</option>
-                    <option value="used">Usadas</option>
-                    <option value="expired">Expiradas</option>
-                    <option value="invalid">Inválidas</option>
-                </select>
+            <div class="modal-body">
+                <div class="text-center mb-6">
+                    <div style="font-size: 4rem;">🛡️</div>
+                    <p style="color: var(--gray-600);">A sua jornada de formação começa agora</p>
+                </div>
+                
+                <div class="alert alert-info mb-4">
+                    <strong>🎯 Como Funciona</strong>
+                    <ul style="margin-top: var(--space-2); margin-left: var(--space-4);">
+                        <li>10 módulos progressivos</li>
+                        <li>Quizzes interativos</li>
+                        <li>Simulador realista</li>
+                        <li>Sistema de conquistas</li>
+                    </ul>
+                </div>
+                
+                <div class="alert alert-warning mb-4">
+                    <strong>💡 Dica Importante</strong>
+                    <p class="mt-2">Visite primeiro a <strong>Biblioteca</strong> para estudar ao seu ritmo, sem pressão.</p>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>🏆 Objetivo Final</strong>
+                    <p class="mt-2">Complete todos os módulos e obtenha o <strong>Certificado Profissional</strong></p>
+                </div>
             </div>
-            
-            <div>
-                <label style="display:block;color:#64748b;font-size:0.9rem;margin-bottom:0.3rem">Pesquisar:</label>
-                <input type="text" id="filterSearch" placeholder="Chave ou email..." onkeyup="filterKeys()" 
-                       style="padding:0.5rem;border-radius:6px;border:1px solid #e2e8f0;width:200px">
-            </div>
-            
-            <div style="margin-left:auto">
-                <button onclick="exportKeysToCSV()" style="background:#10b981;padding:0.5rem 1rem">📥 Exportar CSV</button>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeWelcomePopup()">Explorar</button>
+                <button class="btn btn-primary" onclick="goToModulesFromWelcome()">Começar Formação</button>
             </div>
         </div>
-    </div>
-    
-    <!-- Estatísticas rápidas -->
-    <div id="keyStats" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.5rem"></div>
-    
-    <!-- Lista de chaves -->
-    <div style="max-height:500px;overflow-y:auto">
-        <table id="keysTable" style="width:100%;border-collapse:collapse">
-            <thead>
-                <tr style="background:#f1f5f9">
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Chave</th>
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Tipo</th>
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Utilizações</th>
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Validade</th>
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Estado</th>
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Criada</th>
-                    <th style="padding:1rem;text-align:left;border-bottom:2px solid #e2e8f0">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="keysList">
-                <!-- As chaves serão carregadas aqui -->
-            </tbody>
-        </table>
-    </div>
-    
-    <div style="text-align:center;margin-top:1.5rem;color:#64748b;font-size:0.9rem">
-        <p>Total de chaves: <span id="totalKeysCount">0</span> | Mostrando: <span id="showingKeysCount">0</span></p>
-    </div>
-</div>
-
-    <!-- POPUP DE BOAS-VINDAS MELHORADO -->
-    <div id="welcomeOverlay" class="welcome-overlay hidden"></div>
-    <div id="welcomePopup" class="welcome-popup hidden">
-        <div style="text-align:right">
-            <button onclick="closeWelcomePopup()" style="background:#64748b;padding:0.5rem 1rem;font-size:0.9rem">✕ Fechar</button>
-        </div>
-        
-        <div style="text-align:center;margin-bottom:2rem">
-            <div style="font-size:4rem;margin-bottom:1rem">🎓</div>
-            <h2 style="color:#3b82f6;margin-bottom:0.5rem">Bem-vindo à Academia Anti-Phishing Elite!</h2>
-            <p style="color:#64748b">Vamos começar a sua jornada de formação em segurança digital</p>
-        </div>
-        
-        <div class="welcome-feature">
-            <div class="welcome-feature-icon">🎯</div>
-            <div>
-                <h4 style="color:#3b82f6;margin-bottom:0.5rem">🎯 COMO FUNCIONA</h4>
-                <p><strong>1. Módulos de Formação</strong> - 5 módulos progressivos sobre segurança</p>
-                <p><strong>2. Quizzes</strong> - Teste seu conhecimento após cada módulo</p>
-                <p><strong>3. Simulador</strong> - Pratique com emails reais de phishing</p>
-                <p><strong>4. Conquistas</strong> - Ganhe badges e XP por progresso</p>
-            </div>
-        </div>
-        
-        <div class="welcome-feature" style="background:#fef3c7">
-            <div class="welcome-feature-icon">💡</div>
-            <div>
-                <h4 style="color:#d97706;margin-bottom:0.5rem">💡 DICA IMPORTANTE</h4>
-                <p><strong>Se ainda não te sentes preparado para os quizzes ou simulador:</strong></p>
-                <p>📍 <strong>Vai primeiro à Biblioteca!</strong></p>
-                <p>Lá encontrarás todos os materiais para estudar ao teu ritmo, sem pressão.</p>
-                <p>Só quando te sentires confiante é que deves fazer os testes.</p>
-            </div>
-        </div>
-        
-        <div class="welcome-feature">
-            <div class="welcome-feature-icon">📊</div>
-            <div>
-                <h4 style="color:#10b981;margin-bottom:0.5rem">📊 O TEU PROGRESSO</h4>
-                <p>✅ <strong>Dashboard</strong> - Vê teu progresso e estatísticas</p>
-                <p>✅ <strong>Módulos</strong> - Conclui um de cada vez</p>
-                <p>✅ <strong>Biblioteca</strong> - Estuda quando quiseres</p>
-                <p>✅ <strong>Certificado</strong> - Ganha certificado ao completar todos os módulos</p>
-            </div>
-        </div>
-        
-        <div class="welcome-feature" style="background:#dbeafe">
-            <div class="welcome-feature-icon">⚡</div>
-            <div>
-                <h4 style="color:#1d4ed8;margin-bottom:0.5rem">⚡ COMEÇA POR AQUI</h4>
-                <p><strong>Recomendação para iniciantes:</strong></p>
-                <ol style="text-align:left;margin:1rem 0">
-                    <li>Primeiro, visita a <strong>Biblioteca</strong> para aprender os conceitos</li>
-                    <li>Depois, faz o <strong>Módulo 1: Introdução ao Phishing</strong></li>
-                    <li>Experimenta o <strong>Simulador</strong> para praticar</li>
-                    <li>Continua pelos outros módulos ao teu ritmo</li>
-                </ol>
-            </div>
-        </div>
-        
-        <div style="background:#f0fdf4;padding:1.5rem;border-radius:8px;margin:2rem 0">
-            <h4 style="color:#065f46;margin-bottom:1rem">🏆 OBJETIVO FINAL</h4>
-            <p>Completar <strong>todos os 5 módulos básicos</strong> para:</p>
-            <p>✅ Ganhar o <strong>Certificado Profissional</strong></p>
-            <p>✅ Desbloquear conteúdo <strong>Premium</strong> (se tiver média de 4/5 ou mais)</p>
-            <p>✅ Tornar-te um <strong>Especialista em Segurança Digital</strong></p>
-        </div>
-        
-        <div style="text-align:center;margin-top:2rem">
-            <button onclick="goToLibraryFirst()" style="background:#f59e0b;margin-right:1rem;padding:1rem 2rem">
-                📖 IR PARA BIBLIOTECA PRIMEIRO
-            </button>
-            <button onclick="goToDashboardFromWelcome()" style="background:#3b82f6;padding:1rem 2rem">
-                📊 VER MEU DASHBOARD
-            </button>
-        </div>
-        
-        <p style="text-align:center;color:#64748b;margin-top:2rem;font-size:0.9rem">
-            Podes voltar a ver esta informação a qualquer momento no botão de Ajuda
-        </p>
     </div>
 
-    <script src="script.js"></script>
+    <script src="phishguard-elite.js"></script>
 </body>
 </html>
