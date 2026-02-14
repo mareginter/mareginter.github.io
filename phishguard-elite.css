@@ -749,6 +749,34 @@ header {
     background: var(--primary-700);
 }
 
+/* Popup de conclusão */
+#completionOverlay .modal {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+#completionOverlay .modal-body {
+    text-align: center;
+    padding: 2rem;
+}
+
+#completionOverlay .modal-footer {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
 /* ==================== QUIZ OPTIONS ====================*/
 .quiz-option {
     padding: var(--space-3) var(--space-4);
