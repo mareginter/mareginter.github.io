@@ -775,24 +775,51 @@ function showLandingPage() {
 function showLoginType(type) {
     console.log('A mostrar tipo de login:', type);
     
+    // Elementos do DOM
     const userForm = document.getElementById('userLoginForm');
     const adminForm = document.getElementById('adminLoginForm');
     const tabUser = document.getElementById('tabUser');
     const tabAdmin = document.getElementById('tabAdmin');
     const adminExtraFields = document.getElementById('adminExtraFields');
+    const masterKeyField = document.getElementById('masterKeyField');
 
+    // Verificação de segurança
+    if (!userForm || !adminForm || !tabUser || !tabAdmin) {
+        console.error('Elementos de login não encontrados');
+        return;
+    }
+
+    // Reset completo de TODOS os estados
+    userForm.classList.add('hidden');
+    adminForm.classList.add('hidden');
+    tabUser.classList.remove('active');
+    tabAdmin.classList.remove('active');
+    
+    // Esconder campos extras
+    if (adminExtraFields) {
+        adminExtraFields.classList.add('hidden');
+    }
+    
+    if (masterKeyField) {
+        masterKeyField.style.display = 'none';
+    }
+    
+    // Limpar formulários para evitar dados antigos
+    document.getElementById('adminEmail').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminName').value = '';
+    document.getElementById('companyName').value = '';
+    document.getElementById('masterKey').value = '';
+    
+    // Ativar o tipo selecionado
     if (type === 'user') {
-        if (userForm) userForm.classList.remove('hidden');
-        if (adminForm) adminForm.classList.add('hidden');
-        if (tabUser) tabUser.classList.add('active');
-        if (tabAdmin) tabAdmin.classList.remove('active');
-        if (adminExtraFields) adminExtraFields.classList.add('hidden');
+        userForm.classList.remove('hidden');
+        tabUser.classList.add('active');
+        console.log('Modo colaborador ativado');
     } else {
-        if (userForm) userForm.classList.add('hidden');
-        if (adminForm) adminForm.classList.remove('hidden');
-        if (tabUser) tabUser.classList.remove('active');
-        if (tabAdmin) tabAdmin.classList.add('active');
-        if (adminExtraFields) adminExtraFields.classList.add('hidden');
+        adminForm.classList.remove('hidden');
+        tabAdmin.classList.add('active');
+        console.log('Modo administrador ativado');
     }
 }
 
@@ -2336,174 +2363,215 @@ async function loadAdminStats() {
     }
 }
 
+// ==================== SHOW ADMIN TAB CORRIGIDA ====================
 function showAdminTab(tab) {
+    console.log('A mostrar tab admin:', tab);
+    
+    // Atualizar tabs ativas
     document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(`tab-${tab}`)?.classList.add('active');
+    const tabElement = document.getElementById(`tab-${tab}`);
+    if (tabElement) tabElement.classList.add('active');
     
     const content = document.getElementById('adminTabContent');
     if (!content) return;
     
-    let html = '';
+    // Mostrar loading
+    content.innerHTML = `
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 2rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
+            <p style="color: var(--gray-500);">A carregar ${tab}...</p>
+        </div>
+    `;
     
-    switch(tab) {
-        case 'overview':
-            html = `
-                <h3 style="margin-bottom: 1.5rem;">Visão Geral da Empresa</h3>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
-                    <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                        <h4 style="margin-bottom: 1rem;">Informação</h4>
-                        <p><strong>Empresa:</strong> ${COMPANY.name || 'Não definida'}</p>
-                        <p><strong>Código:</strong> ${COMPANY.code || USER.companyCode}</p>
-                        <p><strong>Administrador:</strong> ${USER.name || USER.email}</p>
-                        <p><strong>Data de registo:</strong> ${USER.startDate ? new Date(USER.startDate).toLocaleDateString('pt-PT') : new Date().toLocaleDateString('pt-PT')}</p>
-                    </div>
-                    <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                        <h4 style="margin-bottom: 1rem;">Estatísticas</h4>
-                        <p><strong>Total de colaboradores:</strong> <span id="statEmployees">0</span></p>
-                        <p><strong>Módulos concluídos:</strong> <span id="statModules">0</span></p>
-                        <p><strong>XP total da equipa:</strong> <span id="statXP">0</span></p>
-                        <p><strong>Simulações realizadas:</strong> <span id="statSims">0</span></p>
-                    </div>
-                </div>
-            `;
-            break;
-            
-        case 'keys':
-            html = `
-                <h3 style="margin-bottom: 1.5rem;">Gestão de Chaves de Ativação</h3>
-                
-                <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                    <h4 style="margin-bottom: 1rem;">Gerar Nova Chave</h4>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                        <div>
-                            <label class="form-label">Tipo de Chave</label>
-                            <select id="keyType" class="form-input">
-                                <option value="basic">Básica (6 meses)</option>
-                                <option value="premium">Premium (1 ano)</option>
-                                <option value="enterprise">Enterprise (2 anos)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="form-label">Número de Licenças</label>
-                            <input type="number" id="keyLicenses" class="form-input" value="1" min="1" max="100">
-                        </div>
-                        <div>
-                            <label class="form-label">Validade (dias)</label>
-                            <input type="number" id="keyValidity" class="form-input" value="180" min="1" max="730">
+    // Carregar conteúdo com delay para mostrar loading
+    setTimeout(() => {
+        let html = '';
+        
+        switch(tab) {
+            case 'overview':
+                html = `
+                    <div style="padding: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem;">Visão Geral da Empresa</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                            <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
+                                <h4 style="margin-bottom: 1rem;">Informação</h4>
+                                <p><strong>Empresa:</strong> ${COMPANY.name || 'Não definida'}</p>
+                                <p><strong>Código:</strong> ${COMPANY.code || USER.companyCode}</p>
+                                <p><strong>Administrador:</strong> ${USER.name || USER.email}</p>
+                                <p><strong>Data de registo:</strong> ${USER.startDate ? new Date(USER.startDate).toLocaleDateString('pt-PT') : new Date().toLocaleDateString('pt-PT')}</p>
+                            </div>
+                            <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
+                                <h4 style="margin-bottom: 1rem;">Estatísticas</h4>
+                                <p><strong>Total de colaboradores:</strong> <span id="statEmployees">0</span></p>
+                                <p><strong>Módulos concluídos:</strong> <span id="statModules">0</span></p>
+                                <p><strong>XP total da equipa:</strong> <span id="statXP">0</span></p>
+                                <p><strong>Simulações realizadas:</strong> <span id="statSims">0</span></p>
+                            </div>
                         </div>
                     </div>
-                    
-                    <button class="btn btn-primary" onclick="generateNewKey()">
-                        Gerar Chave
-                    </button>
-                    
-                    <div id="generatedKeyDisplay" class="hidden" style="margin-top: 1.5rem; padding: 1.5rem; background: var(--success-light); border-radius: var(--radius);">
-                        <p style="font-weight: 600; margin-bottom: 0.5rem;">Chave gerada com sucesso:</p>
-                        <div style="display: flex; gap: 0.5rem; align-items: center; background: white; padding: 0.75rem; border-radius: var(--radius);">
-                            <code id="generatedKey" style="flex: 1; font-family: monospace; font-size: 1.2rem; text-align: center;">XXXX-XXXX-XXXX-XXXX</code>
-                            <button class="btn btn-sm btn-outline" onclick="copyKey()">Copiar</button>
+                `;
+                content.innerHTML = html;
+                loadAdminStatsDetailed();
+                break;
+                
+            case 'keys':
+                html = `
+                    <div style="padding: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem;">Gestão de Chaves de Ativação</h3>
+                        
+                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">Gerar Nova Chave</h4>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div>
+                                    <label class="form-label">Tipo de Chave</label>
+                                    <select id="keyType" class="form-input">
+                                        <option value="basic">Básica (6 meses)</option>
+                                        <option value="premium">Premium (1 ano)</option>
+                                        <option value="enterprise">Enterprise (2 anos)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Número de Licenças</label>
+                                    <input type="number" id="keyLicenses" class="form-input" value="1" min="1" max="100">
+                                </div>
+                                <div>
+                                    <label class="form-label">Validade (dias)</label>
+                                    <input type="number" id="keyValidity" class="form-input" value="180" min="1" max="730">
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-primary" onclick="generateNewKey()">
+                                Gerar Chave
+                            </button>
+                            
+                            <div id="generatedKeyDisplay" class="hidden" style="margin-top: 1.5rem; padding: 1.5rem; background: var(--success-light); border-radius: var(--radius);">
+                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Chave gerada com sucesso:</p>
+                                <div style="display: flex; gap: 0.5rem; align-items: center; background: white; padding: 0.75rem; border-radius: var(--radius);">
+                                    <code id="generatedKey" style="flex: 1; font-family: monospace; font-size: 1.2rem; text-align: center;">XXXX-XXXX-XXXX-XXXX</code>
+                                    <button class="btn btn-sm btn-outline" onclick="copyKey()">Copiar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
+                            <h4 style="margin-bottom: 1rem;">Chaves Existentes</h4>
+                            <div id="keysList">
+                                <p style="color: var(--gray-500); text-align: center;">Nenhuma chave gerada ainda.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                `;
+                content.innerHTML = html;
+                loadKeysList();
+                break;
                 
-                <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                    <h4 style="margin-bottom: 1rem;">Chaves Existentes</h4>
-                    <div id="keysList">
-                        <p style="color: var(--gray-500); text-align: center;">Nenhuma chave gerada ainda.</p>
+            case 'employees':
+                html = `
+                    <div style="padding: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem;">Gestão de Colaboradores</h3>
+                        
+                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h4>Lista de Colaboradores</h4>
+                                <button class="btn btn-outline btn-sm" onclick="exportEmployees()">📥 Exportar</button>
+                            </div>
+                            
+                            <div id="employeesList">
+                                <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                                    <div style="font-size: 2rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
+                                    <p>A carregar colaboradores...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 0.875rem; color: var(--gray-500);">Total</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-700);" id="statsTotal">0</div>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 0.875rem; color: var(--gray-500);">XP Total</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-700);" id="statsXP">0</div>
+                            </div>
+                            <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                                <div style="font-size: 0.875rem; color: var(--gray-500);">Módulos</div>
+                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-700);" id="statsModules">0</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            `;
-            break;
-            
-        case 'employees':
-            html = `
-                <h3 style="margin-bottom: 1.5rem;">Gestão de Colaboradores</h3>
+                `;
+                content.innerHTML = html;
+                loadEmployeesList();
+                break;
                 
-                <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h4>Lista de Colaboradores</h4>
-                        <button class="btn btn-outline btn-sm" onclick="exportEmployees()">📥 Exportar</button>
-                    </div>
-                    
-                    <div id="employeesList">
-                        <p style="color: var(--gray-500); text-align: center;">A carregar colaboradores...</p>
-                    </div>
-                </div>
-            `;
-            loadEmployeesList();
-            break;
-            
-        case 'settings':
-            html = `
-                <h3 style="margin-bottom: 1.5rem;">Configurações da Empresa</h3>
-                
-                <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                    <h4 style="margin-bottom: 1rem;">Informação da Empresa</h4>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label class="form-label">Nome da Empresa</label>
-                        <input type="text" class="form-input" id="companyNameSetting" value="${COMPANY.name || ''}" placeholder="Nome da empresa">
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label class="form-label">Email do Administrador</label>
-                        <input type="email" class="form-input" value="${USER.email}" readonly disabled style="background: var(--gray-100);">
-                    </div>
-                </div>
-                
-                <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                    <h4 style="margin-bottom: 1rem;">Configurações de Formação</h4>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label class="form-label">Pontuação Mínima para Certificado (%)</label>
-                        <input type="number" class="form-input" id="minScoreSetting" value="${COMPANY.settings?.minCertificateScore || 80}" min="50" max="100">
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label class="form-label">Módulos Obrigatórios</label>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
-                            ${MODULES.map(module => `
-                                <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--gray-50); border-radius: var(--radius);">
-                                    <input type="checkbox" id="mod-${module.id}" ${COMPANY.settings?.mandatoryModules?.includes(module.id) ? 'checked' : ''}>
-                                    ${module.title}
+            case 'settings':
+                html = `
+                    <div style="padding: 2rem;">
+                        <h3 style="margin-bottom: 1.5rem;">Configurações da Empresa</h3>
+                        
+                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">Informação da Empresa</h4>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label class="form-label">Nome da Empresa</label>
+                                <input type="text" class="form-input" id="companyNameSetting" value="${COMPANY.name || ''}" placeholder="Nome da empresa">
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label class="form-label">Email do Administrador</label>
+                                <input type="email" class="form-input" value="${USER.email}" readonly disabled style="background: var(--gray-100);">
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1rem;">Configurações de Formação</h4>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label class="form-label">Pontuação Mínima para Certificado (%)</label>
+                                <input type="number" class="form-input" id="minScoreSetting" value="${COMPANY.settings?.minCertificateScore || 80}" min="50" max="100">
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label class="form-label">Módulos Obrigatórios</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
+                                    ${MODULES.map(module => `
+                                        <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--gray-50); border-radius: var(--radius);">
+                                            <input type="checkbox" id="mod-${module.id}" ${COMPANY.settings?.mandatoryModules?.includes(module.id) ? 'checked' : ''}>
+                                            ${module.title}
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
+                            <h4 style="margin-bottom: 1rem;">Configurações Avançadas</h4>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="require2FA" ${COMPANY.settings?.require2FA ? 'checked' : ''}>
+                                    Exigir autenticação de dois fatores para colaboradores
                                 </label>
-                            `).join('')}
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="checkbox" id="allowCustomBranding" ${COMPANY.settings?.allowCustomBranding ? 'checked' : ''}>
+                                    Permitir branding personalizado
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; text-align: right;">
+                            <button class="btn btn-primary" onclick="saveCompanySettings()">Guardar Configurações</button>
                         </div>
                     </div>
-                </div>
-                
-                <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                    <h4 style="margin-bottom: 1rem;">Configurações Avançadas</h4>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="require2FA" ${COMPANY.settings?.require2FA ? 'checked' : ''}>
-                            Exigir autenticação de dois fatores para colaboradores
-                        </label>
-                    </div>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: flex; align-items: center; gap: 0.5rem;">
-                            <input type="checkbox" id="allowCustomBranding" ${COMPANY.settings?.allowCustomBranding ? 'checked' : ''}>
-                            Permitir branding personalizado
-                        </label>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 2rem; text-align: right;">
-                    <button class="btn btn-primary" onclick="saveCompanySettings()">Guardar Configurações</button>
-                </div>
-            `;
-            break;
-    }
-    
-    content.innerHTML = `<div style="padding: 2rem;">${html}</div>`;
-    
-    // Atualizar estatísticas se necessário
-    if (tab === 'overview') {
-        loadAdminStatsDetailed();
-    }
+                `;
+                content.innerHTML = html;
+                break;
+        }
+    }, 300);
 }
 
 async function loadAdminStatsDetailed() {
@@ -2882,5 +2950,14 @@ window.loadLibraryVideos = loadLibraryVideos;
 window.downloadResource = function(type) {
     showMessage('Download iniciado. Ficheiro simulado para demonstração.', 'info');
 };
+// ==================== FUNÇÃO DE EMERGÊNCIA ====================
+// Garante que o botão Admin funciona mesmo em cenários extremos
+window.showAdminTabClick = function() {
+    console.log('⚠️ Função de emergência ativada - redirecionando para admin');
+    showLoginType('admin');
+};
+
+// Redundância: também expor showLoginType globalmente
+window.showLoginType = showLoginType;
 
 console.log('PhishGuard Elite - Versão Profissional carregada com sucesso!');
