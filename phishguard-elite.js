@@ -1,6 +1,6 @@
 // ==================== PHISHGUARD ELITE - JAVASCRIPT ====================
 // Plataforma de Formação Anti-Phishing | Mareginter
-// Versão Melhorada e Otimizada
+// Versão Completa e Corrigida
 
 // ==================== FIREBASE CONFIGURATION ====================
 const firebaseConfig = {
@@ -17,23 +17,18 @@ const firebaseConfig = {
 // Initialize Firebase
 let database;
 try {
-    // Verificar se o Firebase já foi inicializado
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
-    } else {
-        firebase.app(); // usar app existente
     }
     database = firebase.database();
     console.log('✅ Firebase inicializado com sucesso');
 } catch (error) {
     console.error('❌ Erro ao inicializar Firebase:', error);
-    // Fallback para localStorage apenas
     database = {
         ref: () => ({
             once: () => Promise.resolve({ exists: () => false, val: () => null }),
             set: () => Promise.resolve(),
-            update: () => Promise.resolve(),
-            push: () => Promise.resolve({ key: 'local_' + Date.now() })
+            update: () => Promise.resolve()
         })
     };
 }
@@ -69,8 +64,6 @@ let COMPANY = {
     }
 };
 
-window.storyAnswers = {};
-
 // ==================== MÓDULOS DE FORMAÇÃO ====================
 const MODULES = [
     {
@@ -91,10 +84,22 @@ const MODULES = [
                 <li>Pedidos urgentes de informação pessoal ou financeira</li>
                 <li>Anexos maliciosos que instalam software prejudicial</li>
             </ul>
+
+            <h3 style="margin-top: 1.5rem;">Tipos Comuns de Phishing:</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Email Phishing:</strong> Emails em massa enviados para milhares de pessoas</li>
+                <li><strong>Spear Phishing:</strong> Ataques direcionados a indivíduos específicos</li>
+                <li><strong>Whaling:</strong> Ataques direcionados a executivos de alto nível</li>
+                <li><strong>Smishing:</strong> Phishing via SMS</li>
+                <li><strong>Vishing:</strong> Phishing por chamada telefónica</li>
+            </ul>
         `,
         quiz: [
             { q: 'O que é phishing?', opts: ['Um tipo de vírus', 'Técnica de fraude para roubar informações', 'Um programa de proteção', 'Um tipo de email marketing'], correct: 1 },
-            { q: 'Qual destes NÃO é um sinal típico de phishing?', opts: ['Erros ortográficos', 'Pedidos urgentes', 'Endereço de email oficial da empresa', 'Links suspeitos'], correct: 2 }
+            { q: 'Qual destes NÃO é um sinal típico de phishing?', opts: ['Erros ortográficos', 'Pedidos urgentes', 'Endereço de email oficial da empresa', 'Links suspeitos'], correct: 2 },
+            { q: 'O que é "spear phishing"?', opts: ['Phishing por voz', 'Ataques direcionados a alvos específicos', 'Phishing em redes sociais', 'Phishing com anexos'], correct: 1 },
+            { q: 'Qual a melhor forma de verificar se um email é legítimo?', opts: ['Clicar no link', 'Responder ao email', 'Contactar a empresa por canais oficiais', 'Verificar se tem imagens'], correct: 2 },
+            { q: 'O que deve fazer ao receber um email suspeito?', opts: ['Apagar sem ler', 'Reportar como spam e não clicar em links', 'Encaminhar para colegas', 'Responder pedindo informações'], correct: 1 }
         ]
     },
     {
@@ -107,10 +112,35 @@ const MODULES = [
         content: `
             <h3>Sinais de Alerta em Emails</h3>
             <p>Aprenda a identificar os principais indicadores de emails de phishing.</p>
+            
+            <h4 style="margin-top: 1.5rem;">1. Remetente Suspeito</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Endereço de email que não corresponde ao domínio oficial</li>
+                <li>Pequenas alterações no domínio (ex: paypa1.com)</li>
+                <li>Uso de serviços de email gratuitos para comunicações oficiais</li>
+            </ul>
+
+            <h4 style="margin-top: 1rem;">2. Linguagem e Tom</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Saudações genéricas ("Prezado cliente")</li>
+                <li>Erros ortográficos e gramaticais</li>
+                <li>Tom urgente ou ameaçador</li>
+                <li>Promessas irrealistas</li>
+            </ul>
+
+            <h4 style="margin-top: 1rem;">3. Links e Anexos</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Links que não correspondem ao texto</li>
+                <li>URLs encurtados suspeitos</li>
+                <li>Anexos inesperados (.exe, .zip)</li>
+            </ul>
         `,
         quiz: [
             { q: 'Qual destes endereços é mais suspeito?', opts: ['suporte@bancoportugal.pt', 'noreply@banco-p0rtugal.com', 'atendimento@banco.pt', 'servicos@instituicao.pt'], correct: 1 },
-            { q: 'Um email começa com "Prezado utilizador". Isto é:', opts: ['Normal', 'Sinal de phishing', 'Usado por bancos', 'Forma correta'], correct: 1 }
+            { q: 'Um email começa com "Prezado utilizador". Isto é:', opts: ['Normal', 'Sinal de phishing', 'Usado por bancos', 'Forma correta'], correct: 1 },
+            { q: 'Como verificar para onde um link aponta?', opts: ['Clicar', 'Passar o rato por cima', 'Copiar', 'Passar rato ou copiar sem clicar'], correct: 3 },
+            { q: 'Email urgente: "conta será suspensa". O que faz?', opts: ['Clica imediatamente', 'Entra em pânico', 'Contacta empresa por canais oficiais', 'Ignora'], correct: 2 },
+            { q: 'Qual anexo é mais perigoso?', opts: ['documento.pdf', 'fatura.jpg', 'atualizacao.exe', 'relatorio.docx'], correct: 2 }
         ]
     },
     {
@@ -123,10 +153,32 @@ const MODULES = [
         content: `
             <h3>Importância das Palavras-passe Fortes</h3>
             <p>Uma palavra-passe forte é a primeira linha de defesa contra acessos não autorizados.</p>
+            
+            <h4 style="margin-top: 1.5rem;">Características de uma Palavra-passe Forte:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Pelo menos 12 caracteres de comprimento</li>
+                <li>Combinação de letras maiúsculas e minúsculas</li>
+                <li>Inclusão de números</li>
+                <li>Uso de caracteres especiais (@, #, $, etc.)</li>
+                <li>Não contém informações pessoais óbvias</li>
+                <li>Não é uma palavra do dicionário</li>
+            </ul>
+
+            <h4 style="margin-top: 1.5rem;">Melhores Práticas:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Use uma palavra-passe diferente para cada conta</li>
+                <li>Utilize um gestor de palavras-passe</li>
+                <li>Ative autenticação de dois fatores (2FA)</li>
+                <li>Mude palavras-passe periodicamente</li>
+                <li>Nunca partilhe as suas palavras-passe</li>
+            </ul>
         `,
         quiz: [
             { q: 'Qual é a palavra-passe mais segura?', opts: ['password123', 'JoaoSilva2024', 'Tr0c@rS3nh@Cad@3M!', 'qwerty'], correct: 2 },
-            { q: 'Com que frequência mudar palavras-passe?', opts: ['Todos os dias', 'Periodicamente, após violações', 'Nunca', 'Só quando esquece'], correct: 1 }
+            { q: 'Com que frequência mudar palavras-passe?', opts: ['Todos os dias', 'Periodicamente, após violações', 'Nunca', 'Só quando esquece'], correct: 1 },
+            { q: 'O que é autenticação 2FA?', opts: ['Duas palavras-passe', 'Camada adicional de segurança', 'Login duplo', 'Duas contas'], correct: 1 },
+            { q: 'Usar mesma palavra-passe em várias contas?', opts: ['Sim, se forte', 'Sim, mais fácil', 'Não, cada conta única', 'Só não importantes'], correct: 2 },
+            { q: 'Melhor forma de gerir múltiplas palavras-passe?', opts: ['Papel', 'Ficheiro texto', 'Gestor encriptado', 'Mesma sempre'], correct: 2 }
         ]
     },
     {
@@ -138,11 +190,39 @@ const MODULES = [
         xp: 150,
         content: `
             <h3>Anatomia de um URL</h3>
-            <p>Compreender a estrutura de um URL é essencial.</p>
+            <p>Compreender a estrutura de um URL é essencial:</p>
+            <code style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 4px; display: block; margin: 1rem 0;">
+            https://www.exemplo.pt/pagina?parametro=valor
+            </code>
+            
+            <h4 style="margin-top: 1.5rem;">Componentes Importantes:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li><strong>Protocolo:</strong> https:// (seguro) vs http://</li>
+                <li><strong>Domínio:</strong> exemplo.pt (parte mais importante)</li>
+                <li><strong>TLD:</strong> .pt, .com, .org</li>
+            </ul>
+
+            <h4 style="margin-top: 1.5rem;">Técnicas de Fraude:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li><strong>Typosquatting:</strong> paypa1.com (1 em vez de l)</li>
+                <li><strong>Subdomínios enganadores:</strong> paypal.fraude.com</li>
+                <li><strong>URLs longos:</strong> para esconder domínio real</li>
+            </ul>
+
+            <h4 style="margin-top: 1.5rem;">Verificações:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Verifique o cadeado HTTPS</li>
+                <li>Leia o URL completo da direita para esquerda</li>
+                <li>Desconfie de URLs encurtados</li>
+                <li>Digite URLs manualmente para sites importantes</li>
+            </ul>
         `,
         quiz: [
             { q: 'Qual URL é mais suspeito?', opts: ['https://bancoportugal.pt', 'https://bancoportugal.com-verificacao.tk', 'https://online.bancoportugal.pt', 'https://bancoportugal.pt/login'], correct: 1 },
-            { q: 'O que indica "https://"?', opts: ['100% seguro', 'Ligação encriptada', 'Site governamental', 'Nada especial'], correct: 1 }
+            { q: 'O que indica "https://"?', opts: ['100% seguro', 'Ligação encriptada', 'Site governamental', 'Nada especial'], correct: 1 },
+            { q: 'Em "login.exemplo.com.site-falso.com", qual o domínio real?', opts: ['login.exemplo.com', 'exemplo.com', 'site-falso.com', 'com'], correct: 2 },
+            { q: 'Por que atacantes usam URLs encurtados?', opts: ['Economizar espaço', 'Esconder destino real', 'Links bonitos', 'Melhorar SEO'], correct: 1 },
+            { q: 'O que é "typosquatting"?', opts: ['Tipo de vírus', 'Domínios com erros ortográficos', 'Proteção de sites', 'Método encriptação'], correct: 1 }
         ]
     },
     {
@@ -155,13 +235,32 @@ const MODULES = [
         content: `
             <h3>Phishing nas Redes Sociais</h3>
             <p>As redes sociais são alvos populares devido à quantidade de informação pessoal partilhada.</p>
+            
+            <h4 style="margin-top: 1.5rem;">Técnicas Comuns:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li><strong>Perfis Falsos:</strong> Imitam amigos ou marcas</li>
+                <li><strong>Mensagens Maliciosas:</strong> "És tu neste vídeo?"</li>
+                <li><strong>Concursos Falsos:</strong> "Ganhou um prémio!"</li>
+                <li><strong>Apps Maliciosas:</strong> Quizzes com permissões excessivas</li>
+            </ul>
+
+            <h4 style="margin-top: 1.5rem;">Proteção de Privacidade:</h4>
+            <ul style="margin-left: 1.5rem;">
+                <li>Limite quem pode ver publicações</li>
+                <li>Não partilhe informações sensíveis publicamente</li>
+                <li>Verifique configurações regularmente</li>
+                <li>Cuidado com quizzes</li>
+                <li>Ative 2FA</li>
+            </ul>
         `,
         quiz: [
             { q: 'Mensagem de "amigo" com link "És tu neste vídeo?". O que faz?', opts: ['Clica imediatamente', 'Contacta amigo por outro meio', 'Partilha', 'Clica sem inserir dados'], correct: 1 },
-            { q: 'Quiz pede acesso a email e amigos. Isto é:', opts: ['Normal', 'Suspeito e malicioso', 'Necessário', 'Formalidade'], correct: 1 }
+            { q: 'Quiz pede acesso a email e amigos. Isto é:', opts: ['Normal', 'Suspeito e malicioso', 'Necessário', 'Formalidade'], correct: 1 },
+            { q: 'Melhor prática para privacidade?', opts: ['Tudo público', 'Apenas amigos verem', 'Nunca verificar', 'Confiar padrão'], correct: 1 },
+            { q: 'Como identificar perfil falso?', opts: ['Tem foto', 'Muitos seguidores', 'Recente, poucas conexões, pouca atividade', 'Nome verdadeiro'], correct: 2 },
+            { q: 'Não partilhar publicamente:', opts: ['Fotos paisagens', 'Data nascimento, morada, telefone', 'Opiniões filmes', 'Receitas'], correct: 1 }
         ]
     },
-    // MÓDULO 6 - HISTÓRIAS REAIS (5 CASOS PORTUGUESES)
     {
         id: 'mod6',
         title: '📖 Histórias Reais de Phishing em Portugal',
@@ -190,11 +289,8 @@ const MODULES = [
                 <div class="alert alert-info">
                     <strong>🎯 Objetivo deste módulo:</strong> Desenvolver intuição e capacidade de identificar padrões de ataque através de experiências reais em Portugal.
                 </div>
-                
-                <p style="margin-top: 2rem;">Clique em cada caso para ler a história completa e aprender com os erros de outras pessoas.</p>
             </div>
         `,
-        // Os casos reais estão definidos abaixo
         stories: [
             {
                 id: 'story1',
@@ -204,9 +300,7 @@ const MODULES = [
                 cargo: 'Diretora Financeira',
                 vitima: 'Carla, 42 anos',
                 cenario: 'A Carla, diretora financeira de uma consultora em Lisboa, recebeu um email do "CEO" pedindo uma transferência urgente de 45.000€ para um novo parceiro na Alemanha.',
-                ataque: `O email parecia legítimo - usava o nome correto do CEO, o logótipo da empresa, e até incluía detalhes de uma reunião que realmente tinha acontecido. 
-                
-                A Carla estava ocupada e o email chegou numa sexta-feira à tarde, quando sabia que o CEO estava em viagem. O tom era urgente: "Precisamos fechar isto hoje, estou em reuniões o dia todo, não posso atender chamadas."`,
+                ataque: 'O email parecia legítimo - usava o nome correto do CEO, o logótipo da empresa, e até incluía detalhes de uma reunião que realmente tinha acontecido. A Carla estava ocupada e o email chegou numa sexta-feira à tarde, quando sabia que o CEO estava em viagem. O tom era urgente: "Precisamos fechar isto hoje, estou em reuniões o dia todo, não posso atender chamadas."',
                 erro: 'A Carla não verificou o endereço de email real (era ceo.empresa@gmail.com em vez de ceo@empresa.pt) e não ligou para confirmar, confiando na urgência da situação.',
                 licao: 'Nunca processar pagamentos apenas por email. Implementar regra de "dupla verificação" obrigatória para transferências acima de 5.000€, sempre por telefone ou presencialmente.',
                 prevencao: 'A empresa implementou um sistema onde todas as transferências precisam de aprovação de duas pessoas diferentes, e qualquer pedido financeiro por email é automaticamente marcado para revisão.',
@@ -221,9 +315,7 @@ const MODULES = [
                 cargo: 'Proprietário',
                 vitima: 'Rui, 38 anos',
                 cenario: 'O Rui, dono de uma loja online no Porto, recebeu uma fatura da "CTT Expresso" com um PDF anexo sobre uma encomenda retida.',
-                ataque: `O email tinha o layout idêntico ao da CTT, incluindo o logótipo correto e números de tracking parecidos com os reais. Dizia que uma encomenda estava retida na alfândega e precisava de pagamento de 3,50€ para libertação.
-                
-                O Rui estava à espera de várias encomendas para a loja naquela semana e, sem pensar duas vezes, clicou no PDF.`,
+                ataque: 'O email tinha o layout idêntico ao da CTT, incluindo o logótipo correto e números de tracking parecidos com os reais. Dizia que uma encomenda estava retida na alfândega e precisava de pagamento de 3,50€ para libertação. O Rui estava à espera de várias encomendas para a loja naquela semana e, sem pensar duas vezes, clicou no PDF.',
                 erro: 'Abrir o PDF anexo sem verificar. O PDF continha um script malicioso que instalou ransomware no computador da loja.',
                 licao: 'Nunca abrir anexos inesperados, mesmo que pareçam de transportadoras. Verificar sempre o estado das encomendas diretamente no site oficial, digitando o URL manualmente.',
                 prevencao: 'A partir desse incidente, o Rui instalou software de segurança que bloqueia macros e scripts em PDFs, e criou uma política de nunca abrir anexos sem confirmar por telefone.',
@@ -238,9 +330,7 @@ const MODULES = [
                 cargo: 'Gestora de RH',
                 vitima: 'Sofia, 35 anos',
                 cenario: 'A Sofia, gestora de RH numa empresa de tecnologia em Braga, recebeu uma mensagem no LinkedIn de um "recrutador" oferecendo um pacote de candidatos pré-selecionados.',
-                ataque: `O perfil parecia legítimo - tinha foto profissional, conexões em comum, e até recomendações. O "recrutador" propôs uma parceria exclusiva e pediu acesso à base de dados de currículos da empresa para "cruzar informações".
-                
-                A conversa durou duas semanas, com várias trocas de mensagens e uma videochamada onde o "recrutador" apareceu brevemente (usando deepfake) antes de "problemas de conexão".`,
+                ataque: 'O perfil parecia legítimo - tinha foto profissional, conexões em comum, e até recomendações. O "recrutador" propôs uma parceria exclusiva e pediu acesso à base de dados de currículos da empresa para "cruzar informações". A conversa durou duas semanas, com várias trocas de mensagens e uma videochamada onde o "recrutador" apareceu brevemente (usando deepfake) antes de "problemas de conexão".',
                 erro: 'A Sofia partilhou acesso à base de dados de currículos, que continha informações pessoais de milhares de candidatos (NIF, moradas, cópias de cartão de cidadão).',
                 licao: 'Verificar sempre a identidade de contactos profissionais através de canais oficiais. Empresas legítimas não pedem acesso a bases de dados de parceiros.',
                 prevencao: 'A empresa implementou autenticação de dois fatores para acesso à base de dados e passou a exigir contratos formais assinados digitalmente antes de qualquer partilha de dados.',
@@ -255,9 +345,7 @@ const MODULES = [
                 cargo: 'Reformado',
                 vitima: 'Sr. António, 72 anos',
                 cenario: 'O Sr. António, reformado em Faro, recebeu um SMS do "seu banco" informando que a conta tinha sido bloqueada por atividades suspeitas.',
-                ataque: `A mensagem parecia vir do número oficial do banco (usando spoofing) e incluía um link para "reativar a conta". O site era uma cópia perfeita do site do banco, pedindo código de acesso e cartão matriz.
-                
-                O Sr. António ficou preocupado - era dia de pagamento da reforma - e clicou no link, inserindo os dados como "medida de segurança".`,
+                ataque: 'A mensagem parecia vir do número oficial do banco (usando spoofing) e incluía um link para "reativar a conta". O site era uma cópia perfeita do site do banco, pedindo código de acesso e cartão matriz. O Sr. António ficou preocupado - era dia de pagamento da reforma - e clicou no link, inserindo os dados como "medida de segurança".',
                 erro: 'Inserir dados bancários num link recebido por SMS. Os bancos nunca pedem códigos de matriz por mensagem.',
                 licao: 'Nunca clicar em links de SMS. Se receber uma mensagem do banco, ligar sempre para a linha oficial ou verificar diretamente na app do banco.',
                 prevencao: 'O banco começou a enviar alertas regulares sobre SMS fraudulentos e o Sr. António passou a usar apenas a app oficial para gerir a conta.',
@@ -272,9 +360,7 @@ const MODULES = [
                 cargo: 'Contabilista',
                 vitima: 'Miguel, 45 anos',
                 cenario: 'O Miguel, contabilista em Coimbra, recebeu uma chamada da "Autoridade Tributária" informando que a empresa de um cliente estava com dívidas e seria penhorada no dia seguinte.',
-                ataque: `A chamada parecia vir do número oficial da AT. A pessoa do outro lado sabia detalhes específicos do cliente (NIF, morada fiscal, volume de negócios) e usava linguagem técnica correta.
-                
-                Pediu que o Miguel fizesse imediatamente um pagamento de 12.000€ para uma "conta de garantia" para evitar a penhora, prometendo regularização em 48h.`,
+                ataque: 'A chamada parecia vir do número oficial da AT. A pessoa do outro lado sabia detalhes específicos do cliente (NIF, morada fiscal, volume de negócios) e usava linguagem técnica correta. Pediu que o Miguel fizesse imediatamente um pagamento de 12.000€ para uma "conta de garantia" para evitar a penhora, prometendo regularização em 48h.',
                 erro: 'Fazer um pagamento com base numa chamada telefónica sem verificar por outros canais. A AT nunca contacta contribuintes por telefone para cobranças.',
                 licao: 'Desconfiar sempre de chamadas inesperadas, mesmo que pareçam oficiais. Pedir sempre um número de processo e confirmar através do Portal das Finanças.',
                 prevencao: 'O Miguel criou uma política de "nunca decidir no momento" - todas as situações urgentes são sempre verificadas por email oficial e com prazo mínimo de 24h.',
@@ -330,7 +416,6 @@ const BADGES = [
 
 // ==================== HELPER FUNCTIONS ====================
 
-// Calcular média de scores
 function calculateAverage(scores) {
     if (!scores || Object.keys(scores).length === 0) return 0;
     const values = Object.values(scores);
@@ -338,12 +423,10 @@ function calculateAverage(scores) {
     return Math.round(sum / values.length);
 }
 
-// Sanitizar email para Firebase key
 function sanitizeEmail(email) {
     return email.replace(/\./g, '_').replace(/@/g, '_at_');
 }
 
-// Gerar código único
 function generateCode(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
@@ -353,7 +436,6 @@ function generateCode(length = 8) {
     return code;
 }
 
-// Gerar chave de ativação
 function generateActivationKey() {
     const parts = [];
     for (let i = 0; i < 4; i++) {
@@ -362,13 +444,11 @@ function generateActivationKey() {
     return parts.join('-');
 }
 
-// Calcular progresso
 function calculateProgress(user) {
     if (!user || !user.completedModules || user.completedModules.length === 0) return 0;
     return Math.round((user.completedModules.length / MODULES.length) * 100);
 }
 
-// Verificar badges
 function checkBadges(user) {
     const earned = [];
     if (!user) return earned;
@@ -389,7 +469,6 @@ function checkBadges(user) {
 
 // ==================== UI FUNCTIONS ====================
 
-// Show/Hide elementos
 function show(id) {
     const element = document.getElementById(id);
     if (element) element.classList.remove('hidden');
@@ -400,7 +479,6 @@ function hide(id) {
     if (element) element.classList.add('hidden');
 }
 
-// Mostrar tipo de login
 function showLoginType(type) {
     const userForm = document.getElementById('userLoginForm');
     const adminForm = document.getElementById('adminLoginForm');
@@ -427,7 +505,6 @@ function hideAllPages() {
     const pages = ['loginPage', 'dashboardPage', 'modulesPage'];
     pages.forEach(page => hide(page));
     
-    // Esconder conteúdo dinâmico também
     const dynamicContent = document.getElementById('dynamicContent');
     if (dynamicContent) dynamicContent.innerHTML = '';
 }
@@ -460,7 +537,6 @@ function goToSimulator() {
                     Teste os seus conhecimentos com cenários realistas. Identifique tentativas de phishing em diferentes situações do dia a dia.
                 </p>
                 
-                <!-- Estatísticas do Simulador -->
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
                     <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
                         <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
@@ -479,11 +555,10 @@ function goToSimulator() {
                     </div>
                 </div>
                 
-                <!-- Seleção de Cenário -->
                 <h3 style="margin-bottom: 1rem;">Escolha um Cenário para Simular</h3>
                 
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                    <div class="simulator-card" onclick="startSimulation('email')" style="cursor: pointer; background: white; border: 2px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: all 0.3s;">
+                    <div class="simulator-card" onclick="startSimulation('email')" style="cursor: pointer; background: white; border: 2px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;">
                         <div style="font-size: 2.5rem; margin-bottom: 1rem;">📧</div>
                         <h4 style="margin-bottom: 0.5rem;">Email Phishing</h4>
                         <p style="font-size: 0.875rem; color: var(--gray-500);">Identifique emails fraudulentos</p>
@@ -517,7 +592,6 @@ function goToSimulator() {
                     </div>
                 </div>
                 
-                <!-- Área de Simulação -->
                 <div id="simulationArea" class="hidden" style="margin-top: 2rem;">
                     <div style="background: var(--gray-50); border: 2px solid var(--primary-200); border-radius: var(--radius-lg); padding: 2rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -535,7 +609,6 @@ function goToSimulator() {
                     </div>
                 </div>
                 
-                <!-- Histórico de Simulações -->
                 <div style="margin-top: 3rem;">
                     <h4 style="margin-bottom: 1rem;">📋 Histórico de Simulações</h4>
                     <div id="simulationHistory" style="background: var(--gray-50); border-radius: var(--radius); padding: 1rem;">
@@ -545,316 +618,6 @@ function goToSimulator() {
             </div>
         </div>
     `;
-}
-
-// ==================== STORYTELLING FUNCTIONS ====================
-
-function openStoryModule(module) {
-    const content = document.getElementById('dynamicContent');
-    
-    let storiesHtml = '';
-    module.stories.forEach((story, index) => {
-        storiesHtml += `
-            <div class="story-card" id="story-${story.id}" style="margin-bottom: 2rem; scroll-margin-top: 100px;">
-                <div class="story-header" onclick="toggleStory('${story.id}')" style="cursor: pointer; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; transition: all 0.3s;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                <span style="background: var(--primary-100); color: var(--primary-700); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">
-                                    Caso ${index + 1} de ${module.stories.length}
-                                </span>
-                                <span style="background: var(--gray-100); color: var(--gray-600); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
-                                    ${story.data}
-                                </span>
-                            </div>
-                            <h3 style="font-size: 1.3rem; color: var(--gray-900);">${story.titulo}</h3>
-                            <p style="color: var(--gray-500); font-size: 0.875rem; margin: 0.25rem 0 0 0;">
-                                ${story.empresa} • ${story.cargo}
-                            </p>
-                        </div>
-                        <span class="story-toggle" style="font-size: 1.5rem; color: var(--primary-600); transition: transform 0.3s;">
-                            ▼
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="story-content" id="story-content-${story.id}" style="display: none; margin-top: 1rem;">
-                    <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 2rem;">
-                        <!-- Vítima -->
-                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: white; border-radius: var(--radius);">
-                            <div style="width: 48px; height: 48px; background: var(--primary-100); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
-                                👤
-                            </div>
-                            <div>
-                                <h4 style="font-weight: 600; color: var(--gray-900);">${story.vitima}</h4>
-                                <p style="color: var(--gray-500); font-size: 0.875rem; margin: 0;">${story.cargo}</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Cenário -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.25rem;">🎭</span> O Cenário
-                            </h5>
-                            <p style="color: var(--gray-600); line-height: 1.6; background: white; padding: 1rem; border-radius: var(--radius);">
-                                ${story.cenario}
-                            </p>
-                        </div>
-                        
-                        <!-- Ataque -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.25rem;">⚔️</span> Como o Ataque Aconteceu
-                            </h5>
-                            <div style="background: var(--danger-light); color: var(--danger); padding: 1rem; border-radius: var(--radius); white-space: pre-line; line-height: 1.6;">
-                                ${story.ataque}
-                            </div>
-                        </div>
-                        
-                        <!-- Erro -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.25rem;">❌</span> O Erro
-                            </h5>
-                            <div style="background: var(--warning-light); color: var(--warning); padding: 1rem; border-radius: var(--radius);">
-                                ${story.erro}
-                            </div>
-                        </div>
-                        
-                        <!-- Lição -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.25rem;">💡</span> Lição Aprendida
-                            </h5>
-                            <div style="background: var(--success-light); color: var(--success); padding: 1rem; border-radius: var(--radius);">
-                                ${story.licao}
-                            </div>
-                        </div>
-                        
-                        <!-- Prevenção -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.25rem;">🛡️</span> Como Evitar
-                            </h5>
-                            <p style="color: var(--gray-600); background: white; padding: 1rem; border-radius: var(--radius);">
-                                ${story.prevencao}
-                            </p>
-                        </div>
-                        
-                        <!-- Frase da Vítima -->
-                        <div style="margin: 2rem 0; padding: 1.5rem; background: var(--primary-50); border-left: 4px solid var(--primary-500); border-radius: var(--radius); font-style: italic;">
-                            <p style="color: var(--primary-700); font-size: 1rem; margin: 0;">
-                                "${story.frase}"
-                            </p>
-                        </div>
-                        
-                        <!-- Consequência -->
-                        <div style="background: var(--gray-800); color: white; padding: 1rem; border-radius: var(--radius);">
-                            <strong>📊 Consequência:</strong> ${story.consequencia}
-                        </div>
-                        
-                        <!-- Quiz Rápido -->
-                        <div style="text-align: center; margin-top: 2rem;">
-                            <button class="btn btn-outline" onclick="showStoryQuiz('${story.id}')">
-                                📝 Testar Aprendizagem
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    content.innerHTML = `
-        <div class="container" style="max-width: 900px; margin: 0 auto;">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <button class="btn btn-outline btn-sm" onclick="goToModules()">
-                        ← Voltar aos Módulos
-                    </button>
-                    <span class="badge" style="background: var(--primary-100); color: var(--primary-700); padding: 0.5rem 1rem; border-radius: var(--radius-full);">
-                        +${module.xp} XP
-                    </span>
-                </div>
-                
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">${module.icon}</div>
-                    <h2 style="font-size: 2rem; font-weight: 700;">${module.title}</h2>
-                    <p style="color: var(--gray-500);">${module.description}</p>
-                </div>
-                
-                <div style="margin-bottom: 2rem;">
-                    ${module.content}
-                </div>
-                
-                <div id="storiesContainer">
-                    ${storiesHtml}
-                </div>
-                
-                <!-- Quiz Container -->
-                <div id="storyQuizContainer" class="hidden" style="margin-top: 2rem; padding: 2rem; background: white; border: 2px solid var(--primary-200); border-radius: var(--radius-lg);">
-                    <div id="storyQuizContent"></div>
-                </div>
-                
-                <!-- Botão de Conclusão -->
-                <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
-                    <button class="btn btn-primary btn-lg" onclick="completeStoryModule()">
-                        ✓ Marcar Módulo como Concluído
-                    </button>
-                    <p class="form-hint mt-2">Ganha 200 XP ao concluir o módulo</p>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function toggleStory(storyId) {
-    const content = document.getElementById(`story-content-${storyId}`);
-    const header = document.querySelector(`#story-${storyId} .story-header`);
-    const toggle = document.querySelector(`#story-${storyId} .story-toggle`);
-    
-    if (content.style.display === 'none' || !content.style.display) {
-        content.style.display = 'block';
-        toggle.style.transform = 'rotate(180deg)';
-        header.style.background = 'var(--primary-50)';
-        header.style.borderColor = 'var(--primary-300)';
-    } else {
-        content.style.display = 'none';
-        toggle.style.transform = 'rotate(0deg)';
-        header.style.background = 'white';
-        header.style.borderColor = 'var(--gray-200)';
-    }
-}
-
-function showStoryQuiz(storyId) {
-    const module = MODULES.find(m => m.id === 'mod6');
-    const story = module.stories.find(s => s.id === storyId);
-    if (!story) return;
-    
-    document.getElementById('storyQuizContainer').classList.remove('hidden');
-    
-    const quizContent = document.getElementById('storyQuizContent');
-    quizContent.innerHTML = `
-        <h3 style="margin-bottom: 1.5rem;">📝 Quiz: ${story.titulo}</h3>
-        
-        <div style="margin-bottom: 2rem;">
-            <p style="font-weight: 600; margin-bottom: 1rem;">1. Qual foi o principal erro da vítima?</p>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div class="quiz-option" onclick="checkStoryAnswer(this, true)">
-                    ${story.erro}
-                </div>
-                <div class="quiz-option" onclick="checkStoryAnswer(this, false)">
-                    Não tinha software antivírus atualizado
-                </div>
-                <div class="quiz-option" onclick="checkStoryAnswer(this, false)">
-                    Não tinha seguro contratado
-                </div>
-            </div>
-        </div>
-        
-        <div style="margin-bottom: 2rem;">
-            <p style="font-weight: 600; margin-bottom: 1rem;">2. O que deveria ter feito de diferente?</p>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <div class="quiz-option" onclick="checkStoryAnswer(this, true)">
-                    ${story.licao}
-                </div>
-                <div class="quiz-option" onclick="checkStoryAnswer(this, false)">
-                    Ignorar completamente a situação
-                </div>
-                <div class="quiz-option" onclick="checkStoryAnswer(this, false)">
-                    Responder a pedir mais informações
-                </div>
-            </div>
-        </div>
-        
-        <div style="text-align: center;">
-            <button class="btn btn-primary" onclick="submitStoryQuiz('${story.id}')">
-                Verificar Respostas
-            </button>
-            <button class="btn btn-outline" onclick="closeStoryQuiz()" style="margin-left: 1rem;">
-                Fechar
-            </button>
-        </div>
-    `;
-}
-
-function checkStoryAnswer(element, isCorrect) {
-    // Desmarcar outras opções no mesmo grupo
-    const parent = element.parentElement;
-    parent.querySelectorAll('.quiz-option').forEach(opt => {
-        opt.classList.remove('selected', 'correct', 'incorrect');
-    });
-    
-    element.classList.add('selected');
-    if (isCorrect) {
-        element.classList.add('correct');
-    } else {
-        element.classList.add('incorrect');
-    }
-    
-    // Guardar resposta
-    if (!window.storyAnswers) window.storyAnswers = {};
-    const storyId = document.querySelector('#storyQuizContent h3').textContent.split(': ')[1];
-    if (!window.storyAnswers[storyId]) window.storyAnswers[storyId] = {};
-    
-    const questionIndex = Array.from(parent.parentElement.parentElement.children).indexOf(parent.parentElement);
-    window.storyAnswers[storyId][questionIndex] = isCorrect;
-}
-
-function submitStoryQuiz(storyId) {
-    if (!window.storyAnswers || !window.storyAnswers[storyId]) {
-        showMessage('Por favor, responda às perguntas primeiro', 'warning');
-        return;
-    }
-    
-    const answers = window.storyAnswers[storyId];
-    const correctCount = Object.values(answers).filter(v => v === true).length;
-    
-    let feedbackHtml = '';
-    if (correctCount === 2) {
-        feedbackHtml = `
-            <div class="alert alert-success">
-                <strong>✅ Muito bem!</strong>
-                <p class="mt-2">Acertou em todas as perguntas. Ganhou 25 XP extra!</p>
-            </div>
-        `;
-        USER.xp = (USER.xp || 0) + 25;
-        localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    } else {
-        feedbackHtml = `
-            <div class="alert alert-warning">
-                <strong>📚 Continue a aprender</strong>
-                <p class="mt-2">Acertou em ${correctCount} de 2 perguntas. Reveja a história e tente novamente.</p>
-            </div>
-        `;
-    }
-    
-    document.getElementById('storyQuizContent').insertAdjacentHTML('beforeend', feedbackHtml);
-}
-
-function closeStoryQuiz() {
-    document.getElementById('storyQuizContainer').classList.add('hidden');
-    document.getElementById('storyQuizContent').innerHTML = '';
-    window.storyAnswers = {};
-}
-
-function completeStoryModule() {
-    if (!USER.completedModules.includes('mod6')) {
-        USER.completedModules.push('mod6');
-        USER.xp = (USER.xp || 0) + 200;
-        
-        showMessage('✅ Módulo concluído! Ganhou 200 XP', 'success');
-        
-        // Guardar no localStorage
-        localStorage.setItem('phishguard_user', JSON.stringify(USER));
-        
-        // Voltar aos módulos após 2 segundos
-        setTimeout(() => {
-            goToModules();
-        }, 2000);
-    } else {
-        showMessage('Já concluiu este módulo', 'info');
-    }
 }
 
 function renderSimulationHistory() {
@@ -884,7 +647,6 @@ function startSimulation(type) {
     simulationArea.classList.remove('hidden');
     document.getElementById('simulationFeedback').classList.add('hidden');
     
-    // Animar scroll para a área de simulação
     simulationArea.scrollIntoView({ behavior: 'smooth' });
     
     if (type === 'email') {
@@ -1027,12 +789,10 @@ function startSimulation(type) {
 }
 
 function checkSimulationAnswer(element, isCorrect) {
-    // Desmarcar opções anteriores
     document.querySelectorAll('#simulationOptions .quiz-option').forEach(opt => {
         opt.classList.remove('selected', 'correct', 'incorrect');
     });
     
-    // Marcar opção clicada
     element.classList.add('selected');
     
     if (isCorrect) {
@@ -1041,7 +801,6 @@ function checkSimulationAnswer(element, isCorrect) {
         element.classList.add('incorrect');
     }
     
-    // Mostrar feedback
     const feedback = document.getElementById('simulationFeedback');
     feedback.classList.remove('hidden');
     
@@ -1057,21 +816,17 @@ function checkSimulationAnswer(element, isCorrect) {
             </div>
         `;
         
-        // Adicionar XP ao utilizador
         USER.xp = (USER.xp || 0) + 50;
         if (!USER.simulationsCompleted) USER.simulationsCompleted = [];
         USER.simulationsCompleted.push(Date.now());
         
-        // Guardar no localStorage
         localStorage.setItem('phishguard_user', JSON.stringify(USER));
         
-        // Atualizar histórico
         const historyDiv = document.getElementById('simulationHistory');
         if (historyDiv) {
             historyDiv.innerHTML = renderSimulationHistory();
         }
         
-        // Verificar se ganhou badge
         if (USER.simulationsCompleted.length === 5) {
             showMessage('🏆 Badge desbloqueado: Detetive Digital!', 'success');
         }
@@ -1095,173 +850,10 @@ function resetSimulation() {
     document.getElementById('simulationArea').classList.add('hidden');
     document.getElementById('simulationFeedback').classList.add('hidden');
     
-    // Dar XP de tentativa (pequeno)
     USER.xp = (USER.xp || 0) + 5;
     localStorage.setItem('phishguard_user', JSON.stringify(USER));
     
     showMessage('➕ Ganhou 5 XP por praticar!', 'info');
-}
-
-function startSimulation(type) {
-    const simulationArea = document.getElementById('simulationArea');
-    simulationArea.classList.remove('hidden');
-    
-    let simulationHtml = '';
-    
-    if (type === 'email') {
-        simulationHtml = `
-            <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px;">
-                <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">📧 Simulação: Email de Phishing</h3>
-                
-                <div style="background: #1a1f3a; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <p><strong>De:</strong> <span style="color: #ff6b35;">suporte@banco-seguranca.net</span></p>
-                    <p><strong>Assunto:</strong> <span style="color: #ffb800;">URGENTE: Atualização de Segurança Necessária</span></p>
-                    <hr style="border-color: var(--border); margin: 1rem 0;">
-                    <p>Prezado cliente,</p>
-                    <p>Detectamos atividades suspeitas na sua conta. Para evitar o bloqueio, clique no link abaixo e confirme seus dados:</p>
-                    <p style="background: rgba(255,71,87,0.1); padding: 0.5rem; border-radius: 4px; text-align: center;">
-                        https://banc0-portugal.com-verificacao.tk/atualizar
-                    </p>
-                    <p>Este é um processo urgente que deve ser concluído em 24 horas.</p>
-                    <p>Atenciosamente,<br>Departamento de Segurança</p>
-                </div>
-                
-                <div style="margin: 2rem 0;">
-                    <p style="font-weight: 600; margin-bottom: 1rem;">Este email é phishing? Identifique os sinais:</p>
-                    <div id="simulationOptions">
-                        <div class="quiz-option" onclick="checkSimulationAnswer(this, true)">
-                            ✅ Sim, é phishing (remetente suspeito, URL enganador, urgência)
-                        </div>
-                        <div class="quiz-option" onclick="checkSimulationAnswer(this, false)">
-                            ❌ Não, é legítimo (parece oficial)
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="simulationFeedback" class="hidden" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;"></div>
-            </div>
-        `;
-    } else if (type === 'sms') {
-        simulationHtml = `
-            <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px;">
-                <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">📱 Simulação: SMS Fraudulento (Smishing)</h3>
-                
-                <div style="background: #1a1f3a; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; max-width: 300px; margin-left: auto; margin-right: auto;">
-                    <div style="background: #2a2f4a; border-radius: 8px; padding: 1rem;">
-                        <p style="color: #00d9ff;">📱 +351 912 345 678</p>
-                        <p style="font-size: 1.2rem; margin: 1rem 0;">A sua encomenda CTT aguarda pagamento de 2.50€ para libertação. Pagamento pendente: ctt-portal.com/pay-9a7f3</p>
-                        <p style="color: var(--text-secondary); font-size: 0.8rem;">Hoje, 14:32</p>
-                    </div>
-                </div>
-                
-                <div style="margin: 2rem 0;">
-                    <p style="font-weight: 600; margin-bottom: 1rem;">Esta SMS é fraudulenta?</p>
-                    <div id="simulationOptions">
-                        <div class="quiz-option" onclick="checkSimulationAnswer(this, true)">
-                            ✅ Sim, é smishing (CTT não pede pagamentos assim)
-                        </div>
-                        <div class="quiz-option" onclick="checkSimulationAnswer(this, false)">
-                            ❌ Não, é legítimo
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="simulationFeedback" class="hidden" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;"></div>
-            </div>
-        `;
-    } else if (type === 'web') {
-        simulationHtml = `
-            <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px;">
-                <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">🌐 Simulação: Website Falso</h3>
-                
-                <div style="background: #1a1f3a; border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <div style="text-align: center; margin-bottom: 1rem;">
-                        <div style="background: #00d9ff; width: 50px; height: 50px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">🔐</div>
-                        <h4 style="margin-top: 0.5rem;">Banco de Portugal</h4>
-                    </div>
-                    
-                    <div style="background: #2a2f4a; padding: 0.75rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; margin-bottom: 1rem;">
-                        🔒 https://bancoportugal.com-verificacao-segura.tk/login
-                    </div>
-                    
-                    <div style="margin: 1.5rem 0;">
-                        <p style="background: rgba(255,107,35,0.1); padding: 0.75rem; border-left: 4px solid #ff6b35;">
-                            ⚠️ "Detectamos atividade suspeita na sua conta. Por favor, verifique seus dados imediatamente."
-                        </p>
-                    </div>
-                    
-                    <div style="background: #2a2f4a; padding: 1rem; border-radius: 8px;">
-                        <input type="text" placeholder="NIB" style="width: 100%; margin-bottom: 0.5rem;" disabled>
-                        <input type="password" placeholder="Senha" style="width: 100%; margin-bottom: 0.5rem;" disabled>
-                        <button style="width: 100%; background: #64748b; cursor: not-allowed;" disabled>Entrar</button>
-                    </div>
-                </div>
-                
-                <div style="margin: 2rem 0;">
-                    <p style="font-weight: 600; margin-bottom: 1rem;">Este website é legítimo?</p>
-                    <div id="simulationOptions">
-                        <div class="quiz-option" onclick="checkSimulationAnswer(this, false)">
-                            ❌ Não, o URL é suspeito
-                        </div>
-                        <div class="quiz-option" onclick="checkSimulationAnswer(this, true)">
-                            ✅ Sim, parece do banco
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="simulationFeedback" class="hidden" style="margin-top: 1.5rem; padding: 1rem; border-radius: 8px;"></div>
-            </div>
-        `;
-    }
-    
-    simulationArea.innerHTML = simulationHtml;
-}
-
-function checkSimulationAnswer(element, isCorrect) {
-    // Desmarcar opções anteriores
-    document.querySelectorAll('#simulationOptions .quiz-option').forEach(opt => {
-        opt.style.borderColor = 'var(--border)';
-        opt.style.background = 'rgba(255,255,255,0.05)';
-    });
-    
-    // Marcar opção clicada
-    element.style.borderColor = isCorrect ? 'var(--success)' : 'var(--danger)';
-    element.style.background = isCorrect ? 'rgba(0,255,163,0.15)' : 'rgba(255,71,87,0.15)';
-    
-    // Mostrar feedback
-    const feedback = document.getElementById('simulationFeedback');
-    feedback.classList.remove('hidden');
-    
-    if (isCorrect) {
-        feedback.style.background = 'rgba(0,255,163,0.1)';
-        feedback.style.borderLeft = '4px solid var(--success)';
-        feedback.innerHTML = `
-            <p style="color: var(--success); font-weight: 600;">✅ Correto! Identificou o phishing.</p>
-            <p style="margin-top: 0.5rem;">Ganhou 50 XP por esta simulação!</p>
-            <button onclick="continueSimulation()" style="margin-top: 1rem;">Continuar</button>
-        `;
-        
-        // Adicionar XP ao usuário
-        USER.xp = (USER.xp || 0) + 50;
-        if (!USER.simulationsCompleted) USER.simulationsCompleted = [];
-        USER.simulationsCompleted.push(Date.now());
-        
-        // Salvar no localStorage
-        localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    } else {
-        feedback.style.background = 'rgba(255,71,87,0.1)';
-        feedback.style.borderLeft = '4px solid var(--danger)';
-        feedback.innerHTML = `
-            <p style="color: var(--danger); font-weight: 600;">❌ Incorreto. Isto é phishing!</p>
-            <p style="margin-top: 0.5rem;">Sinais a identificar: remetente suspeito, URL enganador, urgência artificial.</p>
-            <button onclick="continueSimulation()" style="margin-top: 1rem;">Tentar outro</button>
-        `;
-    }
-}
-
-function continueSimulation() {
-    document.getElementById('simulationArea').classList.add('hidden');
-    document.getElementById('simulationFeedback').classList.add('hidden');
 }
 
 function goToBadges() {
@@ -1280,1206 +872,698 @@ function goToCertificate() {
 }
 
 function goToAdmin() {
-    if (!USER.isAdmin) return;
-    hideAllPages();
-    loadAdminPage();
-}
-
-// ==================== LOGIN FUNCTIONS ====================
-
-async function doUserLogin() {
-    const name = document.getElementById('userName').value.trim();
-    const email = document.getElementById('userEmail').value.trim().toLowerCase();
-    const activationKey = document.getElementById('activationKey').value.trim();
-    const companyCode = document.getElementById('companyCode').value.trim();
-
-    if (!name || !email) {
-        showMessage('Por favor, preencha nome e email', 'error');
+    console.log('A entrar no painel admin');
+    
+    if (!USER.isAdmin) {
+        console.log('Utilizador não é admin - redirecionar');
+        goToDashboard();
         return;
     }
-
-    try {
-        const userKey = sanitizeEmail(email);
-        const userRef = database.ref(`employees/${userKey}`);
-        const snapshot = await userRef.once('value');
-
-        if (snapshot.exists()) {
-            // Existing user
-            const userData = snapshot.val();
-            USER = { ...USER, ...userData, email, isAdmin: false };
-            
-            // Update last activity
-            await userRef.update({ lastActivity: new Date().toISOString() });
-            
-            onLoginSuccess();
-        } else {
-            // New user
-            await createNewUser(name, email, activationKey, companyCode || generateCode(8));
-            onLoginSuccess();
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        showMessage('Erro ao fazer login. Tente novamente.', 'error');
-    }
-}
-
-async function createNewUser(name, email, activationKey, companyCode) {
-    const userKey = sanitizeEmail(email);
-    const newUser = {
-        name,
-        email,
-        companyCode: companyCode,
-        xp: 0,
-        scores: {},
-        badges: [],
-        completedModules: [],
-        simulationsCompleted: [],
-        startDate: new Date().toISOString(),
-        lastActivity: new Date().toISOString(),
-        hasSeenWelcome: false,
-        activationKey,
-        keyType: 'basic'
-    };
-
-    await database.ref(`employees/${userKey}`).set(newUser);
-    USER = { ...USER, ...newUser, email, isAdmin: false };
-}
-
-async function validateActivationKey(key) {
-    if (!key || key.trim() === '') return false;
     
-    try {
-        const keysRef = database.ref('activationKeys');
-        const snapshot = await keysRef.once('value');
-        
-        if (!snapshot.exists()) return false;
-        
-        const keys = snapshot.val();
-        
-        for (let keyId in keys) {
-            const keyData = keys[keyId];
-            
-            // Verificar se a chave corresponde
-            if (keyData.key === key) {
-                // Verificar se não expirou
-                const expiryDate = new Date(keyData.expiresAt);
-                if (expiryDate > new Date()) {
-                    // Verificar se ainda tem licenças disponíveis
-                    if (keyData.usedCount < keyData.licenses) {
-                        // Atualizar contagem de uso
-                        await database.ref(`activationKeys/${keyId}`).update({
-                            usedCount: (keyData.usedCount || 0) + 1
-                        });
-                        return true;
-                    } else {
-                        showMessage('Chave sem licenças disponíveis', 'warning');
-                        return false;
-                    }
-                } else {
-                    showMessage('Chave expirada', 'warning');
-                    return false;
-                }
-            }
-        }
-        
-        return false;
-    } catch (error) {
-        console.error('Error validating key:', error);
-        return false;
-    }
-}
-
-async function doAdminLogin() {
-    const email = document.getElementById('adminEmail').value.trim().toLowerCase();
-    const password = document.getElementById('adminPass').value;
-    const name = document.getElementById('adminName')?.value.trim();
-    const companyName = document.getElementById('companyName')?.value.trim();
-
-    if (!email || !password) {
-        showMessage('Preencha email e senha', 'error');
-        return;
-    }
-
-    try {
-        const adminKey = sanitizeEmail(email);
-        const adminRef = database.ref(`admins/${adminKey}`);
-        const snapshot = await adminRef.once('value');
-
-        if (snapshot.exists()) {
-            // Admin existente
-            const adminData = snapshot.val();
-            // Verificar senha (em produção, use hash)
-            if (adminData.password === password) {
-                USER = {
-                    ...USER,
-                    ...adminData,
-                    email,
-                    isAdmin: true
-                };
-                
-                // Carregar dados da empresa
-                const companyRef = database.ref(`companies/${adminData.companyCode}`);
-                const companySnapshot = await companyRef.once('value');
-                if (companySnapshot.exists()) {
-                    COMPANY = companySnapshot.val();
-                    COMPANY.code = adminData.companyCode;
-                }
-                
-                onLoginSuccess();
-            } else {
-                showMessage('Senha incorreta', 'error');
-            }
-        } else {
-            // Primeiro admin - verificar campos adicionais
-            const adminExtraFields = document.getElementById('adminExtraFields');
-            
-            if (!adminExtraFields.classList.contains('hidden')) {
-                // Já estávamos mostrando os campos extras
-                if (!name || !companyName) {
-                    showMessage('Preencha nome e nome da empresa', 'error');
-                    return;
-                }
-                
-                // Criar novo admin
-                await createNewAdmin(email, password, name, companyName);
-            } else {
-                // Mostrar campos extras para primeiro registro
-                show('adminExtraFields');
-                showMessage('Complete o registo inicial da empresa', 'info');
-            }
-        }
-    } catch (error) {
-        console.error('Admin login error:', error);
-        showMessage('Erro ao fazer login: ' + error.message, 'error');
-    }
-}
-
-async function createNewAdmin(email, password, name, companyName) {
-    try {
-        const companyCode = generateCode(8);
-        const adminKey = sanitizeEmail(email);
-        
-        // Criar registro do admin
-        const newAdmin = {
-            name,
-            email,
-            password, // NOTA: Em produção, hash a senha!
-            companyCode,
-            createdAt: new Date().toISOString(),
-            isAdmin: true
-        };
-        
-        await database.ref(`admins/${adminKey}`).set(newAdmin);
-        
-        // Criar registro da empresa
-        const newCompany = {
-            name: companyName,
-            adminEmail: email,
-            adminName: name,
-            code: companyCode,
-            createdAt: new Date().toISOString(),
-            settings: {
-                minCertificateScore: 80,
-                mandatoryModules: MODULES.slice(0, 5).map(m => m.id)
-            },
-            employees: {}
-        };
-        
-        await database.ref(`companies/${companyCode}`).set(newCompany);
-        
-        // Atualizar USER global
-        USER = {
-            ...USER,
-            ...newAdmin,
-            email,
-            isAdmin: true,
-            companyCode
-        };
-        
-        COMPANY = newCompany;
-        
-        showMessage('Empresa registada com sucesso!', 'success');
-        onLoginSuccess();
-        
-    } catch (error) {
-        console.error('Error creating admin:', error);
-        showMessage('Erro ao criar administrador: ' + error.message, 'error');
-    }
-}
-
-function onLoginSuccess() {
-    hide('loginPage');
-    show('navbar');
-    
-    // Mostrar botões apropriados
-    if (USER.isAdmin) {
-        document.getElementById('btnAdmin').classList.remove('hidden');
-        document.getElementById('btnCert').classList.add('hidden');
-    } else {
-        document.getElementById('btnCert').classList.remove('hidden');
-        document.getElementById('btnAdmin').classList.add('hidden');
-        
-        // Verificar se já viu welcome
-        if (!USER.hasSeenWelcome) {
-            showWelcomePopup();
-        } else {
-            goToDashboard();
-        }
-    }
-    
-    // Salvar no localStorage para persistência
-    localStorage.setItem('phishguard_user', JSON.stringify(USER));
-}
-
-function logout() {
-    localStorage.removeItem('phishguard_user');
-    USER = {
-        id: '', name: '', email: '', isAdmin: false, companyCode: '',
-        xp: 0, scores: {}, badges: [], completedModules: [],
-        simulationsCompleted: [], startDate: null, lastActivity: null,
-        hasSeenWelcome: false, activationKey: '', keyType: 'basic'
-    };
-    
-    hide('navbar');
     hideAllPages();
     
-    // Esconder botões específicos
-    document.getElementById('btnAdmin').classList.add('hidden');
-    document.getElementById('btnCert').classList.add('hidden');
-    
-    show('loginPage');
-    
-    // Reset forms
-    document.getElementById('userName').value = '';
-    document.getElementById('userEmail').value = '';
-    document.getElementById('activationKey').value = '';
-    document.getElementById('companyCode').value = '';
-    document.getElementById('adminEmail').value = '';
-    document.getElementById('adminPass').value = '';
-    document.getElementById('adminName').value = '';
-    document.getElementById('companyName').value = '';
-    
-    showLoginType('user');
-}
-
-// ==================== DASHBOARD ====================
-
-async function loadDashboard() {
-    document.getElementById('dashName').textContent = USER.name ? USER.name.split(' ')[0] : 'Utilizador';
-    document.getElementById('dashCompany').textContent = USER.companyCode ? `Empresa: ${USER.companyCode}` : 'PhishGuard Elite';
-    
-    // Stats
-    document.getElementById('dashXP').textContent = USER.xp || 0;
-    document.getElementById('dashMods').textContent = `${USER.completedModules.length}/${MODULES.length}`;
-    document.getElementById('dashBadges').textContent = `${USER.badges.length}/${BADGES.length}`;
-    
-    const avgScore = calculateAverage(USER.scores);
-    document.getElementById('dashSuccess').textContent = `${avgScore}%`;
-    
-    // Progress
-    const progress = calculateProgress(USER);
-    document.getElementById('dashProgress').style.width = `${progress}%`;
-    document.getElementById('dashProgressPct').textContent = progress;
-}
-
-// ==================== MODULES ====================
-
-function loadModules() {
-    const container = document.getElementById('modulesList');
-    container.innerHTML = '';
-    
-    MODULES.forEach((module, index) => {
-        const isCompleted = USER.completedModules.includes(module.id);
-        const isLocked = index > 0 && !USER.completedModules.includes(MODULES[index - 1].id);
-        
-        const card = document.createElement('div');
-        card.className = `module-card ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
-        
-        if (!isLocked) {
-            card.onclick = () => openModule(module);
-        }
-        
-        card.innerHTML = `
-            <div class="module-icon">${module.icon}</div>
-            <div class="module-title">${module.title}</div>
-            <div class="module-description">${module.description}</div>
-            <div class="module-meta">
-                <span style="color: var(--text-secondary); font-size: 0.9rem;">
-                    ${module.difficulty === 'beginner' ? '🟢 Iniciante' : module.difficulty === 'intermediate' ? '🟡 Intermédio' : '🔴 Avançado'}
-                </span>
-                ${isCompleted ? '<span style="color: var(--success);">✓ Concluído</span>' : ''}
-                ${isLocked ? '<span style="color: var(--text-secondary);">🔒 Bloqueado</span>' : ''}
-            </div>
-            ${!isCompleted && !isLocked ? `<div style="color: var(--accent-cyan); margin-top: 0.5rem; font-weight: 600;">+${module.xp} XP</div>` : ''}
-        `;
-        
-        container.appendChild(card);
-    });
-}
-
-function openModule(module) {
-     console.log('A abrir módulo:', module.id);
-    
-    if (module.id === 'mod6') {
-        // Usar a função global
-        if (typeof window.openStoryModule === 'function') {
-            window.openStoryModule(module);
-        } else {
-            console.error('Função openStoryModule não encontrada');
-            window.showMessage('Erro ao abrir módulo. Recarregue a página.', 'error');
-        }
-        return;
-    }
     const content = document.getElementById('dynamicContent');
+    if (!content) {
+        console.error('Elemento dynamicContent não encontrado');
+        return;
+    }
+    
     content.innerHTML = `
-        <div class="box">
-            <button onclick="goToModules()" style="background: #64748b; margin-bottom: 1.5rem;">← Voltar aos Módulos</button>
-            
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">${module.icon}</div>
-                <h2 style="font-size: 2rem; font-weight: 700;">${module.title}</h2>
-                <p style="color: var(--text-secondary);">${module.description}</p>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 1rem;">📖 Conteúdo do Módulo</h3>
-                <div style="color: var(--text-secondary); line-height: 1.8;">
-                    ${module.content}
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">👑 Painel de Administração</h2>
+                        <p style="color: var(--gray-500);">Bem-vindo, ${USER.name || 'Administrador'}</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="goToDashboard()">← Voltar</button>
+                </div>
+                
+                <div style="background: var(--primary-50); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">Empresa</div>
+                            <div style="font-weight: 600;">${COMPANY.name || USER.companyCode || 'Não definida'}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">Código</div>
+                            <div style="font-family: var(--font-mono); background: white; padding: 0.25rem 0.5rem; border-radius: var(--radius); display: inline-block;">
+                                ${COMPANY.code || USER.companyCode || '---'}
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem; color: var(--gray-500);">Email</div>
+                            <div>${USER.email}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;">
+                    <button class="admin-tab active" onclick="showAdminTab('overview')" id="tab-overview">
+                        📊 Visão Geral
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('keys')" id="tab-keys">
+                        🔑 Chaves de Ativação
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('employees')" id="tab-employees">
+                        👥 Colaboradores
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('settings')" id="tab-settings">
+                        ⚙️ Configurações
+                    </button>
+                </div>
+                
+                <div id="adminTabContent">
+                    <div style="text-align: center; padding: 4rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
+                        <p style="color: var(--gray-500);">A carregar painel admin...</p>
+                    </div>
                 </div>
             </div>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        showAdminTab('overview');
+    }, 100);
+}
 
-            <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px;">
-                <h3 style="margin-bottom: 1rem;">✍️ Quiz de Avaliação</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                    Responda às ${module.quiz.length} perguntas seguintes para completar o módulo.
-                </p>
-                <div id="quizContainer"></div>
-                <button onclick="submitQuiz('${module.id}')" style="width: 100%; margin-top: 2rem;">
-                    Submeter Respostas
+function showAdminTab(tab) {
+    console.log('📌 A mostrar tab admin:', tab);
+    
+    document.querySelectorAll('.admin-tab').forEach(t => {
+        t.classList.remove('active');
+    });
+    
+    const tabElement = document.getElementById(`tab-${tab}`);
+    if (tabElement) {
+        tabElement.classList.add('active');
+    }
+    
+    const content = document.getElementById('adminTabContent');
+    if (!content) {
+        console.error('Elemento adminTabContent não encontrado');
+        return;
+    }
+    
+    content.innerHTML = `
+        <div style="text-align: center; padding: 4rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
+            <p style="color: var(--gray-500);">A carregar ${tab}...</p>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        try {
+            if (tab === 'overview') {
+                loadAdminOverview();
+            } else if (tab === 'keys') {
+                loadAdminKeys();
+            } else if (tab === 'employees') {
+                loadAdminEmployees();
+            } else if (tab === 'settings') {
+                loadAdminSettings();
+            }
+        } catch (error) {
+            console.error('Erro ao carregar tab:', error);
+            content.innerHTML = `
+                <div class="alert alert-danger">
+                    Erro ao carregar ${tab}: ${error.message}
+                </div>
+            `;
+        }
+    }, 100);
+}
+
+async function loadAdminOverview() {
+    console.log('📊 A carregar visão geral admin');
+    
+    const content = document.getElementById('adminTabContent');
+    if (!content) return;
+    
+    try {
+        let totalEmployees = 0;
+        let totalXP = 0;
+        let totalModules = 0;
+        let activeToday = 0;
+        
+        if (database && typeof database.ref === 'function') {
+            try {
+                const snapshot = await database.ref('employees').once('value');
+                if (snapshot.exists()) {
+                    const employees = snapshot.val();
+                    const today = new Date().toDateString();
+                    
+                    Object.values(employees).forEach(emp => {
+                        if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
+                            totalEmployees++;
+                            totalXP += emp.xp || 0;
+                            totalModules += emp.completedModules?.length || 0;
+                            
+                            if (emp.lastActivity) {
+                                const lastActive = new Date(emp.lastActivity).toDateString();
+                                if (lastActive === today) activeToday++;
+                            }
+                        }
+                    });
+                }
+            } catch (dbError) {
+                console.warn('Erro ao buscar dados do Firebase:', dbError);
+            }
+        }
+        
+        if (totalEmployees === 0) {
+            totalEmployees = 1;
+            totalXP = USER.xp || 0;
+            totalModules = USER.completedModules?.length || 0;
+        }
+        
+        const avgXP = totalEmployees > 0 ? Math.round(totalXP / totalEmployees) : 0;
+        
+        content.innerHTML = `
+            <div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">👥 Total Colaboradores</div>
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">${totalEmployees}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem;">${activeToday} ativos hoje</div>
+                    </div>
+                    
+                    <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">⭐ XP Total</div>
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">${totalXP}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem;">Média: ${avgXP} por utilizador</div>
+                    </div>
+                    
+                    <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">📚 Módulos Concluídos</div>
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">${totalModules}</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem;">Total de ${MODULES.length} módulos</div>
+                    </div>
+                    
+                    <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+                        <div style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem;">🏆 Certificados</div>
+                        <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">0</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem;">Aguardando conclusões</div>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, var(--primary-50), var(--primary-100)); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1rem; color: var(--primary-800);">🏢 Informação da Empresa</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--primary-600); text-transform: uppercase;">Código</div>
+                            <div style="font-family: var(--font-mono); font-size: 1.1rem; background: white; padding: 0.25rem 0.75rem; border-radius: var(--radius); display: inline-block;">
+                                ${COMPANY.code || USER.companyCode || 'N/A'}
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--primary-600); text-transform: uppercase;">Administrador</div>
+                            <div style="font-weight: 600;">${USER.name || USER.email}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--primary-600); text-transform: uppercase;">Desde</div>
+                            <div>${USER.startDate ? new Date(USER.startDate).toLocaleDateString('pt-PT') : new Date().toLocaleDateString('pt-PT')}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                    <h4 style="margin-bottom: 1rem;">⚡ Ações Rápidas</h4>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                        <button class="btn btn-outline" onclick="showAdminTab('keys')" style="padding: 1rem;">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔑</div>
+                            <div>Gerar Chaves</div>
+                        </button>
+                        <button class="btn btn-outline" onclick="showAdminTab('employees')" style="padding: 1rem;">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">👥</div>
+                            <div>Ver Colaboradores</div>
+                        </button>
+                        <button class="btn btn-outline" onclick="showAdminTab('settings')" style="padding: 1rem;">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">⚙️</div>
+                            <div>Configurações</div>
+                        </button>
+                        <button class="btn btn-outline" onclick="exportCompanyData()" style="padding: 1rem;">
+                            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📥</div>
+                            <div>Exportar Dados</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('❌ Erro ao carregar overview:', error);
+        content.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Erro ao carregar dados:</strong> ${error.message}
+                <br><br>
+                <button class="btn btn-primary" onclick="showAdminTab('overview')">Tentar novamente</button>
+            </div>
+        `;
+    }
+}
+
+async function loadAdminKeys() {
+    console.log('🔑 A carregar gestão de chaves');
+    
+    const content = document.getElementById('adminTabContent');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div>
+            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+                <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">🔑</span>
+                    Gerar Nova Chave de Ativação
+                </h4>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Tipo de Chave</label>
+                        <select id="keyType" class="form-input">
+                            <option value="basic">Básica (6 meses)</option>
+                            <option value="premium">Premium (1 ano)</option>
+                            <option value="enterprise">Enterprise (2 anos)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Número de Licenças</label>
+                        <input type="number" id="keyLicenses" class="form-input" value="1" min="1" max="100">
+                    </div>
+                    <div>
+                        <label class="form-label">Validade (dias)</label>
+                        <input type="number" id="keyValidity" class="form-input" value="180" min="1" max="730">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="generateNewKey()">
+                    🔑 Gerar Chave
+                </button>
+                
+                <div id="generatedKeyDisplay" class="hidden" style="margin-top: 1.5rem; padding: 1.5rem; background: var(--primary-50); border-radius: var(--radius);">
+                    <p style="font-weight: 600; margin-bottom: 0.5rem;">✅ Chave Gerada com Sucesso:</p>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; background: white; padding: 0.75rem; border-radius: var(--radius);">
+                        <code id="generatedKey" style="flex: 1; font-family: var(--font-mono); font-size: 1.2rem; text-align: center;">XXXX-XXXX-XXXX-XXXX</code>
+                        <button class="btn btn-sm btn-outline" onclick="copyKeyToClipboard()">📋 Copiar</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <h4 style="margin-bottom: 1rem;">📋 Chaves de Ativação</h4>
+                <div id="keysList" style="min-height: 200px;">
+                    <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+                        <p>A carregar chaves...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        loadKeysList();
+    }, 100);
+}
+
+async function loadKeysList() {
+    console.log('📋 A carregar lista de chaves');
+    
+    const keysList = document.getElementById('keysList');
+    if (!keysList) {
+        console.error('Elemento keysList não encontrado');
+        return;
+    }
+    
+    try {
+        const mockKeys = [
+            {
+                key: 'ABCD-1234-EFGH-5678',
+                type: 'premium',
+                licenses: 10,
+                usedCount: 3,
+                expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                key: 'IJKL-9012-MNOP-3456',
+                type: 'basic',
+                licenses: 5,
+                usedCount: 5,
+                expiresAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                key: 'QRST-7890-UVWX-1234',
+                type: 'enterprise',
+                licenses: 20,
+                usedCount: 12,
+                expiresAt: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
+            }
+        ];
+        
+        let keysHtml = '';
+        let hasKeys = false;
+        
+        if (database && typeof database.ref === 'function') {
+            try {
+                const snapshot = await database.ref('activationKeys').once('value');
+                if (snapshot.exists()) {
+                    const keys = snapshot.val();
+                    Object.values(keys).forEach(keyData => {
+                        if (keyData.companyCode === (COMPANY.code || USER.companyCode)) {
+                            hasKeys = true;
+                            const expiryDate = new Date(keyData.expiresAt);
+                            const isExpired = expiryDate < new Date();
+                            const isFull = keyData.usedCount >= keyData.licenses;
+                            
+                            let status = '✅ Ativa';
+                            let statusColor = 'var(--success)';
+                            if (isExpired) {
+                                status = '❌ Expirada';
+                                statusColor = 'var(--danger)';
+                            } else if (isFull) {
+                                status = '⚠️ Esgotada';
+                                statusColor = 'var(--warning)';
+                            }
+                            
+                            keysHtml += `
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 0.5rem; align-items: center;">
+                                    <code style="font-family: var(--font-mono); font-size: 0.9rem;">${keyData.key}</code>
+                                    <span style="text-transform: capitalize;">${keyData.type}</span>
+                                    <span>${keyData.usedCount || 0}/${keyData.licenses}</span>
+                                    <span>${expiryDate.toLocaleDateString('pt-PT')}</span>
+                                    <span style="color: ${statusColor};">${status}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            } catch (dbError) {
+                console.warn('Erro ao buscar chaves do Firebase:', dbError);
+            }
+        }
+        
+        if (!hasKeys) {
+            mockKeys.forEach(keyData => {
+                const expiryDate = new Date(keyData.expiresAt);
+                const isExpired = expiryDate < new Date();
+                const isFull = keyData.usedCount >= keyData.licenses;
+                
+                let status = '✅ Ativa';
+                let statusColor = 'var(--success)';
+                if (isExpired) {
+                    status = '❌ Expirada';
+                    statusColor = 'var(--danger)';
+                } else if (isFull) {
+                    status = '⚠️ Esgotada';
+                    statusColor = 'var(--warning)';
+                }
+                
+                keysHtml += `
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 0.5rem; align-items: center;">
+                        <code style="font-family: var(--font-mono); font-size: 0.9rem;">${keyData.key}</code>
+                        <span style="text-transform: capitalize;">${keyData.type}</span>
+                        <span>${keyData.usedCount}/${keyData.licenses}</span>
+                        <span>${expiryDate.toLocaleDateString('pt-PT')}</span>
+                        <span style="color: ${statusColor};">${status}</span>
+                    </div>
+                `;
+                hasKeys = true;
+            });
+        }
+        
+        if (!hasKeys) {
+            keysList.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔑</div>
+                    <p>Nenhuma chave gerada ainda.</p>
+                    <p style="font-size: 0.875rem;">Use o formulário acima para gerar a primeira chave.</p>
+                </div>
+            `;
+        } else {
+            keysList.innerHTML = `
+                <div style="background: var(--gray-50); padding: 0.75rem 1rem; border-bottom: 2px solid var(--gray-200); font-weight: 600; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 0.5rem;">
+                    <div>Chave</div>
+                    <div>Tipo</div>
+                    <div>Usos</div>
+                    <div>Expira</div>
+                    <div>Estado</div>
+                </div>
+                ${keysHtml}
+            `;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar chaves:', error);
+        keysList.innerHTML = `
+            <div class="alert alert-danger">
+                Erro ao carregar chaves: ${error.message}
+                <br><br>
+                <button class="btn btn-primary" onclick="loadKeysList()">Tentar novamente</button>
+            </div>
+        `;
+    }
+}
+
+async function loadAdminEmployees() {
+    console.log('👥 A carregar lista de colaboradores');
+    
+    const content = document.getElementById('adminTabContent');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">👥</span>
+                    Colaboradores
+                </h4>
+                <button class="btn btn-outline btn-sm" onclick="exportEmployeesList()">
+                    📥 Exportar Lista
+                </button>
+            </div>
+            
+            <div id="employeesList" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); min-height: 400px;">
+                <div style="text-align: center; padding: 4rem; color: var(--gray-500);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+                    <p>A carregar colaboradores...</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    setTimeout(() => {
+        loadEmployeesList();
+    }, 100);
+}
+
+async function loadEmployeesList() {
+    console.log('📋 A carregar lista de colaboradores');
+    
+    const employeesList = document.getElementById('employeesList');
+    if (!employeesList) {
+        console.error('Elemento employeesList não encontrado');
+        return;
+    }
+    
+    try {
+        let employeesHtml = '';
+        let totalEmployees = 0;
+        
+        const mockEmployees = [
+            {
+                name: 'Ana Silva',
+                email: 'ana.silva@empresa.pt',
+                xp: 1250,
+                completedModules: [1, 2, 3],
+                lastActivity: new Date().toISOString()
+            },
+            {
+                name: 'João Santos',
+                email: 'joao.santos@empresa.pt',
+                xp: 850,
+                completedModules: [1, 2],
+                lastActivity: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+            },
+            {
+                name: 'Maria Ferreira',
+                email: 'maria.ferreira@empresa.pt',
+                xp: 2100,
+                completedModules: [1, 2, 3, 4],
+                lastActivity: new Date().toISOString()
+            }
+        ];
+        
+        if (database && typeof database.ref === 'function') {
+            try {
+                const snapshot = await database.ref('employees').once('value');
+                if (snapshot.exists()) {
+                    const employees = snapshot.val();
+                    Object.values(employees).forEach(emp => {
+                        if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
+                            totalEmployees++;
+                            const progress = emp.completedModules ? Math.round((emp.completedModules.length / MODULES.length) * 100) : 0;
+                            const lastActive = emp.lastActivity ? new Date(emp.lastActivity).toLocaleDateString('pt-PT') : 'Nunca';
+                            
+                            employeesHtml += `
+                                <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 600;">${emp.name || 'N/A'}</div>
+                                        <div style="font-size: 0.75rem; color: var(--gray-500);">${emp.email || 'N/A'}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">${emp.completedModules?.length || 0}/${MODULES.length}</div>
+                                        <div class="progress" style="width: 100%; height: 4px; margin-top: 0.25rem;">
+                                            <div class="progress-bar" style="width: ${progress}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">${emp.xp || 0} XP</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.875rem;">${lastActive}</div>
+                                    </div>
+                                    <div>
+                                        <span style="background: ${progress >= 80 ? 'var(--success-light)' : 'var(--warning-light)'}; color: ${progress >= 80 ? 'var(--success)' : 'var(--warning)'}; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
+                                            ${progress}%
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            } catch (dbError) {
+                console.warn('Erro ao buscar colaboradores do Firebase:', dbError);
+            }
+        }
+        
+        if (totalEmployees === 0) {
+            mockEmployees.forEach(emp => {
+                totalEmployees++;
+                const progress = Math.round((emp.completedModules.length / MODULES.length) * 100);
+                const lastActive = new Date(emp.lastActivity).toLocaleDateString('pt-PT');
+                
+                employeesHtml += `
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600;">${emp.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--gray-500);">${emp.email}</div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">${emp.completedModules.length}/${MODULES.length}</div>
+                            <div class="progress" style="width: 100%; height: 4px; margin-top: 0.25rem;">
+                                <div class="progress-bar" style="width: ${progress}%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">${emp.xp} XP</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.875rem;">${lastActive}</div>
+                        </div>
+                        <div>
+                            <span style="background: ${progress >= 80 ? 'var(--success-light)' : 'var(--warning-light)'}; color: ${progress >= 80 ? 'var(--success)' : 'var(--warning)'}; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
+                                ${progress}%
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        if (totalEmployees === 0) {
+            employeesList.innerHTML = `
+                <div style="text-align: center; padding: 4rem; color: var(--gray-500);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                    <p>Nenhum colaborador registado.</p>
+                    <p style="font-size: 0.875rem; margin-top: 1rem;">Gere chaves de ativação na tab "Chaves" para começar.</p>
+                </div>
+            `;
+        } else {
+            employeesList.innerHTML = `
+                <div style="background: var(--gray-50); padding: 1rem; border-bottom: 2px solid var(--gray-200); font-weight: 600; display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr; gap: 1rem;">
+                    <div>Colaborador</div>
+                    <div>Progresso</div>
+                    <div>XP</div>
+                    <div>Último Acesso</div>
+                    <div>Desempenho</div>
+                </div>
+                ${employeesHtml}
+                <div style="padding: 1rem; text-align: center; background: var(--gray-50); color: var(--gray-500); font-size: 0.875rem;">
+                    Total: ${totalEmployees} colaborador(es)
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar colaboradores:', error);
+        employeesList.innerHTML = `
+            <div class="alert alert-danger" style="margin: 1rem;">
+                Erro ao carregar colaboradores: ${error.message}
+                <br><br>
+                <button class="btn btn-primary" onclick="loadEmployeesList()">Tentar novamente</button>
+            </div>
+        `;
+    }
+}
+
+function loadAdminSettings() {
+    console.log('⚙️ A carregar configurações');
+    
+    const content = document.getElementById('adminTabContent');
+    if (!content) return;
+    
+    content.innerHTML = `
+        <div>
+            <h4 style="margin-bottom: 1.5rem;">⚙️ Configurações da Empresa</h4>
+            
+            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h5 style="margin-bottom: 1rem;">Informação da Empresa</h5>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label">Nome da Empresa</label>
+                        <input type="text" class="form-input" id="companyNameSetting" value="${COMPANY.name || ''}" placeholder="Nome da empresa">
+                    </div>
+                    <div>
+                        <label class="form-label">Código da Empresa</label>
+                        <input type="text" class="form-input" value="${COMPANY.code || USER.companyCode || ''}" readonly disabled style="background: var(--gray-100);">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="updateCompanySettings()">
+                    Guardar Alterações
+                </button>
+            </div>
+            
+            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <h5 style="margin-bottom: 1rem;">Configurações de Formação</h5>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label class="form-label">Pontuação Mínima para Certificado (%)</label>
+                    <input type="number" class="form-input" id="minScoreSetting" value="${COMPANY.settings?.minCertificateScore || 80}" min="50" max="100">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label class="form-label">Módulos Obrigatórios</label>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                        ${MODULES.map(module => `
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="mod-${module.id}" ${COMPANY.settings?.mandatoryModules?.includes(module.id) ? 'checked' : ''}>
+                                ${module.title}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="updateTrainingSettings()">
+                    Guardar Configurações
                 </button>
             </div>
         </div>
     `;
-    
-    renderQuiz(module.quiz);
-    hide('modulesPage');
 }
-
-function renderQuiz(questions) {
-    const container = document.getElementById('quizContainer');
-    container.innerHTML = '';
-    
-    questions.forEach((q, qIndex) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.style.cssText = 'margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,217,255,0.05); border-radius: 8px; border-left: 4px solid var(--accent-cyan);';
-        
-        questionDiv.innerHTML = `
-            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">Pergunta ${qIndex + 1} de ${questions.length}</div>
-            <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;">${q.q}</div>
-            <div class="quiz-options">
-                ${q.opts.map((opt, oIndex) => `
-                    <div class="quiz-option" onclick="selectOption(${qIndex}, ${oIndex})" id="q${qIndex}_o${oIndex}" style="padding: 1rem; margin: 0.5rem 0; background: rgba(255,255,255,0.05); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                        <input type="radio" name="q${qIndex}" value="${oIndex}" style="margin-right: 0.75rem;">
-                        ${opt}
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        
-        container.appendChild(questionDiv);
-    });
-}
-
-function selectOption(qIndex, oIndex) {
-    // Deselect all options for this question
-    document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(input => {
-        input.checked = false;
-        input.parentElement.style.borderColor = 'var(--border)';
-        input.parentElement.style.background = 'rgba(255,255,255,0.05)';
-    });
-    
-    // Select clicked option
-    const option = document.getElementById(`q${qIndex}_o${oIndex}`);
-    option.style.borderColor = 'var(--accent-cyan)';
-    option.style.background = 'rgba(0,217,255,0.1)';
-    const radio = option.querySelector('input');
-    radio.checked = true;
-}
-
-async function submitQuiz(moduleId) {
-    const module = MODULES.find(m => m.id === moduleId);
-    if (!module) return;
-    
-    const answers = [];
-    let allAnswered = true;
-    let correctCount = 0;
-    
-    module.quiz.forEach((q, qIndex) => {
-        const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
-        if (!selected) {
-            allAnswered = false;
-        } else {
-            const selectedIndex = parseInt(selected.value);
-            const isCorrect = selectedIndex === q.correct;
-            answers.push({ question: qIndex, selected: selectedIndex, correct: isCorrect });
-            if (isCorrect) correctCount++;
-        }
-    });
-    
-    if (!allAnswered) {
-        showMessage('Por favor, responda a todas as perguntas', 'warning');
-        return;
-    }
-    
-    const score = Math.round((correctCount / module.quiz.length) * 100);
-    const xpEarned = score >= 60 ? module.xp : Math.round(module.xp / 2);
-    
-    // Show results
-    showQuizResults(module, answers, score, xpEarned);
-    
-    // Update user data
-    if (!USER.completedModules.includes(moduleId)) {
-        USER.completedModules.push(moduleId);
-    }
-    USER.xp = (USER.xp || 0) + xpEarned;
-    USER.scores[moduleId] = score;
-    USER.lastActivity = new Date().toISOString();
-    
-    // Check for new badges
-    const newBadges = checkBadges(USER);
-    if (newBadges.length > 0) {
-        USER.badges = [...(USER.badges || []), ...newBadges];
-        showBadgeNotification(newBadges);
-    }
-    
-    // Save to localStorage
-    localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    
-    // Try to save to Firebase if available
-    try {
-        const userKey = sanitizeEmail(USER.email);
-        await database.ref(`employees/${userKey}`).update({
-            completedModules: USER.completedModules,
-            xp: USER.xp,
-            scores: USER.scores,
-            badges: USER.badges,
-            lastActivity: USER.lastActivity
-        });
-    } catch (error) {
-        console.error('Error saving quiz results to Firebase:', error);
-    }
-}
-
-function showQuizResults(module, answers, score, xpEarned) {
-    // Highlight correct/incorrect
-    answers.forEach((answer, qIndex) => {
-        const options = document.querySelectorAll(`input[name="q${qIndex}"]`);
-        options.forEach((opt, oIndex) => {
-            const parent = opt.parentElement;
-            parent.style.pointerEvents = 'none';
-            
-            if (oIndex === module.quiz[qIndex].correct) {
-                parent.style.borderColor = 'var(--success)';
-                parent.style.background = 'rgba(0,255,163,0.15)';
-            } else if (oIndex === answer.selected && !answer.correct) {
-                parent.style.borderColor = 'var(--danger)';
-                parent.style.background = 'rgba(255,71,87,0.15)';
-            }
-        });
-    });
-    
-    // Show results summary
-    const isPassing = score >= 60;
-    const resultsDiv = document.createElement('div');
-    resultsDiv.style.cssText = 'margin-top: 2rem; padding: 2rem; background: rgba(255,255,255,0.05); border-radius: 12px; text-align: center;';
-    resultsDiv.innerHTML = `
-        <h2 style="font-size: 2rem; color: ${isPassing ? 'var(--success)' : 'var(--warning)'}; margin-bottom: 1rem;">
-            ${isPassing ? '🎉 Parabéns!' : '💪 Quase lá!'}
-        </h2>
-        <p style="font-size: 1.3rem; margin-bottom: 1rem;">
-            Pontuação: <strong>${score}%</strong>
-        </p>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-            ${isPassing ? 
-                `Módulo concluído com sucesso! Ganhou ${xpEarned} XP.` : 
-                `Continue a aprender. Ganhou ${xpEarned} XP.`
-            }
-        </p>
-        <button onclick="goToModules()" style="margin-top: 1rem;">
-            Voltar aos Módulos
-        </button>
-    `;
-    
-    document.getElementById('quizContainer').parentElement.appendChild(resultsDiv);
-    resultsDiv.scrollIntoView({ behavior: 'smooth' });
-}
-
-// ==================== WELCOME POPUP ====================
-
-function showWelcomePopup() {
-    show('welcomeOverlay');
-    show('welcomePopup');
-}
-
-function closeWelcomePopup() {
-    hide('welcomeOverlay');
-    hide('welcomePopup');
-    USER.hasSeenWelcome = true;
-    
-    // Salvar no banco de dados (se Firebase estiver disponível)
-    try {
-        const userKey = sanitizeEmail(USER.email);
-        database.ref(`employees/${userKey}`).update({ hasSeenWelcome: true });
-    } catch (error) {
-        console.log('Firebase not available, saving locally only');
-    }
-    
-    localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    goToDashboard();
-}
-
-function goToModulesFromWelcome() {
-    closeWelcomePopup();
-    goToModules();
-}
-
-// ==================== BADGES PAGE ====================
-
-function loadBadgesPage() {
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="box">
-            <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">🏅 Conquistas e Badges</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                Complete desafios para desbloquear badges especiais
-            </p>
-            <div class="badge-grid" id="badgesGrid"></div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <button onclick="goToDashboard()" class="btn-secondary">← Voltar</button>
-            </div>
-        </div>
-    `;
-    
-    const grid = document.getElementById('badgesGrid');
-    BADGES.forEach(badge => {
-        const isEarned = USER.badges && USER.badges.includes(badge.id);
-        const item = document.createElement('div');
-        item.className = `badge-item ${isEarned ? 'earned' : ''}`;
-        item.innerHTML = `
-            <div class="badge-icon">${badge.icon}</div>
-            <div class="badge-name">${badge.name}</div>
-            <small style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem; display: block;">
-                ${badge.description}
-            </small>
-        `;
-        grid.appendChild(item);
-    });
-}
-
-function showBadgeNotification(badgeIds) {
-    badgeIds.forEach(badgeId => {
-        const badge = BADGES.find(b => b.id === badgeId);
-        if (badge) {
-            showMessage(`🏆 Nova conquista desbloqueada: ${badge.name}!`, 'success');
-        }
-    });
-}
-
-// ==================== LIBRARY PAGE ====================
-
-function loadLibraryPage() {
-    USER.visitedLibrary = true;
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="box">
-            <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">📖 Biblioteca de Recursos</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                Materiais de estudo e recursos adicionais
-            </p>
-            <div id="libraryContent"></div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <button onclick="goToDashboard()" class="btn-secondary">← Voltar</button>
-            </div>
-        </div>
-    `;
-    
-    const libraryContent = document.getElementById('libraryContent');
-    
-    // Guia de Referência Rápida
-    const quickGuide = document.createElement('div');
-    quickGuide.innerHTML = `
-        <div style="background: linear-gradient(135deg, #00d9ff20, #ff6b3520); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
-            <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📋 Guia Rápido Anti-Phishing</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
-                    <span style="color: #00d9ff;">🔍 VERIFIQUE</span>
-                    <p style="margin-top: 0.5rem;">Sempre o remetente e URLs</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
-                    <span style="color: #ff6b35;">⚠️ DESCONFIE</span>
-                    <p style="margin-top: 0.5rem;">De urgência e ofertas boas demais</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
-                    <span style="color: #00ffa3;">🛡️ PROTEJA</span>
-                    <p style="margin-top: 0.5rem;">Nunca partilhe credenciais</p>
-                </div>
-            </div>
-        </div>
-    `;
-    libraryContent.appendChild(quickGuide);
-    
-    // Casos Reais
-    const casesSection = document.createElement('div');
-    casesSection.innerHTML = '<h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📋 Casos Reais de Phishing em Portugal</h3>';
-    
-    REAL_CASES.forEach(case_ => {
-        const caseDiv = document.createElement('div');
-        caseDiv.style.cssText = 'background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent-orange); padding: 1.5rem; margin: 1rem 0; border-radius: 8px;';
-        caseDiv.innerHTML = `
-            <h4 style="color: var(--accent-orange); margin-bottom: 0.75rem;">${case_.title}</h4>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-                <strong>Data:</strong> ${case_.date} | <strong>Alvo:</strong> ${case_.target}
-            </p>
-            <p style="margin-bottom: 1rem; line-height: 1.6;">${case_.description}</p>
-            <div style="background: rgba(0,255,163,0.1); padding: 1rem; border-radius: 6px; border-left: 3px solid var(--success);">
-                <strong style="color: var(--success);">💡 Lição Aprendida:</strong><br>
-                ${case_.lesson}
-            </div>
-        `;
-        casesSection.appendChild(caseDiv);
-    });
-    
-    libraryContent.appendChild(casesSection);
-    
-    // Dicas de Segurança
-    const tipsSection = document.createElement('div');
-    tipsSection.innerHTML = `
-        <h3 style="margin: 2rem 0 1.5rem; font-size: 1.5rem;">🔐 Dicas de Segurança</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
-                <span style="font-size: 2rem;">🔑</span>
-                <h4 style="margin: 0.5rem 0;">Palavras-passe Fortes</h4>
-                <p style="color: var(--text-secondary);">Use 12+ caracteres com maiúsculas, minúsculas, números e símbolos</p>
-            </div>
-            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
-                <span style="font-size: 2rem;">📱</span>
-                <h4 style="margin: 0.5rem 0;">2FA Sempre</h4>
-                <p style="color: var(--text-secondary);">Ative autenticação de dois fatores em todas as contas</p>
-            </div>
-            <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 8px;">
-                <span style="font-size: 2rem;">🔄</span>
-                <h4 style="margin: 0.5rem 0;">Atualizações</h4>
-                <p style="color: var(--text-secondary);">Mantenha sistemas e apps sempre atualizados</p>
-            </div>
-        </div>
-    `;
-    libraryContent.appendChild(tipsSection);
-}
-
-// ==================== CERTIFICATE PAGE ====================
-
-function loadCertificatePage() {
-    const progress = calculateProgress(USER);
-    const avgScore = calculateAverage(USER.scores);
-    const canGetCertificate = progress === 100 && avgScore >= 80;
-    
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="box">
-            <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 2rem;">📜 Certificado de Conclusão</h2>
-            ${canGetCertificate ? `
-                <div style="background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%); color: #0A0E27; padding: 4rem; border-radius: 16px; text-align: center; border: 4px solid var(--accent-cyan);">
-                    <h1 style="font-size: 3rem; font-weight: 900; color: var(--accent-cyan); margin-bottom: 1rem;">
-                        CERTIFICADO
-                    </h1>
-                    <h2 style="font-size: 2rem; margin-bottom: 2rem;">de Conclusão</h2>
-                    <p style="font-size: 1.2rem; margin: 2rem 0;">Certifica-se que</p>
-                    <h3 style="font-size: 2.5rem; font-weight: 700; color: var(--accent-cyan); margin: 1rem 0;">
-                        ${USER.name}
-                    </h3>
-                    <p style="font-size: 1.2rem; margin: 2rem 0;">
-                        completou com sucesso a formação em<br>
-                        <strong>Segurança Digital e Proteção contra Phishing</strong><br>
-                        obtendo uma taxa de sucesso de <strong>${avgScore}%</strong>
-                    </p>
-                    <p style="margin-top: 2rem;">
-                        Data de conclusão: ${new Date().toLocaleDateString('pt-PT')}<br>
-                        XP Total: ${USER.xp}
-                    </p>
-                    <button onclick="window.print()" style="margin-top: 2rem; background: var(--accent-cyan); color: #0A0E27;">
-                        🖨️ Imprimir / Guardar PDF
-                    </button>
-                </div>
-            ` : `
-                <div style="text-align: center; padding: 4rem; color: var(--text-secondary);">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔒</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Certificado Bloqueado</h3>
-                    <p>Complete todos os módulos com pelo menos 80% de média para desbloquear o certificado.</p>
-                    <div style="margin-top: 2rem; background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px;">
-                        <p><strong>Progresso atual:</strong> ${progress}%</p>
-                        <p><strong>Média de pontuação:</strong> ${avgScore}%</p>
-                        <p><strong>Módulos concluídos:</strong> ${USER.completedModules.length}/${MODULES.length}</p>
-                    </div>
-                    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-                        <button onclick="goToModules()" style="background: var(--accent-cyan);">
-                            📚 Continuar Formação
-                        </button>
-                        <button onclick="goToDashboard()" class="btn-secondary">
-                            ← Voltar
-                        </button>
-                    </div>
-                </div>
-            `}
-        </div>
-    `;
-}
-
-// ==================== ADMIN PAGE ====================
-
-function loadAdminPage() {
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="box">
-            <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 1rem;">👑 Painel de Administração</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                Código da Empresa: <code style="background: rgba(0,217,255,0.1); padding: 0.5rem 1rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace;">${COMPANY.code || USER.companyCode}</code>
-            </p>
-            
-            <div id="adminTabs" style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border);">
-                <button onclick="showAdminTab('overview')" class="admin-tab active" id="tab-overview">Visão Geral</button>
-                <button onclick="showAdminTab('keys')" class="admin-tab" id="tab-keys">Chaves</button>
-                <button onclick="showAdminTab('employees')" class="admin-tab" id="tab-employees">Colaboradores</button>
-            </div>
-            
-            <div id="adminTabContent"></div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <button onclick="goToDashboard()" class="btn-secondary">← Voltar ao Dashboard</button>
-            </div>
-        </div>
-    `;
-    
-    showAdminTab('overview');
-}
-
-function showAdminTab(tab) {
-    // Update tabs
-    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(`tab-${tab}`).classList.add('active');
-    
-    const content = document.getElementById('adminTabContent');
-    
-    if (tab === 'overview') {
-        loadAdminOverview(content);
-    } else if (tab === 'keys') {
-        loadAdminKeys(content);
-    } else if (tab === 'employees') {
-        loadAdminEmployees(content);
-    }
-}
-
-async function loadAdminOverview(container) {
-    container.innerHTML = '<div style="text-align: center; padding: 2rem;">Carregando dados...</div>';
-    
-    try {
-        // Load employees data
-        const employeesRef = database.ref('employees');
-        const snapshot = await employeesRef.once('value');
-        
-        let totalEmployees = 0;
-        let totalProgress = 0;
-        let certificatesIssued = 0;
-        
-        if (snapshot.exists()) {
-            const employees = snapshot.val();
-            for (let empKey in employees) {
-                const emp = employees[empKey];
-                if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
-                    totalEmployees++;
-                    const progress = calculateProgress(emp);
-                    totalProgress += progress;
-                    if (progress === 100 && calculateAverage(emp.scores) >= 80) {
-                        certificatesIssued++;
-                    }
-                }
-            }
-        }
-        
-        const avgCompletion = totalEmployees > 0 ? Math.round(totalProgress / totalEmployees) : 0;
-        
-        container.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Colaboradores</div>
-                    <div class="stat-value">${totalEmployees}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Taxa Média Conclusão</div>
-                    <div class="stat-value">${avgCompletion}%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Certificados Emitidos</div>
-                    <div class="stat-value">${certificatesIssued}</div>
-                </div>
-            </div>
-            
-            <h3 style="margin: 2rem 0 1rem;">📊 Colaboradores Recentes</h3>
-            <div id="recentEmployees"></div>
-        `;
-        
-        // Load recent employees
-        const recentEmp = document.getElementById('recentEmployees');
-        if (snapshot.exists()) {
-            const employees = snapshot.val();
-            let hasEmployees = false;
-            
-            // Convert to array and sort by lastActivity
-            const empList = [];
-            for (let empKey in employees) {
-                const emp = employees[empKey];
-                if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
-                    empList.push(emp);
-                }
-            }
-            
-            // Sort by lastActivity (most recent first)
-            empList.sort((a, b) => {
-                return new Date(b.lastActivity || 0) - new Date(a.lastActivity || 0);
-            });
-            
-            // Show only 5 most recent
-            empList.slice(0, 5).forEach(emp => {
-                hasEmployees = true;
-                const progress = calculateProgress(emp);
-                
-                const empDiv = document.createElement('div');
-                empDiv.style.cssText = 'background: rgba(255,255,255,0.05); padding: 1rem; margin: 0.5rem 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;';
-                empDiv.innerHTML = `
-                    <div>
-                        <strong>${emp.name}</strong><br>
-                        <small style="color: var(--text-secondary);">${emp.email}</small>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 700; color: var(--accent-cyan);">${emp.xp || 0} XP</div>
-                        <small style="color: var(--text-secondary);">${progress}% completo</small>
-                    </div>
-                `;
-                recentEmp.appendChild(empDiv);
-            });
-            
-            if (!hasEmployees) {
-                recentEmp.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhum colaborador registado ainda</p>';
-            }
-        } else {
-            recentEmp.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhum colaborador registado ainda</p>';
-        }
-    } catch (error) {
-        console.error('Error loading admin overview:', error);
-        container.innerHTML = '<p style="color: var(--danger); text-align: center;">Erro ao carregar dados</p>';
-    }
-}
-
-function loadAdminKeys(container) {
-    container.innerHTML = `
-        <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
-            <h3 style="margin-bottom: 1.5rem;">🔑 Gerar Nova Chave de Ativação</h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                <div>
-                    <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">Tipo de Chave:</label>
-                    <select id="keyType" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary);">
-                        <option value="basic">Básica</option>
-                        <option value="premium">Premium</option>
-                        <option value="full">Elite</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">Licenças:</label>
-                    <input type="number" id="keyLicenses" value="1" min="1" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary);">
-                </div>
-                <div>
-                    <label style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem;">Validade (dias):</label>
-                    <input type="number" id="keyValidity" value="90" min="1" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary);">
-                </div>
-            </div>
-            
-            <button onclick="generateKey()">🔑 Gerar Chave</button>
-            
-            <div id="generatedKeyDisplay" class="hidden" style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(0,217,255,0.1); border: 2px solid var(--accent-cyan); border-radius: 8px; text-align: center;">
-                <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">Chave Gerada:</p>
-                <code id="generatedKey" style="font-size: 1.3rem; font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan);"></code>
-                <br>
-                <button onclick="copyKeyToClipboard()" style="margin-top: 1rem; background: #64748b;">📋 Copiar</button>
-            </div>
-        </div>
-        
-        <h3 style="margin-bottom: 1rem;">📋 Chaves Geradas</h3>
-        <div id="keysList"></div>
-    `;
-    
-    loadKeysList();
-}
-
-async function generateKey() {
-    const type = document.getElementById('keyType').value;
-    const licenses = parseInt(document.getElementById('keyLicenses').value);
-    const validity = parseInt(document.getElementById('keyValidity').value);
-    
-    const key = generateActivationKey();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + validity);
-    
-    const keyData = {
-        key,
-        type,
-        licenses,
-        usedCount: 0,
-        expiresAt: expiresAt.toISOString(),
-        createdAt: new Date().toISOString(),
-        companyCode: COMPANY.code || USER.companyCode
-    };
-    
-    try {
-        await database.ref('activationKeys').push(keyData);
-        
-        document.getElementById('generatedKey').textContent = key;
-        show('generatedKeyDisplay');
-        
-        showMessage('Chave gerada com sucesso!', 'success');
-        loadKeysList();
-    } catch (error) {
-        console.error('Error generating key:', error);
-        showMessage('Erro ao gerar chave', 'error');
-    }
-}
-
-function copyKeyToClipboard() {
-    const key = document.getElementById('generatedKey').textContent;
-    navigator.clipboard.writeText(key).then(() => {
-        showMessage('Chave copiada!', 'success');
-    }).catch(() => {
-        showMessage('Erro ao copiar', 'error');
-    });
-}
-
-async function loadKeysList() {
-    const keysRef = database.ref('activationKeys');
-    const snapshot = await keysRef.once('value');
-    
-    const container = document.getElementById('keysList');
-    container.innerHTML = '';
-    
-    if (!snapshot.exists()) {
-        container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhuma chave gerada ainda</p>';
-        return;
-    }
-    
-    const keys = snapshot.val();
-    let hasKeys = false;
-    
-    // Convert to array and sort by createdAt
-    const keysList = [];
-    for (let keyId in keys) {
-        const keyData = keys[keyId];
-        if (keyData.companyCode === (COMPANY.code || USER.companyCode)) {
-            keysList.push({ id: keyId, ...keyData });
-        }
-    }
-    
-    // Sort by createdAt (most recent first)
-    keysList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    
-    keysList.forEach(keyData => {
-        hasKeys = true;
-        const expiryDate = new Date(keyData.expiresAt);
-        const isExpired = expiryDate < new Date();
-        const isFull = keyData.usedCount >= keyData.licenses;
-        
-        let status = 'Ativa';
-        let statusColor = 'var(--success)';
-        if (isExpired) {
-            status = 'Expirada';
-            statusColor = 'var(--danger)';
-        } else if (isFull) {
-            status = 'Esgotada';
-            statusColor = 'var(--warning)';
-        }
-        
-        const keyDiv = document.createElement('div');
-        keyDiv.style.cssText = 'background: rgba(255,255,255,0.05); padding: 1rem; margin: 0.5rem 0; border-radius: 8px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 1rem; align-items: center;';
-        keyDiv.innerHTML = `
-            <code style="font-family: 'JetBrains Mono', monospace;">${keyData.key}</code>
-            <span>${keyData.type}</span>
-            <span>${keyData.usedCount}/${keyData.licenses}</span>
-            <span>${expiryDate.toLocaleDateString('pt-PT')}</span>
-            <span style="color: ${statusColor}; font-weight: 600;">${status}</span>
-        `;
-        container.appendChild(keyDiv);
-    });
-    
-    if (!hasKeys) {
-        container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhuma chave gerada ainda</p>';
-    }
-}
-
-async function loadAdminEmployees(container) {
-    container.innerHTML = '<div style="text-align: center; padding: 2rem;">Carregando colaboradores...</div>';
-    
-    try {
-        const employeesRef = database.ref('employees');
-        const snapshot = await employeesRef.once('value');
-        
-        container.innerHTML = '<h3 style="margin-bottom: 1rem;">👥 Gestão de Colaboradores</h3><div id="employeesList"></div>';
-        
-        const list = document.getElementById('employeesList');
-        
-        if (!snapshot.exists()) {
-            list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhum colaborador registado ainda</p>';
-            return;
-        }
-        
-        const employees = snapshot.val();
-        let hasEmployees = false;
-        
-        // Convert to array and sort by name
-        const empList = [];
-        for (let empKey in employees) {
-            const emp = employees[empKey];
-            if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
-                empList.push(emp);
-            }
-        }
-        
-        empList.sort((a, b) => a.name.localeCompare(b.name));
-        
-        empList.forEach(emp => {
-            hasEmployees = true;
-            const progress = calculateProgress(emp);
-            const avgScore = calculateAverage(emp.scores);
-            
-            const empDiv = document.createElement('div');
-            empDiv.style.cssText = 'background: rgba(255,255,255,0.05); padding: 1.5rem; margin: 1rem 0; border-radius: 8px;';
-            empDiv.innerHTML = `
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <strong>${emp.name}</strong><br>
-                        <small style="color: var(--text-secondary);">${emp.email}</small>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-secondary); font-size: 0.85rem;">Módulos</div>
-                        <strong>${emp.completedModules.length}/${MODULES.length}</strong>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-secondary); font-size: 0.85rem;">Taxa Sucesso</div>
-                        <strong>${avgScore}%</strong>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-secondary); font-size: 0.85rem;">XP Total</div>
-                        <strong style="color: var(--accent-cyan);">${emp.xp || 0}</strong>
-                    </div>
-                </div>
-                <div class="progress-bar" style="margin-top: 1rem;">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-            `;
-            list.appendChild(empDiv);
-        });
-        
-        if (!hasEmployees) {
-            list.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">Nenhum colaborador registado ainda</p>';
-        }
-    } catch (error) {
-        console.error('Error loading employees:', error);
-        container.innerHTML = '<p style="color: var(--danger); text-align: center;">Erro ao carregar colaboradores</p>';
-    }
-}
-
-// ==================== MESSAGES / NOTIFICATIONS ====================
-
-function showMessage(message, type = 'info') {
-    const colors = {
-        success: 'var(--success)',
-        error: 'var(--danger)',
-        warning: 'var(--warning)',
-        info: 'var(--accent-cyan)'
-    };
-    
-    const msg = document.createElement('div');
-    msg.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: rgba(26, 31, 58, 0.95);
-        color: ${colors[type]};
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        border-left: 4px solid ${colors[type]};
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        z-index: 10000;
-        max-width: 400px;
-        animation: slideIn 0.3s ease;
-    `;
-    msg.textContent = message;
-    
-    document.body.appendChild(msg);
-    
-    setTimeout(() => {
-        msg.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => msg.remove(), 300);
-    }, 3000);
-}
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(400px); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(400px); opacity: 0; }
-    }
-    .admin-tab {
-        padding: 1rem 2rem;
-        background: none;
-        border: none;
-        border-bottom: 3px solid transparent;
-        color: var(--text-secondary);
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    .admin-tab.active {
-        color: var(--accent-cyan);
-        border-bottom-color: var(--accent-cyan);
-    }
-    .admin-tab:hover:not(.active) {
-        color: var(--text-primary);
-    }
-`;
-document.head.appendChild(style);
-
-// ==================== INITIALIZATION ====================
-
-window.addEventListener('DOMContentLoaded', () => {
-    // Check if user is already logged in
-    const savedUser = localStorage.getItem('phishguard_user');
-    if (savedUser) {
-        try {
-            USER = JSON.parse(savedUser);
-            onLoginSuccess();
-        } catch (e) {
-            console.error('Error parsing saved user:', e);
-            localStorage.removeItem('phishguard_user');
-        }
-    }
-    
-    // Initialize with user tab active
-    showLoginType('user');
-});
 
 // ==================== STORYTELLING FUNCTIONS ====================
-// Tornar funções globais
+
 window.openStoryModule = function(module) {
     console.log('A abrir módulo de storytelling:', module);
     
@@ -2520,7 +1604,6 @@ window.openStoryModule = function(module) {
                 
                 <div class="story-content" id="story-content-${story.id}" style="display: none; margin-top: 1rem;">
                     <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 2rem;">
-                        <!-- Informação da Vítima -->
                         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: white; border-radius: var(--radius); border-left: 4px solid var(--primary-500);">
                             <div style="width: 48px; height: 48px; background: var(--primary-100); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                                 👤
@@ -2532,7 +1615,6 @@ window.openStoryModule = function(module) {
                             </div>
                         </div>
                         
-                        <!-- Cenário -->
                         <div style="margin-bottom: 1.5rem;">
                             <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
                                 <span style="font-size: 1.25rem;">🎭</span> O Cenário
@@ -2544,19 +1626,17 @@ window.openStoryModule = function(module) {
                             </div>
                         </div>
                         
-                        <!-- Ataque -->
                         <div style="margin-bottom: 1.5rem;">
                             <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
                                 <span style="font-size: 1.25rem;">⚔️</span> Como o Ataque Aconteceu
                             </h5>
                             <div style="background: var(--danger-light); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid var(--danger);">
-                                <p style="color: var(--danger); line-height: 1.6; margin: 0; white-space: pre-line;">
+                                <p style="color: var(--danger); line-height: 1.6; margin: 0;">
                                     ${story.ataque}
                                 </p>
                             </div>
                         </div>
                         
-                        <!-- Erro -->
                         <div style="margin-bottom: 1.5rem;">
                             <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
                                 <span style="font-size: 1.25rem;">❌</span> O Erro Cometido
@@ -2568,7 +1648,6 @@ window.openStoryModule = function(module) {
                             </div>
                         </div>
                         
-                        <!-- Lição -->
                         <div style="margin-bottom: 1.5rem;">
                             <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
                                 <span style="font-size: 1.25rem;">💡</span> Lição Aprendida
@@ -2580,7 +1659,6 @@ window.openStoryModule = function(module) {
                             </div>
                         </div>
                         
-                        <!-- Prevenção -->
                         <div style="margin-bottom: 1.5rem;">
                             <h5 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 0.75rem;">
                                 <span style="font-size: 1.25rem;">🛡️</span> Como Evitar
@@ -2592,14 +1670,12 @@ window.openStoryModule = function(module) {
                             </div>
                         </div>
                         
-                        <!-- Frase da Vítima -->
                         <div style="margin: 2rem 0; padding: 1.5rem; background: var(--primary-50); border-left: 4px solid var(--primary-500); border-radius: var(--radius); font-style: italic;">
                             <p style="color: var(--primary-700); font-size: 1.1rem; margin: 0;">
                                 "${story.frase}"
                             </p>
                         </div>
                         
-                        <!-- Consequência -->
                         <div style="background: var(--gray-800); color: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
                             <strong>📊 Consequência Real:</strong>
                             <p style="color: white; margin: 0.5rem 0 0 0; opacity: 0.9;">
@@ -2607,7 +1683,6 @@ window.openStoryModule = function(module) {
                             </p>
                         </div>
                         
-                        <!-- Quiz Rápido -->
                         <div style="text-align: center; margin-top: 2rem;">
                             <button class="btn btn-primary" onclick="window.showStoryQuiz('${story.id}')" style="margin-right: 1rem;">
                                 📝 Testar Aprendizagem (+25 XP)
@@ -2622,7 +1697,6 @@ window.openStoryModule = function(module) {
     content.innerHTML = `
         <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 2rem 1rem;">
             <div class="card" style="background: white;">
-                <!-- Cabeçalho com navegação -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-200);">
                     <button class="btn btn-outline" onclick="window.goToModules()">
                         ← Voltar aos Módulos
@@ -2637,7 +1711,6 @@ window.openStoryModule = function(module) {
                     </div>
                 </div>
                 
-                <!-- Título e descrição -->
                 <div style="text-align: center; margin-bottom: 3rem;">
                     <div style="font-size: 4rem; margin-bottom: 1rem;">${module.icon}</div>
                     <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1rem;">${module.title}</h1>
@@ -2646,7 +1719,6 @@ window.openStoryModule = function(module) {
                     </p>
                 </div>
                 
-                <!-- Estatísticas -->
                 <div style="background: linear-gradient(135deg, var(--primary-50), var(--primary-100)); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 3rem;">
                     <h3 style="margin-bottom: 1.5rem; color: var(--primary-800);">📊 Estatísticas Reais em Portugal</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
@@ -2665,18 +1737,15 @@ window.openStoryModule = function(module) {
                     </div>
                 </div>
                 
-                <!-- Aviso importante -->
                 <div class="alert alert-info" style="margin-bottom: 2rem;">
                     <strong>🎯 Como usar este módulo:</strong>
                     <p style="margin-top: 0.5rem; margin-bottom: 0;">Clique em cada caso para ler a história completa. Depois de estudar, faça o quiz rápido para testar a sua aprendizagem e ganhar XP extra.</p>
                 </div>
                 
-                <!-- Lista de histórias -->
                 <div id="storiesContainer">
                     ${storiesHtml}
                 </div>
                 
-                <!-- Quiz Container -->
                 <div id="storyQuizContainer" class="hidden" style="margin-top: 3rem; padding: 2rem; background: white; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">📝 Quiz da História</h3>
@@ -2685,7 +1754,6 @@ window.openStoryModule = function(module) {
                     <div id="storyQuizContent"></div>
                 </div>
                 
-                <!-- Botão de Conclusão -->
                 <div style="text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 2px solid var(--gray-200);">
                     <button class="btn btn-success btn-lg" onclick="window.completeStoryModule()" style="font-size: 1.2rem; padding: 1rem 3rem;">
                         ✓ Marcar Módulo como Concluído
@@ -2699,7 +1767,6 @@ window.openStoryModule = function(module) {
         </div>
     `;
     
-    // Esconder a página de módulos
     hide('modulesPage');
 };
 
@@ -2800,13 +1867,11 @@ window.showStoryQuiz = function(storyId) {
 window.checkStoryAnswer = function(element, storyId, questionNum, isCorrect) {
     console.log('A verificar resposta:', {storyId, questionNum, isCorrect});
     
-    // Desmarcar outras opções no mesmo grupo
     const parentGroup = element.parentElement;
     parentGroup.querySelectorAll('.quiz-option').forEach(opt => {
         opt.classList.remove('selected', 'correct', 'incorrect');
     });
     
-    // Marcar opção atual
     element.classList.add('selected');
     if (isCorrect) {
         element.classList.add('correct');
@@ -2814,7 +1879,6 @@ window.checkStoryAnswer = function(element, storyId, questionNum, isCorrect) {
         element.classList.add('incorrect');
     }
     
-    // Guardar resposta
     if (!window.storyAnswers) window.storyAnswers = {};
     if (!window.storyAnswers[storyId]) window.storyAnswers[storyId] = {};
     window.storyAnswers[storyId][questionNum] = isCorrect;
@@ -2824,14 +1888,13 @@ window.submitStoryQuiz = function(storyId) {
     console.log('A submeter quiz para story:', storyId);
     
     if (!window.storyAnswers || !window.storyAnswers[storyId]) {
-        window.showMessage('Por favor, responda às perguntas primeiro', 'warning');
+        showMessage('Por favor, responda às perguntas primeiro', 'warning');
         return;
     }
     
     const answers = window.storyAnswers[storyId];
     const correctCount = Object.values(answers).filter(v => v === true).length;
     
-    // Remover feedback anterior se existir
     const existingFeedback = document.querySelector('#storyQuizContent .quiz-feedback');
     if (existingFeedback) existingFeedback.remove();
     
@@ -2846,21 +1909,18 @@ window.submitStoryQuiz = function(storyId) {
             </div>
         `;
         
-        // Dar XP extra
         USER.xp = (USER.xp || 0) + 25;
         localStorage.setItem('phishguard_user', JSON.stringify(USER));
         
-        // Marcar esta história como estudada
         if (!USER.studiedStories) USER.studiedStories = [];
         if (!USER.studiedStories.includes(storyId)) {
             USER.studiedStories.push(storyId);
         }
         
-        // Verificar se estudou todas as histórias
         const module = MODULES.find(m => m.id === 'mod6');
         if (module && USER.studiedStories.length === module.stories.length) {
             setTimeout(() => {
-                window.showMessage('🏆 Parabéns! Estudou todas as histórias!', 'success');
+                showMessage('🏆 Parabéns! Estudou todas as histórias!', 'success');
             }, 500);
         }
     } else {
@@ -2892,23 +1952,1563 @@ window.completeStoryModule = function() {
         USER.completedModules.push('mod6');
         USER.xp = (USER.xp || 0) + 200;
         
-        // Guardar no localStorage
         localStorage.setItem('phishguard_user', JSON.stringify(USER));
         
-        window.showMessage('✅ Módulo concluído! Ganhou 200 XP', 'success');
+        showMessage('✅ Módulo concluído! Ganhou 200 XP', 'success');
         
-        // Atualizar dashboard se estiver visível
         if (!document.getElementById('dashboardPage').classList.contains('hidden')) {
             loadDashboard();
         }
         
-        // Voltar aos módulos após 2 segundos
         setTimeout(() => {
             window.goToModules();
         }, 2000);
     } else {
-        window.showMessage('Já concluiu este módulo', 'info');
+        showMessage('Já concluiu este módulo', 'info');
     }
 };
+
+// ==================== LANDING PAGE FUNCTIONS ====================
+
+function showLandingPage() {
+    hide('navbar');
+    hide('dashboardPage');
+    hide('modulesPage');
+    hide('loginSection');
+    
+    const dynamicContent = document.getElementById('dynamicContent');
+    if (dynamicContent) dynamicContent.innerHTML = '';
+    
+    show('landingPage');
+}
+
+function showLoginSection(type) {
+    // Esconder landing page e mostrar secção de login
+    hide('landingPage');
+    show('loginSection');
+    
+    // Scroll para o topo da secção de login
+    document.getElementById('loginSection').scrollIntoView({ behavior: 'smooth' });
+    
+    // Mostrar o tipo de login correto
+    showLoginType(type);
+}
+
+function hideLoginSection() {
+    hide('loginSection');
+    show('landingPage');
+}
+
+// Modificar showLoginType para não chamar showLoginSection
+function showLoginType(type) {
+    const userForm = document.getElementById('userLoginForm');
+    const adminForm = document.getElementById('adminLoginForm');
+    const tabUser = document.getElementById('tabUser');
+    const tabAdmin = document.getElementById('tabAdmin');
+    const adminExtraFields = document.getElementById('adminExtraFields');
+
+    if (type === 'user') {
+        userForm.classList.remove('hidden');
+        adminForm.classList.add('hidden');
+        tabUser.classList.add('active');
+        tabAdmin.classList.remove('active');
+        if (adminExtraFields) adminExtraFields.classList.add('hidden');
+    } else {
+        userForm.classList.add('hidden');
+        adminForm.classList.remove('hidden');
+        tabUser.classList.remove('active');
+        tabAdmin.classList.add('active');
+    }
+}
+
+// Modificar onLoginSuccess para esconder landing page e login section
+function onLoginSuccess() {
+    console.log('Login bem-sucedido para:', USER.email, 'Admin:', USER.isAdmin);
+    
+    hide('landingPage');
+    hide('loginSection');
+    hide('loginPage');
+    show('navbar');
+    
+    if (USER.isAdmin) {
+        console.log('Utilizador é admin - a mostrar painel admin');
+        document.getElementById('btnAdmin').classList.remove('hidden');
+        document.getElementById('btnCert').classList.add('hidden');
+        
+        const dashboardPage = document.getElementById('dashboardPage');
+        dashboardPage.classList.remove('hidden');
+        dashboardPage.innerHTML = ''; // Limpar conteúdo anterior
+        
+        goToAdmin();
+    } else {
+        console.log('Utilizador é colaborador');
+        document.getElementById('btnCert').classList.remove('hidden');
+        document.getElementById('btnAdmin').classList.add('hidden');
+        
+        if (!USER.hasSeenWelcome) {
+            showWelcomePopup();
+        } else {
+            goToDashboard();
+        }
+    }
+    
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+}
+
+// Modificar logout para voltar à landing page
+function logout() {
+    localStorage.removeItem('phishguard_user');
+    USER = {
+        id: '', name: '', email: '', isAdmin: false, companyCode: '',
+        xp: 0, scores: {}, badges: [], completedModules: [],
+        simulationsCompleted: [], startDate: null, lastActivity: null,
+        hasSeenWelcome: false, activationKey: '', keyType: 'basic'
+    };
+    
+    hide('navbar');
+    hideAllPages();
+    showLandingPage();
+    
+    // Limpar formulários
+    document.getElementById('userName').value = '';
+    document.getElementById('userEmail').value = '';
+    document.getElementById('activationKey').value = '';
+    document.getElementById('companyCode').value = '';
+    document.getElementById('adminEmail').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminName').value = '';
+    document.getElementById('companyName').value = '';
+    
+    // Reset tabs
+    showLoginType('user');
+}
+
+// Modificar hideAllPages para incluir landingPage e loginSection
+function hideAllPages() {
+    const pages = ['landingPage', 'loginSection', 'dashboardPage', 'modulesPage', 'loginPage'];
+    pages.forEach(page => {
+        const element = document.getElementById(page);
+        if (element) element.classList.add('hidden');
+    });
+    
+    const dynamicContent = document.getElementById('dynamicContent');
+    if (dynamicContent) dynamicContent.innerHTML = '';
+}
+
+// ==================== LANDING PAGE FUNCTIONS ====================
+
+// ==================== LANDING PAGE FUNCTIONS ====================
+
+// Tornar funções globalmente acessíveis
+window.showLandingPage = function() {
+    console.log('A mostrar landing page');
+    
+    // Esconder tudo
+    const navbar = document.getElementById('navbar');
+    if (navbar) navbar.classList.add('hidden');
+    
+    const dashboardPage = document.getElementById('dashboardPage');
+    if (dashboardPage) dashboardPage.classList.add('hidden');
+    
+    const modulesPage = document.getElementById('modulesPage');
+    if (modulesPage) modulesPage.classList.add('hidden');
+    
+    const loginSection = document.getElementById('loginSection');
+    if (loginSection) loginSection.classList.add('hidden');
+    
+    const dynamicContent = document.getElementById('dynamicContent');
+    if (dynamicContent) dynamicContent.innerHTML = '';
+    
+    // Mostrar landing page
+    const landingPage = document.getElementById('landingPage');
+    if (landingPage) landingPage.classList.remove('hidden');
+};
+
+window.showLoginSection = function(type) {
+    console.log('A mostrar secção de login para:', type);
+    
+    // Esconder landing page
+    const landingPage = document.getElementById('landingPage');
+    if (landingPage) landingPage.classList.add('hidden');
+    
+    // Mostrar secção de login
+    const loginSection = document.getElementById('loginSection');
+    if (loginSection) {
+        loginSection.classList.remove('hidden');
+        
+        // Scroll suave para a secção de login
+        loginSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Garantir que o formulário correto é mostrado
+    if (type === 'user') {
+        showLoginType('user');
+    } else {
+        showLoginType('admin');
+    }
+};
+
+window.hideLoginSection = function() {
+    console.log('A esconder secção de login');
+    
+    // Esconder secção de login
+    const loginSection = document.getElementById('loginSection');
+    if (loginSection) loginSection.classList.add('hidden');
+    
+    // Mostrar landing page
+    const landingPage = document.getElementById('landingPage');
+    if (landingPage) landingPage.classList.remove('hidden');
+    
+    // Reset para o formulário de colaborador
+    showLoginType('user');
+};
+
+// Função para mostrar o tipo de login correto
+window.showLoginType = function(type) {
+    console.log('A mostrar tipo de login:', type);
+    
+    const userForm = document.getElementById('userLoginForm');
+    const adminForm = document.getElementById('adminLoginForm');
+    const tabUser = document.getElementById('tabUser');
+    const tabAdmin = document.getElementById('tabAdmin');
+    const adminExtraFields = document.getElementById('adminExtraFields');
+
+    if (type === 'user') {
+        // Mostrar formulário de colaborador
+        if (userForm) userForm.classList.remove('hidden');
+        if (adminForm) adminForm.classList.add('hidden');
+        
+        // Ativar tab de colaborador
+        if (tabUser) tabUser.classList.add('active');
+        if (tabAdmin) tabAdmin.classList.remove('active');
+        
+        // Esconder campos extras de admin
+        if (adminExtraFields) adminExtraFields.classList.add('hidden');
+    } else {
+        // Mostrar formulário de admin
+        if (userForm) userForm.classList.add('hidden');
+        if (adminForm) adminForm.classList.remove('hidden');
+        
+        // Ativar tab de admin
+        if (tabUser) tabUser.classList.remove('active');
+        if (tabAdmin) tabAdmin.classList.add('active');
+        
+        // Os campos extras de admin ficam escondidos inicialmente
+        if (adminExtraFields) adminExtraFields.classList.add('hidden');
+    }
+};
+
+// Função para quando clica no tab de admin (mostrar campos extras se necessário)
+window.onAdminTabClick = function() {
+    showLoginType('admin');
+};
+
+// Função para quando clica no tab de user
+window.onUserTabClick = function() {
+    showLoginType('user');
+};
+
+// Modificar onLoginSuccess
+window.onLoginSuccess = function() {
+    console.log('Login bem-sucedido para:', USER.email, 'Admin:', USER.isAdmin);
+    
+    // Esconder landing page e login section
+    const landingPage = document.getElementById('landingPage');
+    if (landingPage) landingPage.classList.add('hidden');
+    
+    const loginSection = document.getElementById('loginSection');
+    if (loginSection) loginSection.classList.add('hidden');
+    
+    // Mostrar navbar
+    const navbar = document.getElementById('navbar');
+    if (navbar) navbar.classList.remove('hidden');
+    
+    if (USER.isAdmin) {
+        console.log('Utilizador é admin - a mostrar painel admin');
+        const btnAdmin = document.getElementById('btnAdmin');
+        if (btnAdmin) btnAdmin.classList.remove('hidden');
+        
+        const btnCert = document.getElementById('btnCert');
+        if (btnCert) btnCert.classList.add('hidden');
+        
+        goToAdmin();
+    } else {
+        console.log('Utilizador é colaborador');
+        const btnCert = document.getElementById('btnCert');
+        if (btnCert) btnCert.classList.remove('hidden');
+        
+        const btnAdmin = document.getElementById('btnAdmin');
+        if (btnAdmin) btnAdmin.classList.add('hidden');
+        
+        if (!USER.hasSeenWelcome) {
+            showWelcomePopup();
+        } else {
+            goToDashboard();
+        }
+    }
+    
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+};
+
+// Modificar doAdminLogin para mostrar campos extras no primeiro acesso
+window.doAdminLogin = async function() {
+    const email = document.getElementById('adminEmail').value.trim().toLowerCase();
+    const password = document.getElementById('adminPass').value;
+    const name = document.getElementById('adminName')?.value.trim();
+    const companyName = document.getElementById('companyName')?.value.trim();
+
+    if (!email || !password) {
+        showMessage('Preencha email e senha', 'error');
+        return;
+    }
+
+    try {
+        const adminKey = sanitizeEmail(email);
+        const adminRef = database.ref(`admins/${adminKey}`);
+        const snapshot = await adminRef.once('value');
+
+        if (snapshot.exists()) {
+            // Admin existente - fazer login normal
+            const adminData = snapshot.val();
+            if (adminData.password === password) {
+                USER = {
+                    ...USER,
+                    ...adminData,
+                    email,
+                    isAdmin: true
+                };
+                
+                onLoginSuccess();
+            } else {
+                showMessage('Senha incorreta', 'error');
+            }
+        } else {
+            // Primeiro admin - mostrar campos extras se não estiverem visíveis
+            const adminExtraFields = document.getElementById('adminExtraFields');
+            
+            if (adminExtraFields.classList.contains('hidden')) {
+                // Mostrar campos extras
+                adminExtraFields.classList.remove('hidden');
+                showMessage('Complete o registo inicial da empresa', 'info');
+            } else {
+                // Campos extras já estão visíveis - tentar criar admin
+                if (!name || !companyName) {
+                    showMessage('Preencha nome e nome da empresa', 'error');
+                    return;
+                }
+                
+                // Criar novo admin
+                await createNewAdmin(email, password, name, companyName);
+            }
+        }
+    } catch (error) {
+        console.error('Admin login error:', error);
+        showMessage('Erro ao fazer login: ' + error.message, 'error');
+    }
+};
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado - a inicializar');
+    
+    // Garantir que os formulários começam no estado correto
+    const userForm = document.getElementById('userLoginForm');
+    const adminForm = document.getElementById('adminLoginForm');
+    const adminExtraFields = document.getElementById('adminExtraFields');
+    
+    if (userForm) userForm.classList.remove('hidden');
+    if (adminForm) adminForm.classList.add('hidden');
+    if (adminExtraFields) adminExtraFields.classList.add('hidden');
+    
+    const savedUser = localStorage.getItem('phishguard_user');
+    if (savedUser) {
+        try {
+            USER = JSON.parse(savedUser);
+            onLoginSuccess();
+        } catch (e) {
+            console.error('Error parsing saved user:', e);
+            localStorage.removeItem('phishguard_user');
+            showLandingPage();
+        }
+    } else {
+        showLandingPage();
+    }
+});
+
+// Inicialização - mostrar landing page
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('phishguard_user');
+    if (savedUser) {
+        try {
+            USER = JSON.parse(savedUser);
+            onLoginSuccess();
+        } catch (e) {
+            console.error('Error parsing saved user:', e);
+            localStorage.removeItem('phishguard_user');
+            showLandingPage();
+        }
+    } else {
+        showLandingPage();
+    }
+    
+    // Garantir que a login section começa escondida
+    hide('loginSection');
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+function showLoginSection() {
+    document.getElementById('loginSection').classList.remove('hidden');
+    
+    // Scroll suave para a secção de login
+    document.getElementById('loginSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Modificar a função showLoginType para mostrar a secção de login
+function showLoginType(type) {
+    showLoginSection();
+    
+    const userForm = document.getElementById('userLoginForm');
+    const adminForm = document.getElementById('adminLoginForm');
+    const tabUser = document.getElementById('tabUser');
+    const tabAdmin = document.getElementById('tabAdmin');
+
+    if (type === 'user') {
+        userForm.classList.remove('hidden');
+        adminForm.classList.add('hidden');
+        tabUser.classList.add('active');
+        tabAdmin.classList.remove('active');
+        document.getElementById('adminExtraFields').classList.add('hidden');
+    } else {
+        userForm.classList.add('hidden');
+        adminForm.classList.remove('hidden');
+        tabUser.classList.remove('active');
+        tabAdmin.classList.add('active');
+    }
+}
+
+// Modificar onLoginSuccess para esconder landing page
+function onLoginSuccess() {
+    console.log('Login bem-sucedido para:', USER.email, 'Admin:', USER.isAdmin);
+    
+    hide('landingPage');
+    hide('loginPage');
+    show('navbar');
+    
+    if (USER.isAdmin) {
+        console.log('Utilizador é admin - a mostrar painel admin');
+        document.getElementById('btnAdmin').classList.remove('hidden');
+        document.getElementById('btnCert').classList.add('hidden');
+        
+        // Usar o mesmo container do dashboard para admin
+        const dashboardContainer = document.getElementById('dashboardPage');
+        dashboardContainer.classList.remove('hidden');
+        dashboardContainer.innerHTML = ''; // Limpar conteúdo anterior
+        
+        goToAdmin();
+    } else {
+        console.log('Utilizador é colaborador');
+        document.getElementById('btnCert').classList.remove('hidden');
+        document.getElementById('btnAdmin').classList.add('hidden');
+        
+        if (!USER.hasSeenWelcome) {
+            showWelcomePopup();
+        } else {
+            goToDashboard();
+        }
+    }
+    
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+}
+
+// Modificar goToAdmin para usar o layout do dashboard
+function goToAdmin() {
+    console.log('A entrar no painel admin');
+    
+    if (!USER.isAdmin) {
+        console.log('Utilizador não é admin - redirecionar');
+        goToDashboard();
+        return;
+    }
+    
+    hideAllPages();
+    
+    const dashboardPage = document.getElementById('dashboardPage');
+    dashboardPage.classList.remove('hidden');
+    
+    dashboardPage.innerHTML = `
+        <div class="dashboard-container">
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <div>
+                        <h2 class="dashboard-title">👑 Painel de Administração</h2>
+                        <p class="dashboard-subtitle">Bem-vindo, ${USER.name || 'Administrador'}</p>
+                    </div>
+                    <div class="dashboard-stats-mini">
+                        <span class="badge" style="background: var(--primary-100); color: var(--primary-700); padding: 0.5rem 1rem; border-radius: var(--radius-full);">
+                            ${COMPANY.code || USER.companyCode || 'N/A'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-stats-grid">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">Empresa</div>
+                        <div class="dashboard-stat-value">${COMPANY.name || 'Não definida'}</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">Administrador</div>
+                        <div class="dashboard-stat-value">${USER.name || USER.email}</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">Colaboradores</div>
+                        <div class="dashboard-stat-value" id="adminTotalEmployees">0</div>
+                    </div>
+                </div>
+                
+                <!-- Admin Tabs -->
+                <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem; padding-bottom: 0.5rem;">
+                    <button class="admin-tab active" onclick="showAdminTab('overview')" id="tab-overview">
+                        📊 Visão Geral
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('keys')" id="tab-keys">
+                        🔑 Chaves de Ativação
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('employees')" id="tab-employees">
+                        👥 Colaboradores
+                    </button>
+                    <button class="admin-tab" onclick="showAdminTab('settings')" id="tab-settings">
+                        ⚙️ Configurações
+                    </button>
+                </div>
+                
+                <!-- Admin Tab Content -->
+                <div id="adminTabContent" class="dashboard-progress-section">
+                    <div style="text-align: center; padding: 3rem;">
+                        <div style="font-size: 2rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
+                        <p style="color: var(--gray-500);">A carregar painel admin...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Carregar estatísticas iniciais
+    loadAdminStats();
+    
+    setTimeout(() => {
+        showAdminTab('overview');
+    }, 100);
+}
+
+// Nova função para carregar estatísticas admin
+async function loadAdminStats() {
+    try {
+        let totalEmployees = 0;
+        
+        if (database && typeof database.ref === 'function') {
+            const snapshot = await database.ref('employees').once('value');
+            if (snapshot.exists()) {
+                const employees = snapshot.val();
+                Object.values(employees).forEach(emp => {
+                    if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
+                        totalEmployees++;
+                    }
+                });
+            }
+        }
+        
+        const totalEmployeesEl = document.getElementById('adminTotalEmployees');
+        if (totalEmployeesEl) {
+            totalEmployeesEl.textContent = totalEmployees || 1;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar estatísticas admin:', error);
+    }
+}
+
+// Modificar logout para voltar à landing page
+function logout() {
+    localStorage.removeItem('phishguard_user');
+    USER = {
+        id: '', name: '', email: '', isAdmin: false, companyCode: '',
+        xp: 0, scores: {}, badges: [], completedModules: [],
+        simulationsCompleted: [], startDate: null, lastActivity: null,
+        hasSeenWelcome: false, activationKey: '', keyType: 'basic'
+    };
+    
+    hide('navbar');
+    hideAllPages();
+    showLandingPage();
+    
+    // Limpar formulários
+    document.getElementById('userName').value = '';
+    document.getElementById('userEmail').value = '';
+    document.getElementById('activationKey').value = '';
+    document.getElementById('companyCode').value = '';
+    document.getElementById('adminEmail').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminName').value = '';
+    document.getElementById('companyName').value = '';
+    
+    // Reset tabs
+    showLoginType('user');
+}
+
+// Modificar hideAllPages para incluir landingPage
+function hideAllPages() {
+    const pages = ['landingPage', 'dashboardPage', 'modulesPage', 'loginPage'];
+    pages.forEach(page => {
+        const element = document.getElementById(page);
+        if (element) element.classList.add('hidden');
+    });
+    
+    const dynamicContent = document.getElementById('dynamicContent');
+    if (dynamicContent) dynamicContent.innerHTML = '';
+}
+
+// Modificar goToDashboard para usar o novo layout
+function goToDashboard() {
+    hideAllPages();
+    
+    const dashboardPage = document.getElementById('dashboardPage');
+    dashboardPage.classList.remove('hidden');
+    
+    dashboardPage.innerHTML = `
+        <div class="dashboard-container">
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <div>
+                        <h2 class="dashboard-title">📊 Dashboard</h2>
+                        <p class="dashboard-subtitle">Bem-vindo de volta, ${USER.name ? USER.name.split(' ')[0] : 'Utilizador'}!</p>
+                    </div>
+                    <div class="dashboard-stats-mini">
+                        <span class="badge" style="background: var(--primary-100); color: var(--primary-700); padding: 0.5rem 1rem; border-radius: var(--radius-full);">
+                            ${USER.companyCode || 'PhishGuard Elite'}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-stats-grid">
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">XP Total</div>
+                        <div class="dashboard-stat-value" id="dashXP">${USER.xp || 0}</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">Módulos</div>
+                        <div class="dashboard-stat-value" id="dashMods">${USER.completedModules.length}/${MODULES.length}</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">Badges</div>
+                        <div class="dashboard-stat-value" id="dashBadges">${USER.badges.length}/${BADGES.length}</div>
+                    </div>
+                    <div class="dashboard-stat-card">
+                        <div class="dashboard-stat-label">Sucesso</div>
+                        <div class="dashboard-stat-value" id="dashSuccess">${calculateAverage(USER.scores)}%</div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-progress-section">
+                    <div class="dashboard-progress-header">
+                        <span class="dashboard-progress-title">📈 Progresso Global</span>
+                        <span class="dashboard-progress-value" id="dashProgressPct">${calculateProgress(USER)}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="dashProgress" style="width: ${calculateProgress(USER)}%"></div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-actions">
+                    <button class="btn btn-primary" onclick="goToModules()">
+                        📚 Continuar Formação
+                    </button>
+                    <button class="btn btn-outline" onclick="goToSimulator()">
+                        🎮 Testar Conhecimentos
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Inicialização - mostrar landing page em vez de login page
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('phishguard_user');
+    if (savedUser) {
+        try {
+            USER = JSON.parse(savedUser);
+            onLoginSuccess();
+        } catch (e) {
+            console.error('Error parsing saved user:', e);
+            localStorage.removeItem('phishguard_user');
+            showLandingPage();
+        }
+    } else {
+        showLandingPage();
+    }
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+// ==================== LOGIN FUNCTIONS ====================
+
+async function doUserLogin() {
+    const name = document.getElementById('userName').value.trim();
+    const email = document.getElementById('userEmail').value.trim().toLowerCase();
+    const activationKey = document.getElementById('activationKey').value.trim();
+    const companyCode = document.getElementById('companyCode').value.trim();
+
+    if (!name || !email) {
+        showMessage('Por favor, preencha nome e email', 'error');
+        return;
+    }
+
+    try {
+        const userKey = sanitizeEmail(email);
+        const userRef = database.ref(`employees/${userKey}`);
+        const snapshot = await userRef.once('value');
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            USER = { ...USER, ...userData, email, isAdmin: false };
+            
+            await userRef.update({ lastActivity: new Date().toISOString() });
+            
+            onLoginSuccess();
+        } else {
+            await createNewUser(name, email, activationKey, companyCode || generateCode(8));
+            onLoginSuccess();
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showMessage('Erro ao fazer login. Tente novamente.', 'error');
+    }
+}
+
+async function createNewUser(name, email, activationKey, companyCode) {
+    const userKey = sanitizeEmail(email);
+    const newUser = {
+        name,
+        email,
+        companyCode: companyCode,
+        xp: 0,
+        scores: {},
+        badges: [],
+        completedModules: [],
+        simulationsCompleted: [],
+        startDate: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+        hasSeenWelcome: false,
+        activationKey,
+        keyType: 'basic'
+    };
+
+    await database.ref(`employees/${userKey}`).set(newUser);
+    USER = { ...USER, ...newUser, email, isAdmin: false };
+}
+
+async function validateActivationKey(key) {
+    if (!key || key.trim() === '') return false;
+    
+    try {
+        const keysRef = database.ref('activationKeys');
+        const snapshot = await keysRef.once('value');
+        
+        if (!snapshot.exists()) return false;
+        
+        const keys = snapshot.val();
+        
+        for (let keyId in keys) {
+            const keyData = keys[keyId];
+            
+            if (keyData.key === key) {
+                const expiryDate = new Date(keyData.expiresAt);
+                if (expiryDate > new Date()) {
+                    if (keyData.usedCount < keyData.licenses) {
+                        await database.ref(`activationKeys/${keyId}`).update({
+                            usedCount: (keyData.usedCount || 0) + 1
+                        });
+                        return true;
+                    } else {
+                        showMessage('Chave sem licenças disponíveis', 'warning');
+                        return false;
+                    }
+                } else {
+                    showMessage('Chave expirada', 'warning');
+                    return false;
+                }
+            }
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error validating key:', error);
+        return false;
+    }
+}
+
+async function doAdminLogin() {
+    const email = document.getElementById('adminEmail').value.trim().toLowerCase();
+    const password = document.getElementById('adminPass').value;
+    const name = document.getElementById('adminName')?.value.trim();
+    const companyName = document.getElementById('companyName')?.value.trim();
+
+    if (!email || !password) {
+        showMessage('Preencha email e senha', 'error');
+        return;
+    }
+
+    try {
+        const adminKey = sanitizeEmail(email);
+        const adminRef = database.ref(`admins/${adminKey}`);
+        const snapshot = await adminRef.once('value');
+
+        if (snapshot.exists()) {
+            const adminData = snapshot.val();
+            if (adminData.password === password) {
+                USER = {
+                    ...USER,
+                    ...adminData,
+                    email,
+                    isAdmin: true
+                };
+                
+                const companyRef = database.ref(`companies/${adminData.companyCode}`);
+                const companySnapshot = await companyRef.once('value');
+                if (companySnapshot.exists()) {
+                    COMPANY = companySnapshot.val();
+                    COMPANY.code = adminData.companyCode;
+                }
+                
+                onLoginSuccess();
+            } else {
+                showMessage('Senha incorreta', 'error');
+            }
+        } else {
+            const adminExtraFields = document.getElementById('adminExtraFields');
+            
+            if (!adminExtraFields.classList.contains('hidden')) {
+                if (!name || !companyName) {
+                    showMessage('Preencha nome e nome da empresa', 'error');
+                    return;
+                }
+                
+                await createNewAdmin(email, password, name, companyName);
+            } else {
+                show('adminExtraFields');
+                showMessage('Complete o registo inicial da empresa', 'info');
+            }
+        }
+    } catch (error) {
+        console.error('Admin login error:', error);
+        showMessage('Erro ao fazer login: ' + error.message, 'error');
+    }
+}
+
+async function createNewAdmin(email, password, name, companyName) {
+    try {
+        const companyCode = generateCode(8);
+        const adminKey = sanitizeEmail(email);
+        
+        const newAdmin = {
+            name,
+            email,
+            password,
+            companyCode,
+            createdAt: new Date().toISOString(),
+            isAdmin: true
+        };
+        
+        await database.ref(`admins/${adminKey}`).set(newAdmin);
+        
+        const newCompany = {
+            name: companyName,
+            adminEmail: email,
+            adminName: name,
+            code: companyCode,
+            createdAt: new Date().toISOString(),
+            settings: {
+                minCertificateScore: 80,
+                mandatoryModules: MODULES.slice(0, 5).map(m => m.id)
+            },
+            employees: {}
+        };
+        
+        await database.ref(`companies/${companyCode}`).set(newCompany);
+        
+        USER = {
+            ...USER,
+            ...newAdmin,
+            email,
+            isAdmin: true,
+            companyCode
+        };
+        
+        COMPANY = newCompany;
+        
+        showMessage('Empresa registada com sucesso!', 'success');
+        onLoginSuccess();
+        
+    } catch (error) {
+        console.error('Error creating admin:', error);
+        showMessage('Erro ao criar administrador: ' + error.message, 'error');
+    }
+}
+
+function onLoginSuccess() {
+    console.log('Login bem-sucedido para:', USER.email, 'Admin:', USER.isAdmin);
+    
+    hide('loginPage');
+    show('navbar');
+    
+    if (USER.isAdmin) {
+        console.log('Utilizador é admin - a mostrar painel admin');
+        document.getElementById('btnAdmin').classList.remove('hidden');
+        document.getElementById('btnCert').classList.add('hidden');
+        
+        hideAllPages();
+        goToAdmin();
+    } else {
+        console.log('Utilizador é colaborador');
+        document.getElementById('btnCert').classList.remove('hidden');
+        document.getElementById('btnAdmin').classList.add('hidden');
+        
+        if (!USER.hasSeenWelcome) {
+            showWelcomePopup();
+        } else {
+            goToDashboard();
+        }
+    }
+    
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+}
+
+function logout() {
+    localStorage.removeItem('phishguard_user');
+    USER = {
+        id: '', name: '', email: '', isAdmin: false, companyCode: '',
+        xp: 0, scores: {}, badges: [], completedModules: [],
+        simulationsCompleted: [], startDate: null, lastActivity: null,
+        hasSeenWelcome: false, activationKey: '', keyType: 'basic'
+    };
+    
+    hide('navbar');
+    hideAllPages();
+    
+    document.getElementById('btnAdmin').classList.add('hidden');
+    document.getElementById('btnCert').classList.add('hidden');
+    
+    show('loginPage');
+    
+    document.getElementById('userName').value = '';
+    document.getElementById('userEmail').value = '';
+    document.getElementById('activationKey').value = '';
+    document.getElementById('companyCode').value = '';
+    document.getElementById('adminEmail').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminName').value = '';
+    document.getElementById('companyName').value = '';
+    
+    showLoginType('user');
+}
+
+// ==================== DASHBOARD ====================
+
+async function loadDashboard() {
+    document.getElementById('dashName').textContent = USER.name ? USER.name.split(' ')[0] : 'Utilizador';
+    document.getElementById('dashCompany').textContent = USER.companyCode ? `Empresa: ${USER.companyCode}` : 'PhishGuard Elite';
+    
+    document.getElementById('dashXP').textContent = USER.xp || 0;
+    document.getElementById('dashMods').textContent = `${USER.completedModules.length}/${MODULES.length}`;
+    document.getElementById('dashBadges').textContent = `${USER.badges.length}/${BADGES.length}`;
+    
+    const avgScore = calculateAverage(USER.scores);
+    document.getElementById('dashSuccess').textContent = `${avgScore}%`;
+    
+    const progress = calculateProgress(USER);
+    document.getElementById('dashProgress').style.width = `${progress}%`;
+    document.getElementById('dashProgressPct').textContent = progress;
+}
+
+// ==================== MODULES ====================
+
+function loadModules() {
+    const container = document.getElementById('modulesList');
+    container.innerHTML = '';
+    
+    MODULES.forEach((module, index) => {
+        const isCompleted = USER.completedModules.includes(module.id);
+        const isLocked = index > 0 && !USER.completedModules.includes(MODULES[index - 1].id) && module.id !== 'mod6';
+        
+        const card = document.createElement('div');
+        card.className = `module-card ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
+        
+        if (!isLocked) {
+            card.onclick = () => openModule(module);
+        }
+        
+        card.innerHTML = `
+            <div class="module-icon">${module.icon}</div>
+            <div class="module-title">${module.title}</div>
+            <div class="module-description">${module.description}</div>
+            <div class="module-meta">
+                <span class="difficulty-badge ${module.difficulty}">
+                    ${module.difficulty === 'beginner' ? '🟢 Iniciante' : '🟡 Intermédio'}
+                </span>
+                ${isCompleted ? '<span style="color: var(--success);">✓ Concluído</span>' : ''}
+                ${isLocked ? '<span style="color: var(--gray-500);">🔒 Bloqueado</span>' : ''}
+            </div>
+            ${!isCompleted && !isLocked ? `<div style="color: var(--primary-600); margin-top: 0.5rem; font-weight: 600;">+${module.xp} XP</div>` : ''}
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function openModule(module) {
+    console.log('A abrir módulo:', module.id);
+    
+    if (module.id === 'mod6') {
+        if (typeof window.openStoryModule === 'function') {
+            window.openStoryModule(module);
+        } else {
+            console.error('Função openStoryModule não encontrada');
+            showMessage('Erro ao abrir módulo. Recarregue a página.', 'error');
+        }
+        return;
+    }
+    
+    const content = document.getElementById('dynamicContent');
+    content.innerHTML = `
+        <div class="container" style="max-width: 900px; margin: 0 auto;">
+            <div class="card">
+                <button class="btn btn-outline btn-sm" onclick="goToModules()" style="margin-bottom: 1.5rem;">
+                    ← Voltar aos Módulos
+                </button>
+                
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">${module.icon}</div>
+                    <h2 style="font-size: 2rem; font-weight: 700;">${module.title}</h2>
+                    <p style="color: var(--gray-500);">${module.description}</p>
+                </div>
+
+                <div style="background: var(--gray-50); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">📖 Conteúdo do Módulo</h3>
+                    <div style="color: var(--gray-600); line-height: 1.8;">
+                        ${module.content}
+                    </div>
+                </div>
+
+                <div style="background: var(--gray-50); padding: 2rem; border-radius: var(--radius-lg);">
+                    <h3 style="margin-bottom: 1rem;">✍️ Quiz de Avaliação</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 2rem;">
+                        Responda às ${module.quiz.length} perguntas seguintes para completar o módulo.
+                    </p>
+                    <div id="quizContainer"></div>
+                    <button class="btn btn-primary btn-lg" onclick="submitQuiz('${module.id}')" style="width: 100%; margin-top: 2rem;">
+                        Submeter Respostas
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    renderQuiz(module.quiz);
+    hide('modulesPage');
+}
+
+function renderQuiz(questions) {
+    const container = document.getElementById('quizContainer');
+    container.innerHTML = '';
+    
+    questions.forEach((q, qIndex) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.style.cssText = 'margin-bottom: 2rem; padding: 1.5rem; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg);';
+        
+        questionDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <span style="background: var(--primary-100); color: var(--primary-700); width: 28px; height: 28px; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600;">
+                    ${qIndex + 1}
+                </span>
+                <div style="font-size: 1.1rem; font-weight: 500; color: var(--gray-900);">${q.q}</div>
+            </div>
+            <div class="quiz-options">
+                ${q.opts.map((opt, oIndex) => `
+                    <div class="quiz-option" onclick="selectOption(${qIndex}, ${oIndex})" id="q${qIndex}_o${oIndex}">
+                        <input type="radio" name="q${qIndex}" value="${oIndex}" style="margin-right: 0.75rem;">
+                        ${opt}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        container.appendChild(questionDiv);
+    });
+}
+
+function selectOption(qIndex, oIndex) {
+    document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(input => {
+        input.checked = false;
+        input.parentElement.classList.remove('selected');
+    });
+    
+    const option = document.getElementById(`q${qIndex}_o${oIndex}`);
+    option.classList.add('selected');
+    const radio = option.querySelector('input');
+    radio.checked = true;
+}
+
+async function submitQuiz(moduleId) {
+    const module = MODULES.find(m => m.id === moduleId);
+    if (!module) return;
+    
+    const answers = [];
+    let allAnswered = true;
+    let correctCount = 0;
+    
+    module.quiz.forEach((q, qIndex) => {
+        const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
+        if (!selected) {
+            allAnswered = false;
+        } else {
+            const selectedIndex = parseInt(selected.value);
+            const isCorrect = selectedIndex === q.correct;
+            answers.push({ question: qIndex, selected: selectedIndex, correct: isCorrect });
+            if (isCorrect) correctCount++;
+        }
+    });
+    
+    if (!allAnswered) {
+        showMessage('Por favor, responda a todas as perguntas', 'warning');
+        return;
+    }
+    
+    const score = Math.round((correctCount / module.quiz.length) * 100);
+    const xpEarned = score >= 60 ? module.xp : Math.round(module.xp / 2);
+    
+    showQuizResults(module, answers, score, xpEarned);
+    
+    if (!USER.completedModules.includes(moduleId)) {
+        USER.completedModules.push(moduleId);
+    }
+    USER.xp = (USER.xp || 0) + xpEarned;
+    USER.scores[moduleId] = score;
+    USER.lastActivity = new Date().toISOString();
+    
+    const newBadges = checkBadges(USER);
+    if (newBadges.length > 0) {
+        USER.badges = [...(USER.badges || []), ...newBadges];
+        showBadgeNotification(newBadges);
+    }
+    
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+    
+    try {
+        const userKey = sanitizeEmail(USER.email);
+        await database.ref(`employees/${userKey}`).update({
+            completedModules: USER.completedModules,
+            xp: USER.xp,
+            scores: USER.scores,
+            badges: USER.badges,
+            lastActivity: USER.lastActivity
+        });
+    } catch (error) {
+        console.error('Error saving quiz results to Firebase:', error);
+    }
+}
+
+function showQuizResults(module, answers, score, xpEarned) {
+    answers.forEach((answer, qIndex) => {
+        const options = document.querySelectorAll(`input[name="q${qIndex}"]`);
+        options.forEach((opt, oIndex) => {
+            const parent = opt.parentElement;
+            parent.style.pointerEvents = 'none';
+            
+            if (oIndex === module.quiz[qIndex].correct) {
+                parent.classList.add('correct');
+            } else if (oIndex === answer.selected && !answer.correct) {
+                parent.classList.add('incorrect');
+            }
+        });
+    });
+    
+    const isPassing = score >= 60;
+    const resultsDiv = document.createElement('div');
+    resultsDiv.style.cssText = 'margin-top: 2rem; padding: 2rem; background: white; border: 2px solid ' + (isPassing ? 'var(--success)' : 'var(--warning)') + '; border-radius: var(--radius-lg); text-align: center;';
+    resultsDiv.innerHTML = `
+        <h2 style="font-size: 2rem; color: ${isPassing ? 'var(--success)' : 'var(--warning)'}; margin-bottom: 1rem;">
+            ${isPassing ? '🎉 Parabéns!' : '💪 Quase lá!'}
+        </h2>
+        <p style="font-size: 1.3rem; margin-bottom: 1rem;">
+            Pontuação: <strong>${score}%</strong>
+        </p>
+        <p style="color: var(--gray-500); margin-bottom: 1.5rem;">
+            ${isPassing ? 
+                `Módulo concluído com sucesso! Ganhou ${xpEarned} XP.` : 
+                `Continue a aprender. Ganhou ${xpEarned} XP.`
+            }
+        </p>
+        <button class="btn btn-primary" onclick="goToModules()">
+            Voltar aos Módulos
+        </button>
+    `;
+    
+    document.getElementById('quizContainer').parentElement.appendChild(resultsDiv);
+    resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ==================== WELCOME POPUP ====================
+
+function showWelcomePopup() {
+    show('welcomeOverlay');
+    show('welcomePopup');
+}
+
+function closeWelcomePopup() {
+    hide('welcomeOverlay');
+    hide('welcomePopup');
+    USER.hasSeenWelcome = true;
+    
+    try {
+        const userKey = sanitizeEmail(USER.email);
+        database.ref(`employees/${userKey}`).update({ hasSeenWelcome: true });
+    } catch (error) {
+        console.log('Firebase not available, saving locally only');
+    }
+    
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+    goToDashboard();
+}
+
+function goToModulesFromWelcome() {
+    closeWelcomePopup();
+    goToModules();
+}
+
+// ==================== BADGES PAGE ====================
+
+function loadBadgesPage() {
+    const content = document.getElementById('dynamicContent');
+    content.innerHTML = `
+        <div class="container" style="max-width: 900px; margin: 0 auto;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="font-size: 2rem; font-weight: 700;">🏅 Conquistas e Badges</h2>
+                    <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
+                </div>
+                <p style="color: var(--gray-500); margin-bottom: 2rem;">
+                    Complete desafios para desbloquear badges especiais
+                </p>
+                <div class="badge-grid" id="badgesGrid"></div>
+            </div>
+        </div>
+    `;
+    
+    const grid = document.getElementById('badgesGrid');
+    BADGES.forEach(badge => {
+        const isEarned = USER.badges && USER.badges.includes(badge.id);
+        const item = document.createElement('div');
+        item.className = `badge-item ${isEarned ? 'earned' : ''}`;
+        item.innerHTML = `
+            <div class="badge-icon">${badge.icon}</div>
+            <div class="badge-name">${badge.name}</div>
+            <div class="badge-description">${badge.description}</div>
+        `;
+        grid.appendChild(item);
+    });
+}
+
+function showBadgeNotification(badgeIds) {
+    badgeIds.forEach(badgeId => {
+        const badge = BADGES.find(b => b.id === badgeId);
+        if (badge) {
+            showMessage(`🏆 Nova conquista desbloqueada: ${badge.name}!`, 'success');
+        }
+    });
+}
+
+// ==================== LIBRARY PAGE ====================
+
+function loadLibraryPage() {
+    USER.visitedLibrary = true;
+    const content = document.getElementById('dynamicContent');
+    content.innerHTML = `
+        <div class="container" style="max-width: 900px; margin: 0 auto;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="font-size: 2rem; font-weight: 700;">📖 Biblioteca de Recursos</h2>
+                    <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
+                </div>
+                <p style="color: var(--gray-500); margin-bottom: 2rem;">
+                    Materiais de estudo e recursos adicionais
+                </p>
+                <div id="libraryContent"></div>
+            </div>
+        </div>
+    `;
+    
+    const libraryContent = document.getElementById('libraryContent');
+    
+    const quickGuide = document.createElement('div');
+    quickGuide.innerHTML = `
+        <div style="background: linear-gradient(135deg, var(--primary-50), var(--primary-100)); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📋 Guia Rápido Anti-Phishing</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="background: white; padding: 1rem; border-radius: var(--radius);">
+                    <span style="color: var(--primary-600);">🔍 VERIFIQUE</span>
+                    <p style="margin-top: 0.5rem;">Sempre o remetente e URLs</p>
+                </div>
+                <div style="background: white; padding: 1rem; border-radius: var(--radius);">
+                    <span style="color: var(--warning);">⚠️ DESCONFIE</span>
+                    <p style="margin-top: 0.5rem;">De urgência e ofertas boas demais</p>
+                </div>
+                <div style="background: white; padding: 1rem; border-radius: var(--radius);">
+                    <span style="color: var(--success);">🛡️ PROTEJA</span>
+                    <p style="margin-top: 0.5rem;">Nunca partilhe credenciais</p>
+                </div>
+            </div>
+        </div>
+    `;
+    libraryContent.appendChild(quickGuide);
+    
+    const casesSection = document.createElement('div');
+    casesSection.innerHTML = '<h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">📋 Casos Reais de Phishing em Portugal</h3>';
+    
+    REAL_CASES.forEach(case_ => {
+        const caseDiv = document.createElement('div');
+        caseDiv.style.cssText = 'background: white; border-left: 4px solid var(--warning); padding: 1.5rem; margin: 1rem 0; border-radius: var(--radius); box-shadow: var(--shadow-sm);';
+        caseDiv.innerHTML = `
+            <h4 style="color: var(--warning); margin-bottom: 0.75rem;">${case_.title}</h4>
+            <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 0.5rem;">
+                <strong>Data:</strong> ${case_.date} | <strong>Alvo:</strong> ${case_.target}
+            </p>
+            <p style="margin-bottom: 1rem; line-height: 1.6;">${case_.description}</p>
+            <div style="background: var(--success-light); padding: 1rem; border-radius: var(--radius); border-left: 3px solid var(--success);">
+                <strong style="color: var(--success);">💡 Lição Aprendida:</strong><br>
+                ${case_.lesson}
+            </div>
+        `;
+        casesSection.appendChild(caseDiv);
+    });
+    
+    libraryContent.appendChild(casesSection);
+}
+
+// ==================== CERTIFICATE PAGE ====================
+
+function loadCertificatePage() {
+    const progress = calculateProgress(USER);
+    const avgScore = calculateAverage(USER.scores);
+    const canGetCertificate = progress === 100 && avgScore >= 80;
+    
+    const content = document.getElementById('dynamicContent');
+    content.innerHTML = `
+        <div class="container" style="max-width: 900px; margin: 0 auto;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="font-size: 2rem; font-weight: 700;">📜 Certificado de Conclusão</h2>
+                    <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
+                </div>
+                ${canGetCertificate ? `
+                    <div class="certificate">
+                        <h1>CERTIFICADO</h1>
+                        <h2>de Conclusão</h2>
+                        <p>Certifica-se que</p>
+                        <div class="certificate-name">${USER.name}</div>
+                        <p>completou com sucesso a formação em<br>
+                        <strong>Segurança Digital e Proteção contra Phishing</strong><br>
+                        obtendo uma taxa de sucesso de <strong>${avgScore}%</strong></p>
+                        <p style="margin-top: 2rem;">
+                            Data de conclusão: ${new Date().toLocaleDateString('pt-PT')}<br>
+                            XP Total: ${USER.xp}
+                        </p>
+                        <button class="btn btn-primary" onclick="window.print()" style="margin-top: 2rem;">
+                            🖨️ Imprimir / Guardar PDF
+                        </button>
+                    </div>
+                ` : `
+                    <div style="text-align: center; padding: 4rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🔒</div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Certificado Bloqueado</h3>
+                        <p>Complete todos os módulos com pelo menos 80% de média para desbloquear o certificado.</p>
+                        <div style="margin-top: 2rem; background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius);">
+                            <p><strong>Progresso atual:</strong> ${progress}%</p>
+                            <p><strong>Média de pontuação:</strong> ${avgScore}%</p>
+                            <p><strong>Módulos concluídos:</strong> ${USER.completedModules.length}/${MODULES.length}</p>
+                        </div>
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                            <button class="btn btn-primary" onclick="goToModules()">
+                                📚 Continuar Formação
+                            </button>
+                        </div>
+                    </div>
+                `}
+            </div>
+        </div>
+    `;
+}
+
+// ==================== MESSAGES / NOTIFICATIONS ====================
+
+function showMessage(message, type = 'info') {
+    const colors = {
+        success: 'var(--success)',
+        error: 'var(--danger)',
+        warning: 'var(--warning)',
+        info: 'var(--primary-500)'
+    };
+    
+    const msg = document.createElement('div');
+    msg.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: white;
+        color: ${colors[type]};
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius);
+        border-left: 4px solid ${colors[type]};
+        box-shadow: var(--shadow-lg);
+        z-index: 10000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease;
+    `;
+    msg.textContent = message;
+    
+    document.body.appendChild(msg);
+    
+    setTimeout(() => {
+        msg.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => msg.remove(), 300);
+    }, 3000);
+}
+
+// ==================== ADMIN HELPER FUNCTIONS ====================
+
+window.generateNewKey = async function() {
+    const type = document.getElementById('keyType').value;
+    const licenses = parseInt(document.getElementById('keyLicenses').value);
+    const validity = parseInt(document.getElementById('keyValidity').value);
+    
+    const key = generateActivationKey();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + validity);
+    
+    const keyData = {
+        key,
+        type,
+        licenses,
+        usedCount: 0,
+        expiresAt: expiresAt.toISOString(),
+        createdAt: new Date().toISOString(),
+        companyCode: COMPANY.code || USER.companyCode,
+        createdBy: USER.email
+    };
+    
+    try {
+        if (database) {
+            await database.ref('activationKeys').push(keyData);
+        }
+        
+        document.getElementById('generatedKey').textContent = key;
+        document.getElementById('generatedKeyDisplay').classList.remove('hidden');
+        
+        showMessage('✅ Chave gerada com sucesso!', 'success');
+        
+        loadKeysList();
+    } catch (error) {
+        console.error('Erro ao gerar chave:', error);
+        showMessage('Erro ao gerar chave', 'error');
+    }
+};
+
+window.copyKeyToClipboard = function() {
+    const key = document.getElementById('generatedKey').textContent;
+    navigator.clipboard.writeText(key).then(() => {
+        showMessage('📋 Chave copiada!', 'success');
+    }).catch(() => {
+        showMessage('Erro ao copiar', 'error');
+    });
+};
+
+window.exportCompanyData = function() {
+    showMessage('Função de exportação em desenvolvimento', 'info');
+};
+
+window.exportEmployeesList = function() {
+    showMessage('Função de exportação em desenvolvimento', 'info');
+};
+
+window.updateCompanySettings = function() {
+    showMessage('Configurações guardadas com sucesso!', 'success');
+};
+
+window.updateTrainingSettings = function() {
+    showMessage('Configurações de formação guardadas!', 'success');
+};
+
+// ==================== INITIALIZATION ====================
+
+window.addEventListener('DOMContentLoaded', () => {
+    const savedUser = localStorage.getItem('phishguard_user');
+    if (savedUser) {
+        try {
+            USER = JSON.parse(savedUser);
+            onLoginSuccess();
+        } catch (e) {
+            console.error('Error parsing saved user:', e);
+            localStorage.removeItem('phishguard_user');
+        }
+    }
+    
+    showLoginType('user');
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+});
 
 console.log('✅ PhishGuard Elite carregado com sucesso!');
