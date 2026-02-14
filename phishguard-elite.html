@@ -136,85 +136,95 @@
         </div>
     </div>
 
+    
     <!-- LOGIN SECTION -->
-    <div id="loginSection" class="login-section hidden">
-        <div class="login-card">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🛡️</div>
-                <h2 class="login-title">PhishGuard Elite</h2>
-                <p style="color: var(--gray-500);">Segurança Digital Corporativa</p>
+<div id="loginSection" class="login-section hidden">
+    <div class="login-card">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🛡️</div>
+            <h2 class="login-title">PhishGuard Elite</h2>
+            <p style="color: var(--gray-500);">Segurança Digital Corporativa</p>
+        </div>
+
+        <!-- TABS CORRETAS -->
+        <div class="login-tabs">
+            <button class="login-tab active" id="tabUser" onclick="showLoginType('user')">
+                👤 Colaborador
+            </button>
+            <button class="login-tab" id="tabAdmin" onclick="showLoginType('admin')">
+                👑 Administrador
+            </button>
+        </div>
+
+        <!-- Formulário Colaborador -->
+        <div id="userLoginForm">
+            <div class="form-group">
+                <label class="form-label">Nome completo</label>
+                <input type="text" class="form-input" id="userName" placeholder="Ex: Ana Silva">
             </div>
-
-            <div class="login-tabs">
-                <button class="login-tab active" id="tabUser" onclick="showLoginType('user')">
-                    👤 Colaborador
-                </button>
-                <button class="login-tab" id="tabAdmin" onclick="showAdminTabClick()">
-                    👑 Administrador
-                </button>
+            <div class="form-group">
+                <label class="form-label">Email corporativo</label>
+                <input type="email" class="form-input" id="userEmail" placeholder="ana.silva@empresa.pt">
             </div>
-
-            <!-- Formulário Colaborador -->
-            <div id="userLoginForm">
-                <div class="form-group">
-                    <label class="form-label">Nome completo</label>
-                    <input type="text" class="form-input" id="userName" placeholder="Ex: Ana Silva">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email corporativo</label>
-                    <input type="email" class="form-input" id="userEmail" placeholder="ana.silva@empresa.pt">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Chave de ativação</label>
-                    <input type="text" class="form-input" id="activationKey" placeholder="XXXX-XXXX-XXXX-XXXX">
-                    <span class="form-hint">Fornecida pelo administrador da sua empresa</span>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Código da empresa</label>
-                    <input type="text" class="form-input" id="companyCode" placeholder="Ex: EMP123">
-                </div>
-                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="doUserLogin()">
-                    Aceder à Formação
-                </button>
-                <p class="form-hint" style="text-align: center; margin-top: 1rem;">
-                    Não tem chave? Contacte o seu administrador
-                </p>
+            <div class="form-group">
+                <label class="form-label">Chave de ativação</label>
+                <input type="text" class="form-input" id="activationKey" placeholder="XXXX-XXXX-XXXX-XXXX">
+                <span class="form-hint">Fornecida pelo administrador da sua empresa</span>
             </div>
-
-            <!-- Formulário Administrador -->
-            <div id="adminLoginForm" class="hidden">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="adminEmail" placeholder="admin@empresa.pt">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Palavra-passe</label>
-                    <input type="password" class="form-input" id="adminPass" placeholder="••••••••">
-                </div>
-                
-                <div id="adminExtraFields" class="hidden">
-                    <div class="form-group">
-                        <label class="form-label">Nome do administrador</label>
-                        <input type="text" class="form-input" id="adminName" placeholder="Ex: João Santos">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nome da empresa</label>
-                        <input type="text" class="form-input" id="companyName" placeholder="Ex: Empresa, SA">
-                    </div>
-                </div>
-
-                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="doAdminLogin()">
-                    Aceder ao Painel Admin
-                </button>
+            <div class="form-group">
+                <label class="form-label">Código da empresa</label>
+                <input type="text" class="form-input" id="companyCode" placeholder="Ex: EMP123">
             </div>
-
-            <p style="text-align: center; margin-top: 2rem;">
-                <button class="btn btn-outline btn-sm" onclick="hideLoginSection()">
-                    ← Voltar
-                </button>
+            <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="doUserLogin()">
+                Aceder à Formação
+            </button>
+            <p class="form-hint" style="text-align: center; margin-top: 1rem;">
+                Não tem chave? Contacte o seu administrador
             </p>
         </div>
+
+        <!-- Formulário Administrador -->
+        <div id="adminLoginForm" class="hidden">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="adminEmail" placeholder="admin@empresa.pt">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Palavra-passe</label>
+                <input type="password" class="form-input" id="adminPass" placeholder="••••••••">
+            </div>
+            
+            <!-- Campo Master Key (inicialmente escondido) -->
+            <div id="masterKeyField" style="display: none;">
+                <label class="form-label">Master Key</label>
+                <input type="password" class="form-input" id="masterKey" placeholder="Master Key para nova empresa">
+            </div>
+            
+            <div id="adminExtraFields" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">Nome do administrador</label>
+                    <input type="text" class="form-input" id="adminName" placeholder="Ex: João Santos">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nome da empresa</label>
+                    <input type="text" class="form-input" id="companyName" placeholder="Ex: Empresa, SA">
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="doAdminLogin()">
+                Aceder ao Painel Admin
+            </button>
+        </div>
+
+        <!-- Botão Voltar -->
+        <p style="text-align: center; margin-top: 2rem;">
+            <button class="btn btn-outline btn-sm" onclick="hideLoginSection()">
+                ← Voltar
+            </button>
+        </p>
     </div>
+</div>
+
 
     <!-- DASHBOARD PAGE -->
     <div id="dashboardPage" class="hidden"></div>
