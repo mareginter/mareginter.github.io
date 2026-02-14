@@ -3,273 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhishGuard Elite | Proteção contra Phishing</title>
-    
-    <!-- LINK DO CSS - ESTAVA FALTANDO! -->
+    <title>PhishGuard Elite • Segurança Digital Corporativa</title>
     <link rel="stylesheet" href="phishguard-elite.css">
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header>
+    <!-- NAVBAR -->
+    <nav id="navbar" class="hidden">
         <div class="header-content">
             <div class="logo">
                 <div class="logo-icon">🛡️</div>
-                <div class="logo-text">PhishGuard <span>Elite</span></div>
+                <div class="logo-text">PhishGuard<span>Elite</span></div>
             </div>
-            <nav class="nav hidden" id="navbar">
-                <button class="nav-btn" onclick="goToDashboard()" id="btnDash">📊 Dashboard</button>
-                <button class="nav-btn" onclick="goToModules()" id="btnMods">📚 Módulos</button>
-                <button class="nav-btn" onclick="goToSimulator()" id="btnSim">🎮 Simulador</button>
-                <button class="nav-btn" onclick="goToBadges()" id="btnBadges">🏅 Badges</button>
-                <button class="nav-btn" onclick="goToLibrary()" id="btnLib">📖 Biblioteca</button>
-                <button class="nav-btn" onclick="goToCertificate()" id="btnCert" class="hidden">📜 Certificado</button>
-                <button class="nav-btn" onclick="goToAdmin()" id="btnAdmin" class="hidden">👑 Admin</button>
-                <button class="nav-btn logout-btn" onclick="logout()">🚪 Sair</button>
-            </nav>
-        </div>
-    </header>
-
-    <main>
-        <!-- Landing Page -->
-        <div class="landing-container" id="landingPage">
-            <!-- Hero Section -->
-            <div class="hero-section">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        Proteja sua Empresa contra <span class="gradient-text">Ataques de Phishing</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Treine seus colaboradores com simulações realistas de phishing e fortaleça a segurança da sua organização.
-                    </p>
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary btn-lg" onclick="showLoginSection('admin')">
-                            <span class="btn-icon">🏢</span>
-                            Registar Empresa
-                        </button>
-                        <button class="btn btn-outline btn-lg" onclick="showLoginSection('user')">
-                            <span class="btn-icon">👤</span>
-                            Registar como Colaborador
-                        </button>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <div class="floating-card">
-                        <div class="stat-card-mini">
-                            <span class="stat-icon">🛡️</span>
-                            <div class="stat-info">
-                                <span class="stat-value">+10k</span>
-                                <span class="stat-label">Utilizadores</span>
-                            </div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <span class="stat-icon">📊</span>
-                            <div class="stat-info">
-                                <span class="stat-value">95%</span>
-                                <span class="stat-label">Eficácia</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Features Section -->
-            <div class="features-section">
-                <h2 class="section-title">Porquê escolher o PhishGuard Elite?</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">👥</div>
-                        <h3 class="feature-title">Gestão de Equipas</h3>
-                        <p class="feature-description">
-                            Gerencie colaboradores, gere chaves de ativação e acompanhe o progresso em tempo real.
-                        </p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">📈</div>
-                        <h3 class="feature-title">Analytics Detalhados</h3>
-                        <p class="feature-description">
-                            Visualize métricas de performance e identifique áreas de melhoria na sua equipa.
-                        </p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <div class="feature-icon">📜</div>
-                        <h3 class="feature-title">Certificação</h3>
-                        <p class="feature-description">
-                            Colaboradores recebem certificados após completar todos os módulos com sucesso.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <div class="stat-large">
-                    <span class="stat-large-value">98%</span>
-                    <span class="stat-large-label">Taxa de retenção</span>
-                </div>
-                <div class="stat-large">
-                    <span class="stat-large-value">50+</span>
-                    <span class="stat-large-label">Empresas parceiras</span>
-                </div>
-                <div class="stat-large">
-                    <span class="stat-large-value">24/7</span>
-                    <span class="stat-large-label">Suporte dedicado</span>
-                </div>
+            <div class="nav">
+                <button class="nav-btn" onclick="goToDashboard()" id="btnDashboard">
+                    <span>📊</span> Dashboard
+                </button>
+                <button class="nav-btn" onclick="goToModules()" id="btnModules">
+                    <span>📚</span> Módulos
+                </button>
+                <button class="nav-btn" onclick="goToSimulator()" id="btnSimulator">
+                    <span>🎮</span> Simulador
+                </button>
+                <button class="nav-btn" onclick="goToBadges()" id="btnBadges">
+                    <span>🏆</span> Conquistas
+                </button>
+                <button class="nav-btn" onclick="goToLibrary()" id="btnLibrary">
+                    <span>📖</span> Biblioteca
+                </button>
+                <button class="nav-btn" onclick="goToCertificate()" id="btnCert">
+                    <span>📜</span> Certificado
+                </button>
+                <button class="nav-btn" onclick="goToAdmin()" id="btnAdmin" style="display: none;">
+                    <span>👑</span> Admin
+                </button>
+                <button class="nav-btn logout-btn" onclick="logout()">
+                    <span>🚪</span> Sair
+                </button>
             </div>
         </div>
+    </nav>
 
-        <!-- Login Section (inicialmente oculta) -->
-        <div class="login-section hidden" id="loginSection">
-            <div class="login-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 class="login-title">Área de Acesso</h2>
-                    <button class="btn btn-sm btn-outline" onclick="hideLoginSection()">← Voltar</button>
-                </div>
-                
-                <div class="login-tabs">
-                    <button class="login-tab active" onclick="showLoginType('user')" id="tabUser">
-                        👤 Colaborador
-                    </button>
-                    <button class="login-tab" onclick="showLoginType('admin')" id="tabAdmin">
-                        👑 Administrador
-                    </button>
-                </div>
-
-                <!-- User Login (visível por padrão) -->
-                <div id="userLoginForm">
-                    <div class="form-group">
-                        <label class="form-label">Nome completo</label>
-                        <input type="text" class="form-input" id="userName" placeholder="João Silva" required />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Email profissional</label>
-                        <input type="email" class="form-input" id="userEmail" placeholder="joao@empresa.pt" required />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Chave de ativação <span class="form-hint">(opcional)</span></label>
-                        <input type="text" class="form-input" id="activationKey" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-family: var(--font-mono);" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Código da empresa <span class="form-hint">(opcional)</span></label>
-                        <input type="text" class="form-input" id="companyCode" placeholder="ABC123" style="font-family: var(--font-mono);" />
-                    </div>
-                    
-                    <button class="btn btn-primary btn-lg" onclick="doUserLogin()" style="width: 100%;">
-                        Entrar na Formação
-                    </button>
-                    
-                    <p class="text-center form-hint" style="margin-top: var(--space-4);">
-                        💡 Sem chave? Contacte o administrador da sua empresa
-                    </p>
-                </div>
-
-                <!-- Admin Login (oculto por padrão) -->
-                <div id="adminLoginForm" class="hidden">
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" id="adminEmail" placeholder="admin@empresa.pt" required />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Senha</label>
-                        <input type="password" class="form-input" id="adminPass" placeholder="••••••••" required />
-                    </div>
-                    
-                    <div id="adminExtraFields" class="hidden">
-                        <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px dashed var(--gray-300);">
-                            <p class="alert alert-warning" style="margin-bottom: var(--space-4);">
-                                ⚠️ Primeiro acesso? Preencha os dados da empresa
-                            </p>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Nome do administrador</label>
-                                <input type="text" class="form-input" id="adminName" placeholder="Ana Santos" />
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">Nome da empresa</label>
-                                <input type="text" class="form-input" id="companyName" placeholder="Empresa, Lda" />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary btn-lg" onclick="doAdminLogin()" style="width: 100%; margin-top: 1rem;">
-                        Entrar como Administrador
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dashboard (escondido inicialmente) -->
-        <div class="dashboard-container hidden" id="dashboardPage"></div>
-
-        <!-- Modules Page (escondido inicialmente) -->
-        <div class="dashboard-container hidden" id="modulesPage">
-            <div class="dashboard-card">
-                <div class="dashboard-header">
-                    <h2 class="dashboard-title">📚 Módulos de Formação</h2>
-                </div>
-                <p class="dashboard-subtitle">
-                    Complete todos os módulos para desbloquear o certificado profissional
+    <!-- LANDING PAGE -->
+    <div id="landingPage" class="landing-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div>
+                <h1 class="hero-title">
+                    Formação <span class="gradient-text">Anti-Phishing</span><br>
+                    para Empresas
+                </h1>
+                <p class="hero-subtitle">
+                    Capacite a sua equipa com a melhor formação em segurança digital. 
+                    Detecte e previna ataques de phishing com simulações realistas e 
+                    casos reais portugueses.
                 </p>
-                <div class="module-grid" id="modulesList"></div>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary btn-lg" onclick="showLoginSection('user')">
+                        <span class="btn-icon">🔐</span> Área de Colaborador
+                    </button>
+                    <button class="btn btn-outline btn-lg" onclick="showLoginSection('admin')">
+                        <span class="btn-icon">👑</span> Área de Administrador
+                    </button>
+                </div>
+            </div>
+            <div class="floating-card">
+                <div class="stat-card-mini">
+                    <span class="stat-icon">📊</span>
+                    <div class="stat-info">
+                        <span class="stat-value">+5.000</span>
+                        <span class="stat-label">utilizadores formados</span>
+                    </div>
+                </div>
+                <div class="stat-card-mini">
+                    <span class="stat-icon">🇵🇹</span>
+                    <div class="stat-info">
+                        <span class="stat-value">15+</span>
+                        <span class="stat-label">casos portugueses</span>
+                    </div>
+                </div>
+                <div class="stat-card-mini">
+                    <span class="stat-icon">🏢</span>
+                    <div class="stat-info">
+                        <span class="stat-value">200+</span>
+                        <span class="stat-label">empresas parceiras</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Dynamic Content -->
-        <div id="dynamicContent"></div>
-    </main>
+        <!-- Features Section -->
+        <div class="features-section">
+            <h2 class="section-title">Porque escolher a PhishGuard Elite?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Simulações Realistas</h3>
+                    <p class="feature-description">
+                        Cenários baseados em ataques reais em Portugal, com emails, SMS e websites fraudulentos.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Dashboard Corporativo</h3>
+                    <p class="feature-description">
+                        Acompanhe o progresso da sua equipa em tempo real e identifique áreas de melhoria.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Gamificação</h3>
+                    <p class="feature-description">
+                        Badges, XP e certificados para motivar a aprendizagem contínua da sua equipa.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-    <!-- Welcome Modal -->
-    <div id="welcomeOverlay" class="modal-overlay hidden">
-        <div class="modal" id="welcomePopup">
-            <div class="modal-header">
-                <h3>🛡️ Bem-vindo ao PhishGuard Elite!</h3>
-                <button class="modal-close" onclick="closeWelcomePopup()">×</button>
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-large">
+                <span class="stat-large-value">98%</span>
+                <span class="stat-large-label">de retenção</span>
             </div>
-            <div class="modal-body">
-                <div class="text-center mb-6">
-                    <div style="font-size: 4rem;">🛡️</div>
-                    <p style="color: var(--gray-600);">A sua jornada de formação começa agora</p>
-                </div>
-                
-                <div class="alert alert-info mb-4">
-                    <strong>🎯 Como Funciona</strong>
-                    <ul style="margin-top: var(--space-2); margin-left: var(--space-4);">
-                        <li>6 módulos progressivos</li>
-                        <li>Quizzes interativos</li>
-                        <li>Simulador realista</li>
-                        <li>Sistema de conquistas</li>
-                    </ul>
-                </div>
-                
-                <div class="alert alert-warning mb-4">
-                    <strong>💡 Dica Importante</strong>
-                    <p class="mt-2">Visite primeiro a <strong>Biblioteca</strong> para estudar ao seu ritmo, sem pressão.</p>
-                </div>
-                
-                <div class="alert alert-success">
-                    <strong>🏆 Objetivo Final</strong>
-                    <p class="mt-2">Complete todos os módulos e obtenha o <strong>Certificado Profissional</strong></p>
-                </div>
+            <div class="stat-large">
+                <span class="stat-large-value">24/7</span>
+                <span class="stat-large-label">disponível</span>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeWelcomePopup()">Explorar</button>
-                <button class="btn btn-primary" onclick="goToModulesFromWelcome()">Começar Formação</button>
+            <div class="stat-large">
+                <span class="stat-large-value">RGPD</span>
+                <span class="stat-large-label">conforme</span>
             </div>
         </div>
     </div>
 
+    <!-- LOGIN SECTION -->
+    <div id="loginSection" class="login-section hidden">
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🛡️</div>
+                <h2 class="login-title">PhishGuard Elite</h2>
+                <p style="color: var(--gray-500);">Segurança Digital Corporativa</p>
+            </div>
+
+            <div class="login-tabs">
+                <button class="login-tab active" id="tabUser" onclick="showLoginType('user')">
+                    👤 Colaborador
+                </button>
+                <button class="login-tab" id="tabAdmin" onclick="showAdminTabClick()">
+                    👑 Administrador
+                </button>
+            </div>
+
+            <!-- Formulário Colaborador -->
+            <div id="userLoginForm">
+                <div class="form-group">
+                    <label class="form-label">Nome completo</label>
+                    <input type="text" class="form-input" id="userName" placeholder="Ex: Ana Silva">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email corporativo</label>
+                    <input type="email" class="form-input" id="userEmail" placeholder="ana.silva@empresa.pt">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Chave de ativação</label>
+                    <input type="text" class="form-input" id="activationKey" placeholder="XXXX-XXXX-XXXX-XXXX">
+                    <span class="form-hint">Fornecida pelo administrador da sua empresa</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Código da empresa</label>
+                    <input type="text" class="form-input" id="companyCode" placeholder="Ex: EMP123">
+                </div>
+                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="doUserLogin()">
+                    Aceder à Formação
+                </button>
+                <p class="form-hint" style="text-align: center; margin-top: 1rem;">
+                    Não tem chave? Contacte o seu administrador
+                </p>
+            </div>
+
+            <!-- Formulário Administrador -->
+            <div id="adminLoginForm" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="adminEmail" placeholder="admin@empresa.pt">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Palavra-passe</label>
+                    <input type="password" class="form-input" id="adminPass" placeholder="••••••••">
+                </div>
+                
+                <div id="adminExtraFields" class="hidden">
+                    <div class="form-group">
+                        <label class="form-label">Nome do administrador</label>
+                        <input type="text" class="form-input" id="adminName" placeholder="Ex: João Santos">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nome da empresa</label>
+                        <input type="text" class="form-input" id="companyName" placeholder="Ex: Empresa, SA">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg" style="width: 100%;" onclick="doAdminLogin()">
+                    Aceder ao Painel Admin
+                </button>
+            </div>
+
+            <p style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-outline btn-sm" onclick="hideLoginSection()">
+                    ← Voltar
+                </button>
+            </p>
+        </div>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div id="dashboardPage" class="hidden"></div>
+
+    <!-- MODULES PAGE -->
+    <div id="modulesPage" class="hidden">
+        <div class="dashboard-container">
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title">📚 Módulos de Formação</h2>
+                    <p class="dashboard-subtitle">Escolha um módulo para começar</p>
+                </div>
+                <div id="modulesList" class="module-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DYNAMIC CONTENT (Simulator, Badges, Library, Certificate) -->
+    <div id="dynamicContent"></div>
+
+    <!-- WELCOME POPUP -->
+    <div id="welcomeOverlay" class="modal-overlay hidden" onclick="closeWelcomePopup()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>🎉 Bem-vindo à PhishGuard Elite!</h3>
+                <button class="modal-close" onclick="closeWelcomePopup()">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 4rem;">🛡️</div>
+                </div>
+                <p>Estamos muito felizes por tê-lo connosco nesta jornada de segurança digital.</p>
+                <p><strong>Comece por:</strong></p>
+                <ul style="margin-left: 1.5rem;">
+                    <li>Explorar os módulos de formação</li>
+                    <li>Testar os seus conhecimentos no simulador</li>
+                    <li>Ganhar badges e XP</li>
+                </ul>
+                <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); margin-top: 1rem;">
+                    <p style="color: var(--primary-700); margin: 0;">
+                        <strong>💡 Dica:</strong> Complete todos os módulos com 80%+ para obter o certificado.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="goToModulesFromWelcome()">
+                    Começar Formação
+                </button>
+                <button class="btn btn-outline" onclick="closeWelcomePopup()">
+                    Explorar depois
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="phishguard-elite.js"></script>
 </body>
 </html>
