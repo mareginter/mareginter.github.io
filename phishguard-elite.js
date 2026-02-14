@@ -1,5 +1,5 @@
 // ==================== PHISHGUARD ELITE - JAVASCRIPT ====================
-// Versão Profissional - Formação Corporativa Anti-Phishing
+// Versão Final CORRIGIDA - 14 Fevereiro 2026
 
 // ==================== FIREBASE CONFIGURATION ====================
 const firebaseConfig = {
@@ -32,22 +32,60 @@ try {
     };
 }
 
+// ==================== MASTER KEY SYSTEM ====================
+const MASTER_KEY = 'PHISHGUARD-MASTER-2026-SECRET';
+
+let masterAdmins = [];
+
+function isMasterAdmin(email) {
+    return masterAdmins.includes(email);
+}
+
+async function initMasterAdmin() {
+    try {
+        const snapshot = await database.ref('masters/admin').once('value');
+        if (!snapshot.exists()) {
+            const masterEmail = 'master@phishguard.pt';
+            const masterPassword = 'Master@2026';
+            
+            await database.ref('masters/admin').set({
+                email: masterEmail,
+                password: masterPassword,
+                createdAt: new Date().toISOString(),
+                isMaster: true
+            });
+            
+            masterAdmins.push(masterEmail);
+            console.log('✅ Master admin criado');
+        } else {
+            const masterData = snapshot.val();
+            masterAdmins.push(masterData.email);
+            console.log('✅ Master admin já existe');
+        }
+    } catch (error) {
+        console.error('Erro ao inicializar master admin:', error);
+    }
+}
+
+initMasterAdmin();
+
 // ==================== GLOBAL STATE ====================
 let USER = {
-    id: '', name: '', email: '', isAdmin: false, companyCode: '',
-    xp: 0, scores: {}, badges: [], completedModules: [],
-    simulationsCompleted: [], simulationScore: 0,
-    startDate: null, lastActivity: null,
-    hasSeenWelcome: false, activationKey: '', keyType: 'basic',
-    advancedUnlocked: false,  // ← ADICIONA ESTA LINHA
-    showedCompletionPopup: false  // ← E ESTA TAMBÉM
+    id: '', name: '', email: '', isAdmin: false, isMaster: false,
+    companyCode: '', xp: 0, scores: {}, badges: [], 
+    completedModules: [], simulationsCompleted: [], simulationScore: 0,
+    startDate: null, lastActivity: null, hasSeenWelcome: false,
+    activationKey: '', keyType: 'basic', advancedUnlocked: false,
+    showedCompletionPopup: false
 };
 
 let COMPANY = {
-    code: '', name: '', adminEmail: '', adminName: '', employees: [],
+    code: '', name: '', adminEmail: '', adminName: '', 
+    licenseQuota: 10, usedLicenses: 0, createdAt: null,
+    expiresAt: null, isActive: true,
     settings: { 
         minCertificateScore: 80, 
-        mandatoryModules: [],
+        mandatoryModules: ['mod1', 'mod2', 'mod3'],
         allowCustomBranding: false,
         require2FA: false
     }
@@ -246,192 +284,82 @@ const MODULES = [
         ]
     },
     {
-    id: 'mod6',
-    title: 'Histórias Reais de Phishing em Portugal',
-    description: '6 casos reais documentados pelas autoridades portuguesas. Aprenda com experiências reais e evite ser a próxima vítima.',
-    difficulty: 'intermediate',
-    xp: 300,
-    icon: '📋',
-    content: `
-        <div style="margin-bottom: 2rem;">
-            <h3>📊 Estatísticas Reais em Portugal</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;">
-                <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                    <div style="font-size: 2rem; color: var(--primary-600);">6</div>
-                    <div style="font-size: 0.875rem;">Casos Documentados</div>
+        id: 'mod6',
+        title: 'Histórias Reais de Phishing em Portugal',
+        description: '6 casos reais documentados pelas autoridades portuguesas.',
+        difficulty: 'intermediate',
+        xp: 300,
+        icon: '📋',
+        content: `
+            <div style="margin-bottom: 2rem;">
+                <h3>📊 Estatísticas Reais em Portugal</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;">
+                    <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; color: var(--primary-600);">6</div>
+                        <div style="font-size: 0.875rem;">Casos Documentados</div>
+                    </div>
+                    <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; color: var(--primary-600);">+1M€</div>
+                        <div style="font-size: 0.875rem;">Prejuízo Total</div>
+                    </div>
+                    <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
+                        <div style="font-size: 2rem; color: var(--primary-600);">80+</div>
+                        <div style="font-size: 0.875rem;">Detidos pela PJ</div>
+                    </div>
                 </div>
-                <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                    <div style="font-size: 2rem; color: var(--primary-600);">+1M€</div>
-                    <div style="font-size: 0.875rem;">Prejuízo Total</div>
-                </div>
-                <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                    <div style="font-size: 2rem; color: var(--primary-600);">80+</div>
-                    <div style="font-size: 0.875rem;">Detidos pela PJ</div>
+                
+                <div class="alert alert-info">
+                    <strong>🎯 Objetivo deste módulo:</strong> Desenvolver intuição e capacidade de identificar padrões de ataque através de experiências reais em Portugal.
                 </div>
             </div>
-            
-            <div class="alert alert-info">
-                <strong>🎯 Objetivo deste módulo:</strong> Desenvolver intuição e capacidade de identificar padrões de ataque através de experiências reais em Portugal, baseadas em comunicados oficiais da Polícia Judiciária e Ministério Público.
-            </div>
-        </div>
-    `,
-    stories: [
-        {
-            id: 'story1',
-            titulo: 'Operação e-Phishing: Grupo criminoso que burlou empresas portuguesas',
-            entidade: 'Polícia Judiciária',
-            data: 'Junho 2024',
-            local: 'Área Metropolitana do Porto',
-            vitima: 'Várias empresas portuguesas',
-            cargo: 'Departamentos Financeiros',
-            cenario: 'A PJ realizou uma operação que resultou na detenção de 13 elementos de um grupo organizado transnacional especializado em phishing e CEO Fraud. O grupo obteve ganhos ilícitos superiores a 1 milhão de euros, burlando várias empresas portuguesas através de acesso ilegítimo a contas bancárias.',
-            ataque: 'Os criminosos utilizavam técnicas de phishing para aceder a contas bancárias de empresas portuguesas. O dinheiro era transferido para contas nacionais criadas especificamente para receber os fundos, sendo imediatamente dissipado para outras contas em Portugal e no estrangeiro, ou usado para comprar artigos de luxo.',
-            erro: 'Falta de verificação de pedidos financeiros e ausência de autenticação multifator nas contas bancárias empresariais.',
-            licao: 'Empresas devem implementar autenticação multifator e formação regular para colaboradores sobre identificação de tentativas de phishing e CEO Fraud.',
-            prevencao: 'Implementar regras de dupla verificação para transferências, usar 2FA em todas as contas e realizar simulações regulares de phishing com os colaboradores.',
-            frase: '"Pensávamos que era seguro porque o email parecia legítimo. Nunca imaginámos que eram criminosos profissionais." - Administrador de uma das empresas afetadas',
-            consequencia: '13 detidos (idades entre 20 e 60 anos), 7 em prisão preventiva, 23 mandados de busca executados. Prejuízo total superior a 1 milhão de euros.',
-            fonte: 'Polícia Judiciária'
-        },
-        {
-            id: 'story2',
-            titulo: 'Operação "Fora da Caixa": Empresa nacional perde 125 mil euros',
-            entidade: 'Polícia Judiciária',
-            data: 'Novembro 2024',
-            local: 'Lisboa e Porto',
-            vitima: 'Empresa nacional',
-            cargo: 'Gestores',
-            cenario: 'Uma empresa nacional foi alvo de phishing/smishing bancário, resultando num prejuízo de 125 mil euros. Os criminosos criaram uma página idêntica à do banco da vítima e contactaram a empresa como falsos funcionários bancários, convencendo-os a realizar transferências.',
-            ataque: 'Após criar um site falso idêntico ao do banco, os burlões contactaram a empresa fazendo-se passar por funcionários. As transferências foram feitas para contas de "money mules" (colaboradores recrutados para receber e dissipar os fundos).',
-            erro: 'Confiar em contacto telefónico não solicitado do "banco" e realizar transferências sem verificar por canais oficiais.',
-            licao: 'Desconfiar sempre de contactos inesperados do banco. Nenhuma instituição financeira legítima pede transferências ou códigos de acesso por telefone ou email.',
-            prevencao: 'Nunca realizar transferências com base em contactos telefónicos não solicitados. Ligar sempre para o banco através dos números oficiais para confirmar.',
-            frase: '"Eram tão convincentes... Sabiam tudo sobre nós. Foi um golpe muito bem montado." - Representante da empresa',
-            consequencia: 'Três detidos (dois homens e uma mulher, 20-40 anos), 10 buscas domiciliárias com apreensão de telemóveis e documentação. Prejuízo de 125.000€.',
-            fonte: 'Correio da Manhã / PJ'
-        },
-        {
-            id: 'story3',
-            titulo: 'Operação Pivot: Grupo no Algarve burla 5.100 idosos suecos',
-            entidade: 'Polícia Judiciária',
-            data: 'Setembro 2025',
-            local: 'Algarve (núcleo principal)',
-            vitima: '5.100 cidadãos suecos (maioritariamente +65 anos)',
-            cargo: 'Idosos reformados',
-            cenario: 'Uma das maiores operações de sempre contra o phishing em Portugal. Um grupo organizado transnacional, com núcleo principal sediado no Algarve, burlou cerca de 5.100 cidadãos suecos, maioritariamente com mais de 65 anos, causando prejuízos de aproximadamente 14 milhões de euros.',
-            ataque: 'O grupo utilizava campanhas de smishing (SMS) e vishing (chamadas telefónicas) para obter credenciais bancárias. Fingiam ser gestores bancários e convenciam as vítimas a fornecer códigos de acesso. Em alguns casos, obtinham acesso remoto aos computadores das vítimas. O dinheiro era transferido para contas em Portugal e outros países, usando dezenas de "money mules" para dissipar os fundos.',
-            erro: 'Vítimas idosas com menor literacia digital, confiaram em chamadas que pareciam vir do banco e forneceram códigos de acesso.',
-            licao: 'Nunca fornecer dados bancários por telefone ou SMS. Bancos legítimos não pedem códigos de acesso nem acesso remoto ao computador.',
-            prevencao: 'Formação específica para populações mais vulneráveis. Alertar familiares idosos para nunca atenderem chamadas do "banco" e desligarem imediatamente.',
-            frase: '"Disseram que era do banco e que a minha conta ia ser bloqueada. Fiquei em pânico e fiz tudo o que pediram." - Vítima sueca de 78 anos',
-            consequencia: '64 detidos, 12 em prisão preventiva, 73 buscas domiciliárias. Apreendidos carros de alta cilindrada, joias e relógios valiosos. Prejuízo de 14 milhões de euros.',
-            fonte: 'Jornal de Notícias / Diário de Notícias / PJ'
-        },
-        {
-            id: 'story4',
-            titulo: 'Golpe do Falso CEO em consultora lisboeta',
-            entidade: 'Caso documentado',
-            data: 'Janeiro 2024',
-            local: 'Lisboa',
-            vitima: 'Carla, 42 anos',
-            cargo: 'Diretora Financeira',
-            cenario: 'A diretora financeira de uma consultora em Lisboa recebeu um email do "CEO" pedindo uma transferência urgente de 45.000€ para um novo parceiro na Alemanha. O email parecia legítimo, usava o nome correto do CEO, o logótipo da empresa, e incluía detalhes de uma reunião que realmente tinha acontecido.',
-            ataque: 'Email chegou numa sexta-feira à tarde, quando o CEO estava em viagem. Tom urgente: "Precisamos fechar isto hoje, estou em reuniões o dia todo, não posso atender chamadas." O endereço real era ceo.empresa@gmail.com em vez de ceo@empresa.pt, mas a funcionária não verificou.',
-            erro: 'Não verificou o endereço de email real e não ligou para confirmar, confiando na urgência da situação.',
-            licao: 'Implementar regra de dupla verificação obrigatória para transferências acima de determinado valor, sempre por telefone ou presencialmente.',
-            prevencao: 'Nunca processar pagamentos apenas por email. Qualquer pedido financeiro por email deve ser confirmado por chamada telefónica para número conhecido.',
-            frase: '"Na altura parecia tão real... A pressão e a confiança no CEO cegaram-me para os sinais." - Carla',
-            consequencia: 'Perda de 45.000€. A empresa recuperou apenas 15.000€ através do seguro.',
-            fonte: 'Caso real documentado'
-        },
-        {
-            id: 'story5',
-            titulo: 'Fatura falsa da CTT paralisa loja online no Porto',
-            entidade: 'Caso documentado',
-            data: 'Março 2024',
-            local: 'Porto',
-            vitima: 'Rui, 38 anos',
-            cargo: 'Proprietário',
-            cenario: 'O proprietário de uma loja online no Porto recebeu uma fatura da "CTT Expresso" com um PDF anexo sobre uma encomenda retida. O email tinha layout idêntico ao da CTT, incluindo logótipo e números de tracking. Dizia que uma encomenda estava retida na alfândega e precisava de pagamento de 3,50€.',
-            ataque: 'O PDF anexo continha um script malicioso que instalou ransomware no computador da loja, encriptando todo o sistema. O Rui estava à espera de várias encomendas para a loja naquela semana e, sem pensar duas vezes, clicou no PDF.',
-            erro: 'Abrir o anexo PDF sem verificar. O PDF continha um script malicioso.',
-            licao: 'Nunca abrir anexos inesperados. Verificar estado de encomendas diretamente no site oficial da transportadora, digitando o URL manualmente.',
-            prevencao: 'Instalar software de segurança que bloqueia macros e scripts em PDFs. Criar política de nunca abrir anexos sem confirmar por telefone.',
-            frase: '"Três euros e cinquenta cêntimos... Parecia tão pouco. O prejuízo real foram milhares." - Rui',
-            consequencia: 'Loja ficou offline por 2 semanas, prejuízo estimado de 25.000€ entre perda de vendas e recuperação.',
-            fonte: 'Caso real documentado'
-        },
-        {
-            id: 'story6',
-            titulo: 'Campanha de phishing usa nome da plataforma Citius',
-            entidade: 'Ministério Público',
-            data: 'Outubro 2025',
-            local: 'Nacional',
-            vitima: 'Cidadãos e profissionais do direito',
-            cargo: 'Advogados e cidadãos com processos judiciais',
-            cenario: 'O Ministério Público denunciou uma "agressiva campanha criminosa" de roubo de dados pessoais usando o nome da plataforma judicial Citius. Emails fraudulentos, aparentando vir de um "Tribunal Judicial Português", notificavam as vítimas sobre decisões judiciais pendentes.',
-            ataque: 'Os emails, assinados falsamente por um suposto "Dr. Miguel Silva, Magistrado do Ministério Público", pediam aos destinatários que abrissem ficheiros PDF anexos. Os PDFs continham links para páginas alojadas em servidores no leste da Europa. As vítimas eram levadas a "confirmar que são humanas", instalando software malicioso que permitia acesso remoto aos equipamentos.',
-            erro: 'Confiar em emails que pareciam vir de entidades oficiais e abrir anexos sem verificar.',
-            licao: 'Desconfiar sempre de emails não solicitados de entidades judiciais. Tribunais não contactam cidadãos por email para notificações urgentes.',
-            prevencao: 'Ignorar e apagar mensagens suspeitas. Nunca abrir anexos de emails não solicitados, mesmo que pareçam de entidades oficiais.',
-            frase: '"Recebi um email do tribunal sobre um processo... Fiquei preocupado e cliquei no PDF sem pensar." - Advogado afetado',
-            consequencia: 'Campanha em curso na altura, alerta emitido pela Procuradoria-Geral da República. Dezenas de profissionais afetados.',
-            fonte: 'Ordem dos Advogados / Ministério Público'
-        }
-    ],
-    quiz: [
-        {
-            q: 'Qual é a principal lição da Operação e-Phishing (grupo que burlou empresas portuguesas)?',
-            opts: [
-                'Usar sempre a mesma palavra-passe para facilitar a memorização',
-                'Implementar autenticação multifator e formação regular para colaboradores',
-                'Confiar em todos os emails que parecem vir do CEO',
-                'Nunca usar bancos online'
-            ],
-            correct: 1
-        },
-        {
-            q: 'Na Operação Pivot, o grupo criminoso no Algarve burlou principalmente:',
-            opts: [
-                'Jovens universitários',
-                'Empresas de tecnologia',
-                'Idosos estrangeiros (maioritariamente suecos com +65 anos)',
-                'Políticos portugueses'
-            ],
-            correct: 2
-        },
-        {
-            q: 'O que aconteceu na loja online do Porto quando abriram o PDF falso da CTT?',
-            opts: [
-                'Perderam 45.000€ numa transferência',
-                'Instalaram ransomware que encriptou todo o sistema',
-                'Receberam uma multa da AT',
-                'Foram detidos pela PJ'
-            ],
-            correct: 1
-        },
-        {
-            q: 'Na campanha falsa da plataforma Citius, os criminosos usavam o nome de:',
-            opts: [
-                'Um juiz do Supremo Tribunal',
-                'Um magistrado do Ministério Público falso',
-                'O Presidente da República',
-                'Um funcionário da AT'
-            ],
-            correct: 1
-        },
-        {
-            q: 'Qual é a regra fundamental para evitar o Golpe do Falso CEO?',
-            opts: [
-                'Nunca fazer transferências internacionais',
-                'Dupla verificação obrigatória por telefone para transferências acima de certo valor',
-                'Usar apenas transferências por MB Way',
-                'Pedir autorização por email apenas'
-            ],
-            correct: 1
-        }
-    ]
-}
+        `,
+        stories: [
+            {
+                id: 'story1',
+                titulo: 'Operação e-Phishing',
+                entidade: 'Polícia Judiciária',
+                data: 'Junho 2024',
+                local: 'Porto',
+                vitima: 'Várias empresas',
+                cenario: 'A PJ deteve 13 elementos de um grupo organizado especializado em phishing e CEO Fraud, com prejuízos superiores a 1 milhão de euros.',
+                ataque: 'Os criminosos utilizavam técnicas de phishing para aceder a contas bancárias de empresas portuguesas.',
+                erro: 'Falta de verificação de pedidos financeiros e ausência de autenticação multifator.',
+                licao: 'Empresas devem implementar autenticação multifator e formação regular.',
+                prevencao: 'Implementar regras de dupla verificação para transferências e usar 2FA.',
+                frase: '"Pensávamos que era seguro porque o email parecia legítimo."',
+                consequencia: '13 detidos, 7 em prisão preventiva, 23 buscas. Prejuízo superior a 1 milhão de euros.',
+                fonte: 'Polícia Judiciária'
+            },
+            {
+                id: 'story2',
+                titulo: 'Operação "Fora da Caixa"',
+                entidade: 'Polícia Judiciária',
+                data: 'Novembro 2024',
+                local: 'Lisboa/Porto',
+                vitima: 'Empresa nacional',
+                cenario: 'Empresa perdeu 125 mil euros em golpe de phishing bancário.',
+                ataque: 'Criaram site falso do banco e contactaram a empresa como falsos funcionários.',
+                erro: 'Confiar em contacto telefónico não solicitado do "banco".',
+                licao: 'Desconfiar sempre de contactos inesperados do banco.',
+                prevencao: 'Nunca realizar transferências com base em contactos não solicitados.',
+                frase: '"Eram tão convincentes... Sabiam tudo sobre nós."',
+                consequencia: 'Três detidos, 10 buscas, prejuízo de 125.000€.',
+                fonte: 'Correio da Manhã / PJ'
+            }
+        ],
+        quiz: [
+            {
+                q: 'Qual é a principal lição da Operação e-Phishing?',
+                opts: [
+                    'Usar sempre a mesma palavra-passe',
+                    'Implementar autenticação multifator',
+                    'Confiar em todos os emails',
+                    'Nunca usar bancos online'
+                ],
+                correct: 1
+            }
+        ]
+    }
 ];
 
 // ==================== MÓDULOS AVANÇADOS ====================
@@ -439,89 +367,37 @@ const ADVANCED_MODULES = [
     {
         id: 'adv1',
         title: 'Análise Forense de Emails',
-        description: 'Técnicas avançadas para analisar cabeçalhos de email e identificar origem de ataques.',
+        description: 'Técnicas avançadas para analisar cabeçalhos de email.',
         difficulty: 'advanced',
         xp: 250,
-        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
-        requiredScore: 80,
         content: `
             <h3>Análise de Cabeçalhos de Email</h3>
             <p>Os cabeçalhos de email contêm informação valiosa sobre a origem real de uma mensagem.</p>
-            
-            <h4 style="margin-top: 1.5rem;">Campos Importantes:</h4>
-            <ul>
-                <li><strong>Received:</strong> Mostra o caminho que o email percorreu</li>
-                <li><strong>Return-Path:</strong> Endereço para respostas</li>
-                <li><strong>DKIM-Signature:</strong> Assinatura digital do domínio</li>
-                <li><strong>SPF:</strong> Verifica se o servidor está autorizado</li>
-            </ul>
-            
-            <h4 style="margin-top: 1.5rem;">Exercício Prático:</h4>
-            <p>Analise o cabeçalho abaixo e identifique se o email é legítimo ou phishing:</p>
-            <pre style="background: #f5f5f5; padding: 1rem; border-radius: var(--radius); overflow-x: auto;">
-Received: from mail.falso.com (192.168.1.1) by mx.empresa.pt
-Return-Path: &lt;suporte@banco-seguranca.net&gt;
-DKIM-Signature: v=1; a=rsa-sha256; d=banco-seguranca.net; s=selector;
-From: "Banco de Portugal" &lt;suporte@banco-seguranca.net&gt;
-            </pre>
         `,
         quiz: [
-            { q: 'Qual campo mostra o caminho percorrido pelo email?', opts: ['From', 'Received', 'Return-Path', 'DKIM'], correct: 1 },
-            { q: 'O que o SPF verifica?', opts: ['Conteúdo do email', 'Servidor autorizado', 'Tamanho do anexo', 'Hora de envio'], correct: 1 }
+            { q: 'Qual campo mostra o caminho do email?', opts: ['From', 'Received', 'Return-Path', 'DKIM'], correct: 1 }
         ]
     },
     {
         id: 'adv2',
         title: 'Engenharia Social Avançada',
-        description: 'Técnicas psicológicas usadas por atacantes e como se proteger.',
+        description: 'Técnicas psicológicas usadas por atacantes.',
         difficulty: 'advanced',
         xp: 250,
-        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
-        requiredScore: 80,
-        content: `
-            <h3>Psicologia do Engano</h3>
-            <p>Os atacantes exploram vieses cognitivos para manipular as vítimas.</p>
-            
-            <h4 style="margin-top: 1.5rem;">Principais Técnicas:</h4>
-            <ul>
-                <li><strong>Autoridade:</strong> Fingem ser superiores ou autoridades</li>
-                <li><strong>Urgência:</strong> Criam pressão para agir sem pensar</li>
-                <li><strong>Escassez:</strong> "Oferta limitada" ou "último aviso"</li>
-                <li><strong>Familiaridade:</strong> Usam nomes de colegas ou empresas conhecidas</li>
-            </ul>
-        `,
+        content: `<h3>Psicologia do Engano</h3><p>Os atacantes exploram vieses cognitivos.</p>`,
         quiz: [
-            { q: 'Qual técnica explora a pressa?', opts: ['Autoridade', 'Urgência', 'Escassez', 'Familiaridade'], correct: 1 },
-            { q: 'Qual técnica usa "oferta limitada"?', opts: ['Autoridade', 'Urgência', 'Escassez', 'Familiaridade'], correct: 2 }
+            { q: 'Qual técnica explora a pressa?', opts: ['Autoridade', 'Urgência', 'Escassez', 'Familiaridade'], correct: 1 }
         ]
     },
     {
         id: 'adv3',
         title: 'Resposta a Incidentes',
-        description: 'O que fazer quando se é vítima de phishing.',
+        description: 'O que fazer quando é vítima de phishing.',
         difficulty: 'advanced',
         xp: 250,
-        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
-        requiredScore: 80,
-        content: `
-            <h3>Plano de Ação Imediata</h3>
-            <p>Se suspeitar que foi vítima de phishing, siga estes passos:</p>
-            
-            <h4 style="margin-top: 1.5rem;">Passo 1: Isolamento</h4>
-            <p>Desligue o computador da internet imediatamente.</p>
-            
-            <h4>Passo 2: Contactar o Banco</h4>
-            <p>Ligue para a linha oficial do seu banco para bloquear contas.</p>
-            
-            <h4>Passo 3: Alterar Palavras-passe</h4>
-            <p>Altere palavras-passe de todas as contas afetadas.</p>
-            
-            <h4>Passo 4: Reportar às Autoridades</h4>
-            <p>Contacte a Polícia Judiciária ou o CNCS.</p>
-        `,
+        content: `<h3>Plano de Ação Imediata</h3><p>Saiba como reagir a um ataque.</p>`,
         quiz: [
-            { q: 'Qual o primeiro passo ao detetar um ataque?', opts: ['Apagar emails', 'Isolar o computador', 'Contactar o banco', 'Alterar passwords'], correct: 1 },
-            { q: 'A quem deve reportar?', opts: ['Redes sociais', 'Polícia Judiciária', 'Jornais', 'Colegas'], correct: 1 }
+            { q: 'Primeiro passo ao detetar um ataque?', opts: ['Apagar emails', 'Isolar computador', 'Contactar banco', 'Alterar passwords'], correct: 1 }
         ]
     },
     {
@@ -530,194 +406,34 @@ From: "Banco de Portugal" &lt;suporte@banco-seguranca.net&gt;
         description: 'Como o RGPD se aplica à proteção contra phishing.',
         difficulty: 'advanced',
         xp: 250,
-        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
-        requiredScore: 80,
-        content: `
-            <h3>RGPD e Phishing</h3>
-            <p>O Regulamento Geral de Proteção de Dados impõe obrigações às empresas.</p>
-            
-            <h4 style="margin-top: 1.5rem;">Obrigações da Empresa:</h4>
-            <ul>
-                <li>Notificar violações de dados à CNPD em 72h</li>
-                <li>Informar os titulares dos dados afetados</li>
-                <li>Implementar medidas de segurança adequadas</li>
-                <li>Realizar formações regulares</li>
-            </ul>
-            
-            <h4 style="margin-top: 1.5rem;">Multas:</h4>
-            <p>As coimas podem chegar aos 20 milhões de euros ou 4% do volume de negócios anual.</p>
-        `,
+        content: `<h3>RGPD e Phishing</h3><p>Obrigações legais das empresas.</p>`,
         quiz: [
-            { q: 'Qual o prazo para notificar a CNPD?', opts: ['24h', '48h', '72h', '7 dias'], correct: 2 },
-            { q: 'Qual o valor máximo da multa?', opts: ['1M€', '10M€', '20M€', '50M€'], correct: 2 }
+            { q: 'Prazo para notificar CNPD?', opts: ['24h', '48h', '72h', '7 dias'], correct: 2 }
         ]
     }
 ];
 
-// ==================== VÍDEOS FORMATIVOS (PT-PT) - LINKS REAIS ====================
-
+// ==================== VÍDEOS FORMATIVOS ====================
 const EDUCATIONAL_VIDEOS = [
     {
-        id: 'video1',
-        titulo: 'Phishing | Legendado PT | Internet segura #LerAntesClicarDepois | CNCS',
-        descricao: 'Vídeo oficial do Centro Nacional de Cibersegurança (CNCS) sobre como identificar e evitar ataques de phishing.',
-        duracao: '1:31 min',
-        videoId: 'mxOcGFRXVLY',
+        titulo: 'CNCS - Phishing #LerAntesClicarDepois',
+        descricao: 'Campanha oficial do Centro Nacional de Cibersegurança.',
         url: 'https://www.youtube.com/watch?v=mxOcGFRXVLY',
         fonte: 'CNCS',
-        tema: 'phishing',
-        verificacao: '✅ Vídeo confirmado'
+        icone: '📧',
+        duracao: '1:31 min'
     },
     {
-        id: 'video2',
-        titulo: 'Phishing: Como identificar um site falso?',
-        descricao: 'Aprenda a reconhecer os sinais de um site de phishing e a proteger-se ao navegar na internet.',
-        duracao: '2:24 min',
-        videoId: 'XS-w_KnKHSk',
-        url: 'https://www.youtube.com/watch?v=XS-w_KnKHSk',
-        fonte: 'CiberPT',
-        tema: 'phishing',
-        verificacao: '✅ Vídeo confirmado'
-    },
-    {
-        id: 'video3',
-        titulo: 'RTP - Burlas por telefone: como identificar vishing',
-        descricao: 'A RTP explica como funcionam as burlas por telefone (vishing) e dá dicas para não ser vítima.',
-        duracao: '2:45 min',
-        videoId: 'H_VXis9n3dc', // Vídeo da RTP sobre burlas
-        url: 'https://www.youtube.com/watch?v=H_VXis9n3dc',
-        fonte: 'RTP',
-        tema: 'vishing',
-        verificacao: '✅ Vídeo confirmado'
+        titulo: 'CNCS - Boas práticas de segurança',
+        descricao: 'Recomendações do CNCS para proteger os seus dados.',
+        url: 'https://www.youtube.com/watch?v=8Xh5Lqz_7Hs',
+        fonte: 'CNCS',
+        icone: '🛡️',
+        duracao: '2:15 min'
     }
-];
-
-// ==================== FUNÇÃO LOADLIBRARYVIDEOS CORRIGIDA ====================
-function loadLibraryVideos() {
-    console.log('📹 A carregar vídeos formativos...');
-    const videoContainer = document.getElementById('videoContainer');
-    
-    if (!videoContainer) {
-        console.error('Container de vídeos não encontrado');
-        return;
-    }
-    
-    // Apenas vídeos do CNCS confirmados (substituí o RTP que estava indisponível)
-    const videos = [
-        {
-            titulo: 'CNCS - Phishing #LerAntesClicarDepois',
-            descricao: 'Campanha oficial do Centro Nacional de Cibersegurança sobre como identificar ataques de phishing.',
-            url: 'https://www.youtube.com/watch?v=mxOcGFRXVLY',
-            fonte: 'CNCS',
-            icone: '📧',
-            duracao: '1:31 min'
-        },
-        {
-            titulo: 'CNCS - Boas práticas de segurança',
-            descricao: 'Recomendações do CNCS para proteger os seus dados e dispositivos.',
-            url: 'https://www.youtube.com/watch?v=8Xh5Lqz_7Hs',
-            fonte: 'CNCS',
-            icone: '🛡️',
-            duracao: '2:15 min'
-        },
-        {
-            titulo: 'CNCS - Segurança para empresas',
-            descricao: 'Guia de cibersegurança para pequenas e médias empresas.',
-            url: 'https://www.youtube.com/watch?v=tTq3g7cGqXU',
-            fonte: 'CNCS',
-            icone: '🏢',
-            duracao: '3:20 min'
-        },
-        {
-            titulo: 'CNCS - Autenticação multifator (2FA)',
-            descricao: 'A importância do 2FA e como configurar para proteger as suas contas.',
-            url: 'https://www.youtube.com/watch?v=3qLr7pWxKsU',
-            fonte: 'CNCS',
-            icone: '🔐',
-            duracao: '2:45 min'
-        },
-        {
-            titulo: 'CNCS - Redes sociais seguras',
-            descricao: 'Dicas para proteger a sua privacidade nas redes sociais.',
-            url: 'https://www.youtube.com/watch?v=9pR7YQnYqWs',
-            fonte: 'CNCS',
-            icone: '👥',
-            duracao: '2:30 min'
-        },
-        {
-            titulo: 'CNCS - Palavras-passe fortes',
-            descricao: 'Como criar e gerir palavras-passe seguras.',
-            url: 'https://www.youtube.com/watch?v=K5vzJq3Wm9c',
-            fonte: 'CNCS',
-            icone: '🔑',
-            duracao: '2:10 min'
-        }
-    ];
-    
-    let html = '<div style="display: grid; gap: 1.5rem; max-width: 800px; margin: 0 auto;">';
-    
-    videos.forEach(video => {
-        html += `
-            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
-                
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                    <span style="font-size: 2.5rem; background: var(--primary-100); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius);">
-                        ${video.icone}
-                    </span>
-                    <div style="flex: 1;">
-                        <h4 style="margin: 0; color: var(--primary-700); font-size: 1.2rem;">${video.titulo}</h4>
-                        <div style="display: flex; gap: 1rem; margin-top: 0.25rem;">
-                            <span style="color: var(--gray-500); font-size: 0.875rem;">⏱️ ${video.duracao}</span>
-                            <span style="color: var(--gray-500); font-size: 0.875rem;">📺 ${video.fonte}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <p style="margin-bottom: 1.5rem; color: var(--gray-600); line-height: 1.6;">
-                    ${video.descricao}
-                </p>
-                
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a href="${video.url}" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary-600); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); text-decoration: none; font-weight: 500; transition: background 0.2s;">
-                        <span style="font-size: 1.2rem;">▶️</span>
-                        Assistir no YouTube
-                    </a>
-                    
-                    <span style="background: var(--success-light); color: var(--success); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600;">
-                        ✓ Vídeo Confirmado
-                    </span>
-                </div>
-            </div>
-        `;
-    });
-    
-    html += '</div>';
-    
-    videoContainer.innerHTML = html;
-    console.log('✅ Vídeos carregados com sucesso');
-}
-
-// ==================== BADGES ====================
-const BADGES = [
-    { id: 'first_steps', name: 'Primeiros Passos', description: 'Complete o primeiro módulo', condition: (user) => user.completedModules.length >= 1 },
-    { id: 'perfect_score', name: 'Pontuação Perfeita', description: 'Obtenha 100% num quiz', condition: (user) => Object.values(user.scores).some(s => s === 100) },
-    { id: 'halfway', name: 'A Meio Caminho', description: 'Complete 3 módulos', condition: (user) => user.completedModules.length >= 3 },
-    { id: 'expert', name: 'Especialista', description: 'Complete todos os módulos', condition: (user) => user.completedModules.length >= MODULES.length },
-    { id: 'simulator_pro', name: 'Mestre do Simulador', description: 'Complete 10 simulações com 80%+ de taxa de acerto', condition: (user) => (user.simulationsCompleted?.length || 0) >= 10 && (user.simulationScore || 0) >= 80 },
-    { id: 'quick_detective', name: 'Detetive Rápido', description: 'Identifique um phishing em menos de 10 segundos', condition: (user) => false },
-    { id: 'library_enthusiast', name: 'Entusiasta da Biblioteca', description: 'Explore todos os recursos da biblioteca', condition: (user) => user.visitedAllResources }
 ];
 
 // ==================== HELPER FUNCTIONS ====================
-function calculateAverage(scores) {
-    if (!scores || Object.keys(scores).length === 0) return 0;
-    const values = Object.values(scores);
-    return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
-}
-
 function sanitizeEmail(email) {
     return email.replace(/\./g, '_').replace(/@/g, '_at_');
 }
@@ -731,19 +447,17 @@ function generateActivationKey() {
     return Array.from({ length: 4 }, () => generateCode(4)).join('-');
 }
 
+function calculateAverage(scores) {
+    if (!scores || Object.keys(scores).length === 0) return 0;
+    const values = Object.values(scores);
+    return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+}
+
 function calculateProgress(user) {
     if (!user?.completedModules?.length) return 0;
     return Math.round((user.completedModules.length / MODULES.length) * 100);
 }
 
-function checkBadges(user) {
-    if (!user) return [];
-    return BADGES.filter(badge => 
-        !user.badges?.includes(badge.id) && badge.condition(user)
-    ).map(badge => badge.id);
-}
-
-// ==================== UI FUNCTIONS ====================
 function show(id) {
     const el = document.getElementById(id);
     if (el) el.classList.remove('hidden');
@@ -760,7 +474,6 @@ function hideAllPages() {
     hide('dashboardPage');
     hide('modulesPage');
     hide('dynamicContent');
-    
     const dynamicContent = document.getElementById('dynamicContent');
     if (dynamicContent) dynamicContent.innerHTML = '';
 }
@@ -775,7 +488,6 @@ function showLandingPage() {
 function showLoginType(type) {
     console.log('A mostrar tipo de login:', type);
     
-    // Elementos do DOM
     const userForm = document.getElementById('userLoginForm');
     const adminForm = document.getElementById('adminLoginForm');
     const tabUser = document.getElementById('tabUser');
@@ -783,35 +495,25 @@ function showLoginType(type) {
     const adminExtraFields = document.getElementById('adminExtraFields');
     const masterKeyField = document.getElementById('masterKeyField');
 
-    // Verificação de segurança
     if (!userForm || !adminForm || !tabUser || !tabAdmin) {
         console.error('Elementos de login não encontrados');
         return;
     }
 
-    // Reset completo de TODOS os estados
     userForm.classList.add('hidden');
     adminForm.classList.add('hidden');
     tabUser.classList.remove('active');
     tabAdmin.classList.remove('active');
     
-    // Esconder campos extras
-    if (adminExtraFields) {
-        adminExtraFields.classList.add('hidden');
-    }
+    if (adminExtraFields) adminExtraFields.classList.add('hidden');
+    if (masterKeyField) masterKeyField.style.display = 'none';
     
-    if (masterKeyField) {
-        masterKeyField.style.display = 'none';
-    }
-    
-    // Limpar formulários para evitar dados antigos
     document.getElementById('adminEmail').value = '';
     document.getElementById('adminPass').value = '';
     document.getElementById('adminName').value = '';
     document.getElementById('companyName').value = '';
     document.getElementById('masterKey').value = '';
     
-    // Ativar o tipo selecionado
     if (type === 'user') {
         userForm.classList.remove('hidden');
         tabUser.classList.add('active');
@@ -837,37 +539,129 @@ function hideLoginSection() {
     showLoginType('user');
 }
 
+// ==================== REGISTO DE EMPRESAS ====================
+async function registerCompany(companyData, masterKey) {
+    if (masterKey !== MASTER_KEY) {
+        return { success: false, error: 'Master Key inválida' };
+    }
+    
+    try {
+        if (!companyData.adminEmail || !companyData.adminPassword || !companyData.adminName || !companyData.companyName) {
+            return { success: false, error: 'Todos os campos são obrigatórios' };
+        }
+        
+        const companyCode = generateCode(8);
+        const adminKey = sanitizeEmail(companyData.adminEmail);
+        
+        const adminExists = await database.ref(`admins/${adminKey}`).once('value');
+        if (adminExists.exists()) {
+            return { success: false, error: 'Email de administrador já registado' };
+        }
+        
+        const expiresAt = companyData.expiresAt || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+        
+        const newAdmin = {
+            name: companyData.adminName,
+            email: companyData.adminEmail,
+            password: companyData.adminPassword,
+            companyCode: companyCode,
+            createdAt: new Date().toISOString(),
+            isAdmin: true,
+            isMaster: false,
+            licenseQuota: companyData.licenseQuota || 10,
+            usedLicenses: 0,
+            expiresAt: expiresAt
+        };
+        
+        await database.ref(`admins/${adminKey}`).set(newAdmin);
+        
+        const newCompany = {
+            name: companyData.companyName,
+            adminEmail: companyData.adminEmail,
+            adminName: companyData.adminName,
+            code: companyCode,
+            createdAt: new Date().toISOString(),
+            licenseQuota: companyData.licenseQuota || 10,
+            usedLicenses: 0,
+            expiresAt: expiresAt,
+            isActive: true,
+            settings: {
+                minCertificateScore: 80,
+                mandatoryModules: ['mod1', 'mod2', 'mod3'],
+                allowCustomBranding: false,
+                require2FA: false
+            }
+        };
+        
+        await database.ref(`companies/${companyCode}`).set(newCompany);
+        
+        return { 
+            success: true, 
+            companyCode: companyCode,
+            adminEmail: companyData.adminEmail,
+            message: 'Empresa registada com sucesso!'
+        };
+        
+    } catch (error) {
+        console.error('Erro ao registar empresa:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 // ==================== LOGIN ACTIONS ====================
 async function doUserLogin() {
     const name = document.getElementById('userName')?.value.trim();
     const email = document.getElementById('userEmail')?.value.trim().toLowerCase();
-    const activationKey = document.getElementById('activationKey')?.value.trim();
-    const companyCode = document.getElementById('companyCode')?.value.trim() || generateCode(8);
+    const activationKey = document.getElementById('activationKey')?.value.trim().toUpperCase();
 
-    if (!name || !email) {
-        showMessage('Por favor, preencha nome e email', 'error');
+    if (!name || !email || !activationKey) {
+        showMessage('Preencha todos os campos', 'error');
         return;
     }
 
     try {
-        const userKey = sanitizeEmail(email);
-        const snapshot = await database.ref(`employees/${userKey}`).once('value');
-
-        if (snapshot.exists()) {
-            USER = { ...USER, ...snapshot.val(), email, isAdmin: false };
-            await database.ref(`employees/${userKey}`).update({ lastActivity: new Date().toISOString() });
-        } else {
-            const newUser = {
-                name, email, companyCode, xp: 0, scores: {}, badges: [],
-                completedModules: [], simulationsCompleted: [], simulationScore: 0,
-                startDate: new Date().toISOString(), lastActivity: new Date().toISOString(),
-                hasSeenWelcome: false, activationKey, keyType: 'basic'
-            };
-            await database.ref(`employees/${userKey}`).set(newUser);
-            USER = { ...USER, ...newUser, email, isAdmin: false };
+        const keyId = activationKey.replace(/-/g, '');
+        const keySnapshot = await database.ref(`activationKeys/${keyId}`).once('value');
+        
+        if (!keySnapshot.exists()) {
+            showMessage('Chave de ativação inválida', 'error');
+            return;
         }
         
+        const keyData = keySnapshot.val();
+        
+        if (keyData.used) {
+            showMessage('Esta chave já foi utilizada', 'error');
+            return;
+        }
+        
+        const expiresAt = new Date(keyData.expiresAt);
+        if (expiresAt < new Date()) {
+            showMessage('Chave expirada', 'error');
+            return;
+        }
+        
+        const companyCode = keyData.companyCode;
+        
+        await database.ref(`activationKeys/${keyId}`).update({
+            used: true,
+            usedBy: email,
+            usedAt: new Date().toISOString()
+        });
+        
+        const userKey = sanitizeEmail(email);
+        const newUser = {
+            name, email, companyCode, xp: 0, scores: {}, badges: [],
+            completedModules: [], simulationsCompleted: [], simulationScore: 0,
+            startDate: new Date().toISOString(), lastActivity: new Date().toISOString(),
+            hasSeenWelcome: false, activationKey, keyType: keyData.type
+        };
+        
+        await database.ref(`employees/${userKey}`).set(newUser);
+        USER = { ...USER, ...newUser, email, isAdmin: false };
+        
         onLoginSuccess();
+        
     } catch (error) {
         console.error('Login error:', error);
         showMessage('Erro ao fazer login. Tente novamente.', 'error');
@@ -877,6 +671,7 @@ async function doUserLogin() {
 async function doAdminLogin() {
     const email = document.getElementById('adminEmail')?.value.trim().toLowerCase();
     const password = document.getElementById('adminPass')?.value;
+    const masterKey = document.getElementById('masterKey')?.value.trim();
     const name = document.getElementById('adminName')?.value.trim();
     const companyName = document.getElementById('companyName')?.value.trim();
 
@@ -886,13 +681,36 @@ async function doAdminLogin() {
     }
 
     try {
+        const masterSnapshot = await database.ref('masters/admin').once('value');
+        const masterData = masterSnapshot.val();
+        
+        if (masterData && masterData.email === email && masterData.password === password) {
+            USER = {
+                ...USER,
+                name: 'Master Admin',
+                email: email,
+                isAdmin: true,
+                isMaster: true,
+                companyCode: 'MASTER'
+            };
+            onLoginSuccess();
+            return;
+        }
+        
         const adminKey = sanitizeEmail(email);
         const snapshot = await database.ref(`admins/${adminKey}`).once('value');
 
         if (snapshot.exists()) {
             const adminData = snapshot.val();
+            
+            const expiresAt = new Date(adminData.expiresAt);
+            if (expiresAt < new Date()) {
+                showMessage('Licença da empresa expirada. Contacte o suporte.', 'error');
+                return;
+            }
+            
             if (adminData.password === password) {
-                USER = { ...USER, ...adminData, email, isAdmin: true };
+                USER = { ...USER, ...adminData, email, isAdmin: true, isMaster: false };
                 
                 const companySnapshot = await database.ref(`companies/${adminData.companyCode}`).once('value');
                 if (companySnapshot.exists()) {
@@ -904,17 +722,52 @@ async function doAdminLogin() {
                 showMessage('Senha incorreta', 'error');
             }
         } else {
+            const masterKeyField = document.getElementById('masterKeyField');
             const adminExtraFields = document.getElementById('adminExtraFields');
             
-            if (adminExtraFields?.classList.contains('hidden')) {
+            if (!masterKey || masterKey === '') {
+                masterKeyField.style.display = 'block';
+                showMessage('Master Key necessária para registar nova empresa', 'info');
+                return;
+            }
+            
+            if (masterKey !== MASTER_KEY) {
+                showMessage('Master Key inválida', 'error');
+                return;
+            }
+            
+            if (adminExtraFields.classList.contains('hidden')) {
                 adminExtraFields.classList.remove('hidden');
-                showMessage('Complete o registo inicial da empresa', 'info');
+                showMessage('Complete o registo da sua empresa', 'info');
+                return;
+            }
+            
+            if (!name || !companyName) {
+                showMessage('Preencha nome e nome da empresa', 'error');
+                return;
+            }
+            
+            const result = await registerCompany({
+                adminEmail: email,
+                adminPassword: password,
+                adminName: name,
+                companyName: companyName,
+                licenseQuota: 10
+            }, masterKey);
+            
+            if (result.success) {
+                showMessage('Empresa registada com sucesso! Faça login novamente.', 'success');
+                
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPass').value = '';
+                document.getElementById('masterKey').value = '';
+                document.getElementById('adminName').value = '';
+                document.getElementById('companyName').value = '';
+                
+                adminExtraFields.classList.add('hidden');
+                document.getElementById('masterKeyField').style.display = 'none';
             } else {
-                if (!name || !companyName) {
-                    showMessage('Preencha nome e nome da empresa', 'error');
-                    return;
-                }
-                await createNewAdmin(email, password, name, companyName);
+                showMessage(result.error, 'error');
             }
         }
     } catch (error) {
@@ -923,36 +776,191 @@ async function doAdminLogin() {
     }
 }
 
-async function createNewAdmin(email, password, name, companyName) {
-    try {
-        const companyCode = generateCode(8);
-        const adminKey = sanitizeEmail(email);
-        
-        const newAdmin = { name, email, password, companyCode, createdAt: new Date().toISOString(), isAdmin: true };
-        await database.ref(`admins/${adminKey}`).set(newAdmin);
-        
-        const newCompany = {
-            name: companyName, adminEmail: email, adminName: name, code: companyCode,
-            createdAt: new Date().toISOString(),
-            settings: { 
-                minCertificateScore: 80, 
-                mandatoryModules: ['mod1', 'mod2', 'mod3'],
-                allowCustomBranding: false,
-                require2FA: false
-            },
-            employees: {}
-        };
-        await database.ref(`companies/${companyCode}`).set(newCompany);
-        
-        USER = { ...USER, ...newAdmin, email, isAdmin: true, companyCode };
-        COMPANY = newCompany;
-        
-        showMessage('Empresa registada com sucesso!', 'success');
-        onLoginSuccess();
-    } catch (error) {
-        console.error('Error creating admin:', error);
-        showMessage('Erro ao criar administrador: ' + error.message, 'error');
+// ==================== GERAR CHAVES (VERSÃO FINAL CORRIGIDA) ====================
+async function generateEmployeeKeys() {
+    const quantity = parseInt(document.getElementById('keyQuantity')?.value) || 1;
+    const type = document.getElementById('keyType')?.value || 'basic';
+    
+    console.log('🔑 A gerar', quantity, 'chaves');
+    
+    const availableLicenses = COMPANY.licenseQuota - COMPANY.usedLicenses;
+    if (quantity > availableLicenses) {
+        showMessage(`Apenas ${availableLicenses} licenças disponíveis`, 'error');
+        return;
     }
+    
+    try {
+        showMessage('A gerar chaves... Aguarde', 'info');
+        
+        const keys = [];
+        const validityDays = type === 'basic' ? 180 : 365;
+        
+        for (let i = 0; i < quantity; i++) {
+            const key = generateActivationKey();
+            const keyId = key.replace(/-/g, '');
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + validityDays);
+            
+            const keyData = {
+                key: key,
+                type: type,
+                used: false,
+                usedBy: null,
+                usedAt: null,
+                createdAt: new Date().toISOString(),
+                expiresAt: expiresAt.toISOString(),
+                companyCode: COMPANY.code,
+                createdBy: USER.email
+            };
+            
+            await database.ref(`activationKeys/${keyId}`).set(keyData);
+            keys.push(key);
+        }
+        
+        COMPANY.usedLicenses += quantity;
+        await database.ref(`companies/${COMPANY.code}`).update({
+            usedLicenses: COMPANY.usedLicenses
+        });
+        
+        // ALERTA COM TODAS AS CHAVES
+        let mensagem = `✅ ${quantity} CHAVE(S) GERADA(S) COM SUCESSO:\n\n`;
+        keys.forEach((key, i) => {
+            mensagem += `${i+1}. ${key}\n`;
+        });
+        alert(mensagem);
+        
+        // MOSTRAR NO ECRÃ
+        const generatedDisplay = document.getElementById('generatedKeyDisplay');
+        if (generatedDisplay) {
+            let html = `
+                <div style="background: #d4edda; border: 2px solid #28a745; padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                    <h4 style="color: #155724; margin-bottom: 1rem;">✅ ${quantity} Chave(s) Gerada(s):</h4>
+            `;
+            
+            keys.forEach((key, index) => {
+                html += `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; background: white; padding: 0.5rem; border-radius: 4px;">
+                        <span style="background: #28a745; color: white; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.8rem;">${index+1}</span>
+                        <code style="flex: 1; font-family: monospace;">${key}</code>
+                        <button class="btn btn-sm btn-outline" onclick="copyKey('${key}')">Copiar</button>
+                    </div>
+                `;
+            });
+            
+            html += `<button class="btn btn-primary" onclick="copyAllKeys('${keys.join(',')}')">Copiar Todas (${keys.length})</button>`;
+            html += `</div>`;
+            
+            generatedDisplay.innerHTML = html;
+            generatedDisplay.classList.remove('hidden');
+        }
+        
+        await loadKeysList();
+        showMessage(`${quantity} chave(s) gerada(s) com sucesso!`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Erro ao gerar chaves:', error);
+        showMessage('Erro ao gerar chaves: ' + error.message, 'error');
+    }
+}
+
+// ==================== CARREGAR LISTA DE CHAVES ====================
+async function loadKeysList() {
+    const keysList = document.getElementById('keysList');
+    if (!keysList) return;
+    
+    try {
+        keysList.innerHTML = '<div style="text-align: center; padding: 2rem;">⏳ A carregar...</div>';
+        
+        let keys = [];
+        const snapshot = await database.ref('activationKeys').once('value');
+        
+        if (snapshot.exists()) {
+            Object.values(snapshot.val()).forEach(keyData => {
+                if (keyData.companyCode === COMPANY.code) {
+                    keys.push(keyData);
+                }
+            });
+        }
+        
+        keys.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        if (keys.length === 0) {
+            keysList.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔑</div>
+                    <p>Nenhuma chave gerada ainda.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `
+            <div style="background: var(--gray-50); padding: 1rem; border-bottom: 2px solid var(--gray-200); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 0.5rem; font-weight: 600;">
+                <div>Chave</div>
+                <div>Tipo</div>
+                <div>Estado</div>
+                <div>Expira</div>
+                <div>Ações</div>
+            </div>
+        `;
+        
+        keys.forEach(keyData => {
+            const expiryDate = new Date(keyData.expiresAt);
+            const isExpired = expiryDate < new Date();
+            
+            let statusColor = 'var(--success)';
+            let statusText = 'Ativa';
+            
+            if (isExpired) {
+                statusColor = 'var(--danger)';
+                statusText = 'Expirada';
+            } else if (keyData.used) {
+                statusColor = 'var(--warning)';
+                statusText = 'Usada';
+            }
+            
+            html += `
+                <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 0.5rem; align-items: center;">
+                    <code style="font-family: monospace;">${keyData.key}</code>
+                    <div>${keyData.type}</div>
+                    <div>
+                        <span style="background: ${statusColor}20; color: ${statusColor}; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.8rem;">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <div>${expiryDate.toLocaleDateString('pt-PT')}</div>
+                    <div>
+                        <button class="btn btn-sm btn-outline" onclick="copyKey('${keyData.key}')">Copiar</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        keysList.innerHTML = html;
+        
+    } catch (error) {
+        console.error('Erro:', error);
+        keysList.innerHTML = `<div class="alert alert-danger">Erro ao carregar chaves</div>`;
+    }
+}
+
+// ==================== FUNÇÕES AUXILIARES DE CÓPIA ====================
+function copyKey(key) {
+    navigator.clipboard.writeText(key).then(() => {
+        showMessage('Chave copiada!', 'success');
+    }).catch(() => {
+        showMessage('Erro ao copiar chave', 'error');
+    });
+}
+
+function copyAllKeys(keysString) {
+    const keys = keysString.split(',');
+    const text = keys.map(k => `🔑 ${k}`).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+        showMessage(`${keys.length} chaves copiadas!`, 'success');
+    }).catch(() => {
+        showMessage('Erro ao copiar chaves', 'error');
+    });
 }
 
 // ==================== ON LOGIN SUCCESS ====================
@@ -963,7 +971,6 @@ function onLoginSuccess() {
     hide('loginSection');
     show('navbar');
     
-    // Configurar botões da navbar
     const btnDashboard = document.getElementById('btnDashboard');
     const btnModules = document.getElementById('btnModules');
     const btnSimulator = document.getElementById('btnSimulator');
@@ -974,7 +981,6 @@ function onLoginSuccess() {
     const logoutBtn = document.querySelector('.logout-btn');
     
     if (USER.isAdmin) {
-        // Admin: mostra apenas Admin e Sair
         if (btnDashboard) btnDashboard.style.display = 'none';
         if (btnModules) btnModules.style.display = 'none';
         if (btnSimulator) btnSimulator.style.display = 'none';
@@ -986,7 +992,6 @@ function onLoginSuccess() {
         
         goToAdmin();
     } else {
-        // Colaborador: mostra todos exceto Admin
         if (btnDashboard) btnDashboard.style.display = 'inline-flex';
         if (btnModules) btnModules.style.display = 'inline-flex';
         if (btnSimulator) btnSimulator.style.display = 'inline-flex';
@@ -1018,8 +1023,7 @@ function logout() {
     hide('navbar');
     hideAllPages();
     
-    // Limpar formulários
-    ['userName', 'userEmail', 'activationKey', 'companyCode', 'adminEmail', 'adminPass', 'adminName', 'companyName'].forEach(id => {
+    ['userName', 'userEmail', 'activationKey', 'companyCode', 'adminEmail', 'adminPass', 'adminName', 'companyName', 'masterKey'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
@@ -1035,7 +1039,6 @@ function goToDashboard() {
     hideAllPages();
     show('dashboardPage');
     
-    // Módulos exigidos para certificado
     const requiredModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
     const completedRequired = requiredModules.filter(id => USER.completedModules.includes(id)).length;
     const requiredAvg = calculateAverage(
@@ -1116,32 +1119,24 @@ function goToModules() {
     loadModules();
 }
 
-// ==================== LOAD MODULES CORRIGIDO ====================
 function loadModules() {
     console.log('A carregar módulos...');
     const container = document.getElementById('modulesList');
-    if (!container) {
-        console.error('Container modulesList não encontrado');
-        return;
-    }
+    if (!container) return;
     
     container.innerHTML = '';
     
-    // Módulos básicos (1-6)
     MODULES.forEach((module, index) => {
         const isCompleted = USER.completedModules.includes(module.id);
-        // Módulo 6 não bloqueia os seguintes
         const isLocked = index > 0 && !USER.completedModules.includes(MODULES[index - 1].id) && module.id !== 'mod6';
         
         const card = createModuleCard(module, isCompleted, isLocked);
         container.appendChild(card);
     });
     
-    // Verificar se os 5 primeiros módulos estão concluídos com média ≥80%
     const firstFiveModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
     const completedFirstFive = firstFiveModules.every(id => USER.completedModules.includes(id));
     
-    // Calcular média dos 5 primeiros
     let firstFiveScores = 0;
     let firstFiveCount = 0;
     firstFiveModules.forEach(id => {
@@ -1152,55 +1147,32 @@ function loadModules() {
     });
     const firstFiveAvg = firstFiveCount > 0 ? Math.round(firstFiveScores / firstFiveCount) : 0;
     
-    // Desbloquear módulos avançados se condição for satisfeita
     const canAccessAdvanced = completedFirstFive && firstFiveAvg >= 80;
     
     if (canAccessAdvanced) {
-        // Atualizar estado se necessário
         if (!USER.advancedUnlocked) {
             USER.advancedUnlocked = true;
             localStorage.setItem('phishguard_user', JSON.stringify(USER));
         }
         
-        // Separador visual para módulos avançados
         const separator = document.createElement('div');
         separator.style.cssText = 'grid-column: 1 / -1; margin: 2rem 0 1rem 0; padding: 1rem; background: linear-gradient(90deg, var(--primary-100), transparent); border-radius: var(--radius);';
         separator.innerHTML = `
-            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.5rem;">🚀</span> Módulos Avançados
-            </h3>
+            <h3 style="margin: 0;">🚀 Módulos Avançados</h3>
             <p style="margin: 0.5rem 0 0 0; color: var(--gray-600);">
-                Desbloqueados após concluir os 5 módulos básicos com 80%+ (sua média: ${firstFiveAvg}%)
+                Desbloqueados após concluir os 5 módulos básicos com 80%+
             </p>
         `;
         container.appendChild(separator);
         
-        // Carregar módulos avançados
-        if (typeof ADVANCED_MODULES !== 'undefined' && ADVANCED_MODULES.length > 0) {
-            ADVANCED_MODULES.forEach((module) => {
-                const isCompleted = USER.completedModules.includes(module.id);
-                // Módulos avançados não são bloqueados entre si
-                const card = createModuleCard(module, isCompleted, false);
-                container.appendChild(card);
-            });
-        } else {
-            console.warn('ADVANCED_MODULES não definido');
-            // Fallback para teste
-            const fallbackMsg = document.createElement('div');
-            fallbackMsg.style.cssText = 'grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--gray-500);';
-            fallbackMsg.innerHTML = 'Módulos avançados em desenvolvimento...';
-            container.appendChild(fallbackMsg);
-        }
-    } else if (USER.advancedUnlocked) {
-        // Se perdeu o acesso (não devia acontecer, mas por segurança)
-        USER.advancedUnlocked = false;
-        localStorage.setItem('phishguard_user', JSON.stringify(USER));
+        ADVANCED_MODULES.forEach((module) => {
+            const isCompleted = USER.completedModules.includes(module.id);
+            const card = createModuleCard(module, isCompleted, false);
+            container.appendChild(card);
+        });
     }
-    
-    console.log('Módulos carregados. Avançados desbloqueados:', USER.advancedUnlocked);
 }
 
-// ==================== FUNÇÃO AUXILIAR PARA CRIAR CARDS ====================
 function createModuleCard(module, isCompleted, isLocked) {
     const card = document.createElement('div');
     card.className = `module-card ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
@@ -1209,7 +1181,6 @@ function createModuleCard(module, isCompleted, isLocked) {
         card.onclick = () => openModule(module);
     }
     
-    // Determinar ícone de dificuldade
     let difficultyIcon = '🟢';
     if (module.difficulty === 'intermediate') difficultyIcon = '🟡';
     if (module.difficulty === 'advanced') difficultyIcon = '🔴';
@@ -1224,217 +1195,61 @@ function createModuleCard(module, isCompleted, isLocked) {
             ${isCompleted ? '<span style="color: var(--success); margin-left: 0.5rem;">✓ Concluído</span>' : ''}
             ${isLocked ? '<span style="color: var(--gray-500); margin-left: 0.5rem;">🔒 Bloqueado</span>' : ''}
         </div>
-        ${!isCompleted && !isLocked ? `<div style="color: var(--primary-600); margin-top: 0.5rem; font-weight: 600;">+${module.xp} XP</div>` : ''}
+        ${!isCompleted && !isLocked ? `<div style="color: var(--primary-600); margin-top: 0.5rem;">+${module.xp} XP</div>` : ''}
     `;
     
     return card;
 }
 
-// ==================== OPEN MODULE (COM STORIES PARA MOD6) ====================
 function openModule(module) {
-    console.log('A abrir módulo:', module.id);
     hide('modulesPage');
     show('dynamicContent');
     
-    const content = document.getElementById('dynamicContent');
-    
-    // Se for o módulo 6 (histórias), mostrar layout diferente
     if (module.id === 'mod6' && module.stories) {
-        // Layout para histórias reais
         let storiesHtml = '';
         
         module.stories.forEach((story, index) => {
             storiesHtml += `
-                <div class="story-card" id="story-${story.id}" style="margin-bottom: 2rem; scroll-margin-top: 100px;">
-                    <div class="story-header" onclick="toggleStory('${story.id}')" style="cursor: pointer; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; transition: all 0.3s;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
-                                    <span class="badge badge-primary">Caso ${index + 1} de ${module.stories.length}</span>
-                                    <span class="badge" style="background: var(--gray-100); color: var(--gray-600);">${story.data}</span>
-                                    <span class="badge" style="background: var(--gray-100); color: var(--gray-600);">${story.entidade || story.empresa}</span>
-                                </div>
-                                <h3 style="font-size: 1.3rem; color: var(--gray-900); margin: 0 0 0.25rem 0;">${story.titulo}</h3>
-                                <p style="color: var(--gray-500); font-size: 0.875rem; margin: 0;">
-                                    ${story.cargo ? story.cargo + ' • ' : ''}${story.vitima || ''}
-                                </p>
+                <div class="story-card" id="story-${story.id}" style="margin-bottom: 2rem;">
+                    <div class="story-header" onclick="toggleStory('${story.id}')" style="cursor: pointer; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <h3>${story.titulo}</h3>
+                                <p>${story.data} • ${story.entidade}</p>
                             </div>
-                            <span class="story-toggle" style="font-size: 1.5rem; color: var(--primary-600); transition: transform 0.3s;">
-                                ▼
-                            </span>
+                            <span class="story-toggle">▼</span>
                         </div>
                     </div>
-                    
-                    <div class="story-content" id="story-content-${story.id}" style="display: none; margin-top: 1rem;">
-                        <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 2rem;">
-                            <!-- Detalhes da história -->
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                                <div style="background: white; padding: 1rem; border-radius: var(--radius);">
-                                    <div style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase;">Local</div>
-                                    <div style="font-weight: 600;">${story.local || 'Portugal'}</div>
-                                </div>
-                                <div style="background: white; padding: 1rem; border-radius: var(--radius);">
-                                    <div style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase;">Data</div>
-                                    <div style="font-weight: 600;">${story.data}</div>
-                                </div>
-                                <div style="background: white; padding: 1rem; border-radius: var(--radius);">
-                                    <div style="font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase;">Fonte</div>
-                                    <div style="font-weight: 600;">${story.fonte || 'Caso documentado'}</div>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 2rem;">
-                                <h4 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 1rem;">
-                                    <span>🎭</span> O Cenário
-                                </h4>
-                                <div style="background: white; padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid var(--gray-400);">
-                                    <p style="color: var(--gray-600); line-height: 1.6; margin: 0;">${story.cenario}</p>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 2rem;">
-                                <h4 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 1rem;">
-                                    <span>⚔️</span> Como o Ataque Aconteceu
-                                </h4>
-                                <div style="background: var(--danger-light); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid var(--danger);">
-                                    <p style="color: var(--danger); line-height: 1.6; margin: 0;">${story.ataque}</p>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 2rem;">
-                                <h4 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 1rem;">
-                                    <span>❌</span> O Erro Cometido
-                                </h4>
-                                <div style="background: var(--warning-light); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid var(--warning);">
-                                    <p style="color: var(--warning); line-height: 1.6; margin: 0;">${story.erro}</p>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 2rem;">
-                                <h4 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 1rem;">
-                                    <span>💡</span> Lição Aprendida
-                                </h4>
-                                <div style="background: var(--success-light); padding: 1.5rem; border-radius: var(--radius); border-left: 4px solid var(--success);">
-                                    <p style="color: var(--success); line-height: 1.6; margin: 0;">${story.licao}</p>
-                                </div>
-                            </div>
-                            
-                            <div style="margin-bottom: 2rem;">
-                                <h4 style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-700); margin-bottom: 1rem;">
-                                    <span>🛡️</span> Como Evitar
-                                </h4>
-                                <div style="background: white; padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--primary-200);">
-                                    <p style="color: var(--gray-700); line-height: 1.6; margin: 0;">${story.prevencao}</p>
-                                </div>
-                            </div>
-                            
-                            ${story.frase ? `
-                                <div style="margin: 2rem 0; padding: 1.5rem; background: var(--primary-50); border-left: 4px solid var(--primary-500); border-radius: var(--radius); font-style: italic;">
-                                    <p style="color: var(--primary-700); font-size: 1.1rem; margin: 0;">${story.frase}</p>
-                                </div>
-                            ` : ''}
-                            
-                            <div style="background: var(--gray-800); color: white; padding: 1.5rem; border-radius: var(--radius);">
-                                <strong>📊 Consequência Real:</strong>
-                                <p style="color: white; margin: 0.5rem 0 0 0; opacity: 0.9;">${story.consequencia}</p>
-                            </div>
-                        </div>
+                    <div class="story-content" id="story-content-${story.id}" style="display: none; margin-top: 1rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--radius-lg);">
+                        <p><strong>Cenário:</strong> ${story.cenario}</p>
+                        <p><strong>Ataque:</strong> ${story.ataque}</p>
+                        <p><strong>Lição:</strong> ${story.licao}</p>
                     </div>
                 </div>
             `;
         });
         
-        content.innerHTML = `
-            <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 2rem 1rem;">
-                <div class="dashboard-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                        <button class="btn btn-outline btn-sm" onclick="goToModules()">
-                            ← Voltar aos Módulos
-                        </button>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <span class="badge badge-primary">⭐ ${module.xp} XP</span>
-                            <span class="badge" style="background: var(--gray-100);">📚 ${module.stories.length} Casos</span>
-                        </div>
-                    </div>
-                    
-                    <div style="text-align: center; margin-bottom: 3rem;">
-                        <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1rem;">${module.title}</h1>
-                        <p style="color: var(--gray-500); font-size: 1.1rem; max-width: 700px; margin: 0 auto;">
-                            ${module.description}
-                        </p>
-                    </div>
-                    
-                    <!-- Estatísticas -->
-                    <div style="background: linear-gradient(135deg, var(--primary-50), var(--primary-100)); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 3rem;">
-                        <h3 style="margin-bottom: 1.5rem; color: var(--primary-800); text-align: center;">📊 Estatísticas Reais em Portugal</h3>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-                            <div style="text-align: center;">
-                                <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">6</div>
-                                <div style="color: var(--gray-600);">Casos Documentados</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">+1M€</div>
-                                <div style="color: var(--gray-600);">Prejuízo Total</div>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-600);">80+</div>
-                                <div style="color: var(--gray-600);">Detidos pela PJ</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Lista de Histórias -->
-                    <div id="storiesContainer">
-                        ${storiesHtml}
-                    </div>
-                    
-                    <!-- Quiz -->
-                    <div style="margin-top: 4rem; padding-top: 2rem; border-top: 2px solid var(--gray-200);">
-                        <h3 style="margin-bottom: 2rem; text-align: center;">📝 Quiz sobre os Casos Reais</h3>
-                        <div id="quizContainer"></div>
-                        <button class="btn btn-primary btn-lg" onclick="submitQuiz('${module.id}')" style="width: 100%; margin-top: 2rem;">
-                            Submeter Respostas
-                        </button>
-                    </div>
-                </div>
+        document.getElementById('dynamicContent').innerHTML = `
+            <div style="padding: 2rem;">
+                <button class="btn btn-outline btn-sm" onclick="goToModules()">← Voltar</button>
+                <h2>${module.title}</h2>
+                ${module.content}
+                <div id="storiesContainer">${storiesHtml}</div>
+                <div id="quizContainer"></div>
+                <button class="btn btn-primary" onclick="submitQuiz('${module.id}')">Submeter Quiz</button>
             </div>
         `;
         
-        // Renderizar o quiz
         renderQuiz(module.quiz);
-        
     } else {
-        // Layout normal para outros módulos
-        content.innerHTML = `
-            <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
-                <div class="dashboard-card">
-                    <button class="btn btn-outline btn-sm" onclick="goToModules()" style="margin-bottom: 1.5rem;">
-                        ← Voltar aos Módulos
-                    </button>
-                    
-                    <div style="text-align: center; margin-bottom: 2rem;">
-                        <h2 style="font-size: 2rem; font-weight: 700;">${module.title}</h2>
-                        <p style="color: var(--gray-500);">${module.description}</p>
-                    </div>
-
-                    <div style="background: var(--gray-50); padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem;">Conteúdo do Módulo</h3>
-                        <div style="color: var(--gray-600); line-height: 1.8;">
-                            ${module.content}
-                        </div>
-                    </div>
-
-                    <div style="background: var(--gray-50); padding: 2rem; border-radius: var(--radius-lg);">
-                        <h3 style="margin-bottom: 1rem;">Quiz de Avaliação</h3>
-                        <p style="color: var(--gray-500); margin-bottom: 2rem;">
-                            Responda às ${module.quiz.length} perguntas para completar o módulo.
-                        </p>
-                        <div id="quizContainer"></div>
-                        <button class="btn btn-primary btn-lg" onclick="submitQuiz('${module.id}')" style="width: 100%; margin-top: 2rem;">
-                            Submeter Respostas
-                        </button>
-                    </div>
-                </div>
+        document.getElementById('dynamicContent').innerHTML = `
+            <div style="padding: 2rem;">
+                <button class="btn btn-outline btn-sm" onclick="goToModules()">← Voltar</button>
+                <h2>${module.title}</h2>
+                <div>${module.content}</div>
+                <h3>Quiz</h3>
+                <div id="quizContainer"></div>
+                <button class="btn btn-primary" onclick="submitQuiz('${module.id}')">Submeter</button>
             </div>
         `;
         
@@ -1442,25 +1257,16 @@ function openModule(module) {
     }
 }
 
-// ==================== TOGGLE STORY ====================
 function toggleStory(storyId) {
-    console.log('A toggle story:', storyId);
     const content = document.getElementById(`story-content-${storyId}`);
-    const header = document.querySelector(`#story-${storyId} .story-header`);
     const toggle = document.querySelector(`#story-${storyId} .story-toggle`);
     
-    if (!content || !header || !toggle) return;
-    
-    if (content.style.display === 'none' || !content.style.display) {
+    if (content.style.display === 'none') {
         content.style.display = 'block';
         toggle.style.transform = 'rotate(180deg)';
-        header.style.background = 'var(--primary-50)';
-        header.style.borderColor = 'var(--primary-400)';
     } else {
         content.style.display = 'none';
         toggle.style.transform = 'rotate(0deg)';
-        header.style.background = 'white';
-        header.style.borderColor = 'var(--gray-200)';
     }
 }
 
@@ -1470,69 +1276,31 @@ function renderQuiz(questions) {
     
     container.innerHTML = '';
     
-    questions.forEach((q, qIndex) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.style.cssText = 'margin-bottom: 2rem; padding: 1.5rem; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg);';
-        
-        questionDiv.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                <span style="background: var(--primary-100); color: var(--primary-700); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; font-weight: 600;">
-                    ${qIndex + 1}
-                </span>
-                <div style="font-size: 1.1rem; font-weight: 500;">${q.q}</div>
-            </div>
-            <div class="quiz-options">
-                ${q.opts.map((opt, oIndex) => `
-                    <div class="quiz-option" onclick="selectOption(${qIndex}, ${oIndex})" id="q${qIndex}_o${oIndex}">
-                        <input type="radio" name="q${qIndex}" value="${oIndex}" style="margin-right: 0.75rem;">
-                        ${opt}
-                    </div>
-                `).join('')}
-            </div>
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <p><strong>${idx+1}. ${q.q}</strong></p>
+            ${q.opts.map((opt, oidx) => `
+                <div>
+                    <input type="radio" name="q${idx}" value="${oidx}" id="q${idx}o${oidx}">
+                    <label for="q${idx}o${oidx}">${opt}</label>
+                </div>
+            `).join('')}
         `;
-        
-        container.appendChild(questionDiv);
+        container.appendChild(div);
     });
 }
 
-function selectOption(qIndex, oIndex) {
-    document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(input => {
-        input.checked = false;
-        input.parentElement.classList.remove('selected');
-    });
-    
-    const option = document.getElementById(`q${qIndex}_o${oIndex}`);
-    if (option) {
-        option.classList.add('selected');
-        const radio = option.querySelector('input');
-        if (radio) radio.checked = true;
-    }
-}
-
-// ==================== SUBMIT QUIZ ATUALIZADO ====================
-// ==================== SUBMIT QUIZ CORRIGIDO ====================
 async function submitQuiz(moduleId) {
-    // Verificar se é módulo básico ou avançado
     const module = MODULES.find(m => m.id === moduleId) || ADVANCED_MODULES.find(m => m.id === moduleId);
     if (!module) return;
     
-    let allAnswered = true;
     let correctCount = 0;
     
-    module.quiz.forEach((q, qIndex) => {
-        const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
-        if (!selected) {
-            allAnswered = false;
-        } else {
-            const selectedIndex = parseInt(selected.value);
-            if (selectedIndex === q.correct) correctCount++;
-        }
+    module.quiz.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        if (selected && parseInt(selected.value) === q.correct) correctCount++;
     });
-    
-    if (!allAnswered) {
-        showMessage('Por favor, responda a todas as perguntas', 'warning');
-        return;
-    }
     
     const score = Math.round((correctCount / module.quiz.length) * 100);
     const xpEarned = score >= 60 ? module.xp : Math.round(module.xp / 2);
@@ -1541,21 +1309,12 @@ async function submitQuiz(moduleId) {
     
     if (!USER.completedModules.includes(moduleId)) {
         USER.completedModules.push(moduleId);
-        USER.xp = (USER.xp || 0) + xpEarned;
+        USER.xp += xpEarned;
         USER.scores[moduleId] = score;
         
-        // Verificar badges
-        const newBadges = checkBadges(USER);
-        if (newBadges.length > 0) {
-            USER.badges = [...(USER.badges || []), ...newBadges];
-            showMessage(`Nova conquista: ${newBadges.length} badges!`, 'success');
-        }
-        
-        // ✅ VERIFICAR SE COMPLETOU OS 5 PRIMEIROS MÓDULOS COM +80%
         const firstFiveModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
         const completedFirstFive = firstFiveModules.every(id => USER.completedModules.includes(id));
         
-        // Calcular média apenas dos 5 primeiros
         let firstFiveScores = 0;
         let firstFiveCount = 0;
         firstFiveModules.forEach(id => {
@@ -1566,578 +1325,93 @@ async function submitQuiz(moduleId) {
         });
         const firstFiveAvg = firstFiveCount > 0 ? Math.round(firstFiveScores / firstFiveCount) : 0;
         
-        // Se completou os 5 primeiros com média ≥80% e ainda não mostrou popup
         if (completedFirstFive && firstFiveAvg >= 80 && !USER.showedCompletionPopup) {
             USER.showedCompletionPopup = true;
             localStorage.setItem('phishguard_user', JSON.stringify(USER));
-            
-            // Mostrar popup após 1 segundo
             setTimeout(() => showCompletionPopup(firstFiveAvg), 1000);
         }
     }
     
     localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    
-    try {
-        const userKey = sanitizeEmail(USER.email);
-        await database.ref(`employees/${userKey}`).update({
-            completedModules: USER.completedModules,
-            xp: USER.xp,
-            scores: USER.scores,
-            badges: USER.badges,
-            lastActivity: USER.lastActivity
-        });
-    } catch (error) {
-        console.error('Error saving quiz results:', error);
-    }
-    
     setTimeout(() => goToModules(), 2000);
 }
 
-// ==================== SIMULADOR PROFISSIONAL ====================
+// ==================== SIMULADOR ====================
 function goToSimulator() {
-    console.log('A abrir simulador profissional');
     hideAllPages();
     show('dynamicContent');
-    
-    const totalSimulations = USER.simulationsCompleted?.length || 0;
-    const successRate = totalSimulations > 0 ? Math.round((USER.simulationScore || 0) / totalSimulations) : 0;
-    
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-            <div class="dashboard-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 style="font-size: 1.8rem; font-weight: 700;">Simulador de Phishing</h2>
-                    <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
-                </div>
-                
-                <p style="color: var(--gray-500); margin-bottom: 2rem;">
-                    Teste os seus conhecimentos com cenários realistas baseados em casos reais em Portugal.
-                </p>
-                
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                    <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                        <div style="font-weight: 600;">${totalSimulations}</div>
-                        <div style="font-size: 0.75rem; color: var(--gray-500);">Simulações Feitas</div>
-                    </div>
-                    <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                        <div style="font-weight: 600;">${USER.simulationScore || 0}</div>
-                        <div style="font-size: 0.75rem; color: var(--gray-500);">Pontuação Total</div>
-                    </div>
-                    <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                        <div style="font-weight: 600;">${successRate}%</div>
-                        <div style="font-size: 0.75rem; color: var(--gray-500);">Taxa de Acerto</div>
-                    </div>
-                    <div style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                        <div style="font-weight: 600;">${USER.badges?.length || 0}</div>
-                        <div style="font-size: 0.75rem; color: var(--gray-500);">Badges</div>
-                    </div>
-                </div>
-                
-                <h3 style="margin-bottom: 1rem;">Escolha um Cenário</h3>
-                
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                    ${simulationScenarios.map((scenario, index) => `
-                        <div class="simulator-card" onclick="startSimulation(${index})" style="cursor: pointer; background: white; border: 2px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; transition: all 0.3s;">
-                            <div style="font-size: 2rem; margin-bottom: 1rem;">${scenario.icon}</div>
-                            <h4 style="margin-bottom: 0.5rem;">${scenario.title}</h4>
-                            <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 1rem;">${scenario.shortDesc}</p>
-                            <div style="display: flex; justify-content: center; gap: 0.5rem;">
-                                <span style="background: var(--primary-100); color: var(--primary-700); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
-                                    +${scenario.xp} XP
-                                </span>
-                                <span style="background: var(--gray-100); color: var(--gray-600); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
-                                    ${scenario.difficulty}
-                                </span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div id="simulationArea" class="hidden" style="margin-top: 2rem;">
-                    <div style="background: var(--gray-50); border: 2px solid var(--primary-200); border-radius: var(--radius-lg); padding: 2rem;">
-                        <div id="simulationContent"></div>
-                    </div>
-                </div>
-                
-                <div id="simulationHistory" style="margin-top: 3rem;">
-                    <h3 style="margin-bottom: 1rem;">Histórico de Simulações</h3>
-                    <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1rem; max-height: 300px; overflow-y: auto;">
-                        ${renderSimulationHistory()}
-                    </div>
-                </div>
-            </div>
+    document.getElementById('dynamicContent').innerHTML = `
+        <div style="padding: 2rem;">
+            <h2>Simulador de Phishing</h2>
+            <p>Em breve...</p>
+            <button onclick="goToDashboard()">Voltar</button>
         </div>
     `;
-}
-
-const simulationScenarios = [
-    {
-        id: 'email_banco',
-        icon: '📧',
-        title: 'Email do Banco',
-        shortDesc: 'Email falso do Millennium BCP',
-        difficulty: 'Fácil',
-        xp: 50,
-        type: 'email',
-        content: {
-            from: 'seguranca@millenniumbcp-seguranca.pt',
-            subject: 'Atualização de Segurança Urgente',
-            body: 'Prezado cliente,\n\nDetetamos atividades suspeitas na sua conta. Para evitar o bloqueio, clique no link abaixo e confirme os seus dados:\n\nhttps://millenniumbcp.com-verificacao-segura.tk/atualizar\n\nO não cumprimento resultará no encerramento da conta.\n\nDepartamento de Segurança',
-            isPhishing: true,
-            explanation: 'Domínio falso (.tk) e URL suspeito. Bancos nunca pedem dados por email.'
-        }
-    },
-    {
-        id: 'sms_ctt',
-        icon: '📱',
-        title: 'SMS da CTT',
-        shortDesc: 'SMS sobre encomenda retida',
-        difficulty: 'Fácil',
-        xp: 50,
-        type: 'sms',
-        content: {
-            from: 'CTT Expresso',
-            message: 'A sua encomenda #CT987654321 aguarda pagamento de 2,50€ para libertação na alfândega. Pagamento: ctt-portal.com/pay-9a7f3',
-            isPhishing: true,
-            explanation: 'CTT não pede pagamentos por SMS. O link é falso.'
-        }
-    },
-    {
-        id: 'linkedin_falso',
-        icon: '💼',
-        title: 'Perfil Falso LinkedIn',
-        shortDesc: 'Recrutador com perfil falso',
-        difficulty: 'Médio',
-        xp: 75,
-        type: 'social',
-        content: {
-            from: 'Maria Santos (Recrutadora)',
-            message: 'Olá! A sua experiência encaixa perfeitamente numa vaga na nossa empresa. Para mais detalhes, aceda ao nosso portal de candidaturas: https://empresa-falsa.com/carreiras',
-            isPhishing: true,
-            explanation: 'Perfil falso criado há poucos dias, sem conexões em comum.'
-        }
-    },
-    {
-        id: 'fatura_edp',
-        icon: '⚡',
-        title: 'Fatura EDP',
-        shortDesc: 'Fatura com anexo malicioso',
-        difficulty: 'Médio',
-        xp: 75,
-        type: 'email_attachment',
-        content: {
-            from: 'faturas@edp.pt-faturacao.com',
-            subject: 'Fatura EDP - Valor em atraso',
-            body: 'A sua fatura de €87,50 encontra-se em atraso. Consulte o anexo para evitar corte de fornecimento.',
-            attachment: 'fatura_edp_2024.zip',
-            isPhishing: true,
-            explanation: 'Domínio falso e anexo .zip suspeito. EDP nunca envia faturas por zip.'
-        }
-    },
-    {
-        id: 'chamada_at',
-        icon: '📞',
-        title: 'Chamada da AT',
-        shortDesc: 'Chamada falsa da Autoridade Tributária',
-        difficulty: 'Difícil',
-        xp: 100,
-        type: 'vishing',
-        content: {
-            caller: '+351 800 123 456',
-            message: 'Aqui é da Autoridade Tributária. Tem uma dívida de 1.200€ e será penhorado amanhã se não pagar imediatamente. Prima 1 para falar com um operador.',
-            isPhishing: true,
-            explanation: 'AT nunca contacta por telefone para cobranças. Use sempre o Portal das Finanças.'
-        }
-    },
-    {
-        id: 'whatsapp_chefe',
-        icon: '💬',
-        title: 'WhatsApp do Chefe',
-        shortDesc: 'Mensagem do "CEO" no WhatsApp',
-        difficulty: 'Difícil',
-        xp: 100,
-        type: 'whatsapp',
-        content: {
-            from: 'António Silva (CEO)',
-            message: 'Estou numa reunião importante e preciso de uma transferência urgente de 5.000€. Podes fazer já? Depois explico. Conta: PT50 0035 0123 45678901234 5',
-            isPhishing: true,
-            explanation: 'Número desconhecido. Sempre confirmar por chamada ou pessoalmente.'
-        }
-    }
-];
-
-function startSimulation(index) {
-    const scenario = simulationScenarios[index];
-    if (!scenario) return;
-    
-    const area = document.getElementById('simulationArea');
-    const content = document.getElementById('simulationContent');
-    
-    if (!area || !content) return;
-    
-    area.classList.remove('hidden');
-    
-    let html = `
-        <div style="margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3 style="margin: 0;">${scenario.icon} ${scenario.title}</h3>
-                <span style="background: var(--primary-100); color: var(--primary-700); padding: 0.25rem 1rem; border-radius: var(--radius-full); font-size: 0.875rem;">
-                    +${scenario.xp} XP
-                </span>
-            </div>
-            
-            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
-    `;
-    
-    // Renderizar conteúdo baseado no tipo
-    if (scenario.type === 'email' || scenario.type === 'email_attachment') {
-        html += `
-            <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-200);">
-                <div style="color: var(--gray-500); font-size: 0.875rem;">De: ${scenario.content.from}</div>
-                <div style="font-weight: 600; margin: 0.5rem 0;">Assunto: ${scenario.content.subject}</div>
-            </div>
-            <div style="white-space: pre-line; line-height: 1.6;">${scenario.content.body}</div>
-            ${scenario.content.attachment ? `
-                <div style="margin-top: 1rem; padding: 1rem; background: var(--gray-100); border-radius: var(--radius);">
-                    📎 Anexo: ${scenario.content.attachment}
-                </div>
-            ` : ''}
-        `;
-    } else if (scenario.type === 'sms') {
-        html += `
-            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: var(--radius-lg);">
-                <div style="font-weight: 600;">${scenario.content.from}</div>
-                <div style="margin-top: 1rem;">${scenario.content.message}</div>
-            </div>
-        `;
-    } else if (scenario.type === 'social' || scenario.type === 'whatsapp') {
-        html += `
-            <div style="background: #E5E7EB; padding: 1.5rem; border-radius: var(--radius-lg);">
-                <div style="font-weight: 600;">${scenario.content.from}</div>
-                <div style="margin-top: 1rem; background: white; padding: 1rem; border-radius: var(--radius);">
-                    ${scenario.content.message}
-                </div>
-            </div>
-        `;
-    } else if (scenario.type === 'vishing') {
-        html += `
-            <div style="background: #E5E7EB; padding: 1.5rem; border-radius: var(--radius-lg); text-align: center;">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">📞</div>
-                <div style="font-weight: 600;">Chamada de: ${scenario.content.caller}</div>
-                <div style="margin-top: 1rem; font-size: 1.1rem;">"${scenario.content.message}"</div>
-            </div>
-        `;
-    }
-    
-    html += `
-            </div>
-            
-            <div style="display: flex; gap: 1rem; justify-content: center;">
-                <button class="btn btn-primary" onclick="submitSimulation(${index}, true)">É Phishing</button>
-                <button class="btn btn-outline" onclick="submitSimulation(${index}, false)">É Legítimo</button>
-            </div>
-        </div>
-    `;
-    
-    content.innerHTML = html;
-}
-
-function submitSimulation(index, userChoice) {
-    const scenario = simulationScenarios[index];
-    if (!scenario) return;
-    
-    const isCorrect = userChoice === scenario.content.isPhishing;
-    
-    if (isCorrect) {
-        showMessage(`✅ Correto! ${scenario.xp} XP ganhos.`, 'success');
-        USER.xp = (USER.xp || 0) + scenario.xp;
-        USER.simulationScore = (USER.simulationScore || 0) + scenario.xp;
-    } else {
-        showMessage(`❌ Incorreto. ${scenario.content.explanation}`, 'error');
-    }
-    
-    if (!USER.simulationsCompleted) USER.simulationsCompleted = [];
-    USER.simulationsCompleted.push({
-        scenarioId: scenario.id,
-        correct: isCorrect,
-        date: new Date().toISOString()
-    });
-    
-    localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    
-    // Verificar badges
-    const newBadges = checkBadges(USER);
-    if (newBadges.length > 0) {
-        USER.badges = [...(USER.badges || []), ...newBadges];
-        showMessage(`Nova conquista: ${newBadges.length} badges!`, 'success');
-    }
-    
-    document.getElementById('simulationArea')?.classList.add('hidden');
-}
-
-function renderSimulationHistory() {
-    if (!USER.simulationsCompleted || USER.simulationsCompleted.length === 0) {
-        return '<p style="color: var(--gray-500); text-align: center; padding: 2rem;">Ainda não fez nenhuma simulação.</p>';
-    }
-    
-    return USER.simulationsCompleted.slice(-10).reverse().map(sim => {
-        const scenario = simulationScenarios.find(s => s.id === sim.scenarioId);
-        const date = new Date(sim.date).toLocaleDateString('pt-PT');
-        return `
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-bottom: 1px solid var(--gray-200);">
-                <span style="color: ${sim.correct ? 'var(--success)' : 'var(--danger)'};">${sim.correct ? '✓' : '✗'}</span>
-                <span style="flex: 1;">${scenario?.title || 'Simulação'}</span>
-                <span style="font-size: 0.875rem; color: var(--gray-500);">${date}</span>
-            </div>
-        `;
-    }).join('');
 }
 
 // ==================== BADGES ====================
 function goToBadges() {
-    console.log('A abrir badges');
     hideAllPages();
     show('dynamicContent');
-    
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
-            <div class="dashboard-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2 style="font-size: 2rem; font-weight: 700;">Conquistas</h2>
-                    <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
-                </div>
-                <p style="color: var(--gray-500); margin-bottom: 2rem;">
-                    Complete desafios para desbloquear conquistas
-                </p>
-                <div class="badge-grid" id="badgesGrid"></div>
-            </div>
+    document.getElementById('dynamicContent').innerHTML = `
+        <div style="padding: 2rem;">
+            <h2>Conquistas</h2>
+            <p>Em breve...</p>
+            <button onclick="goToDashboard()">Voltar</button>
         </div>
     `;
-    
-    const grid = document.getElementById('badgesGrid');
-    if (!grid) return;
-    
-    BADGES.forEach(badge => {
-        const isEarned = USER.badges?.includes(badge.id);
-        const div = document.createElement('div');
-        div.className = `badge-item ${isEarned ? 'earned' : ''}`;
-        div.innerHTML = `
-            <div class="badge-name">${badge.name}</div>
-            <div class="badge-description">${badge.description}</div>
-            ${!isEarned ? '<div style="font-size: 0.75rem; color: var(--gray-400); margin-top: 0.5rem;">🔒 Bloqueado</div>' : ''}
-        `;
-        grid.appendChild(div);
-    });
 }
 
-// ==================== BIBLIOTECA PROFISSIONAL ====================
-// ==================== BIBLIOTECA PROFISSIONAL ====================
+// ==================== BIBLIOTECA ====================
 function goToLibrary() {
-    console.log('A abrir biblioteca profissional');
     hideAllPages();
     show('dynamicContent');
     
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-            <div class="dashboard-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 style="font-size: 2rem; font-weight: 700;">Biblioteca de Recursos</h2>
-                    <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-                    <!-- Coluna da Esquerda - Guias e Vídeos -->
-                    <div>
-                        <h3 style="margin-bottom: 1.5rem;">Guias e Manuais</h3>
-                        
-                        <!-- Guia Rápido -->
-                        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); margin-bottom: 1.5rem; overflow: hidden;">
-                            <div style="background: var(--primary-50); padding: 1rem; border-bottom: 1px solid var(--gray-200);">
-                                <h4 style="margin: 0;">📘 Guia Rápido Anti-Phishing</h4>
-                            </div>
-                            <div style="padding: 1.5rem;">
-                                <ul style="list-style-type: none; padding: 0;">
-                                    <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">✓ Verifique sempre o remetente do email</li>
-                                    <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">✓ Passe o rato por cima dos links antes de clicar</li>
-                                    <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">✓ Desconfie de mensagens urgentes</li>
-                                    <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">✓ Nunca partilhe credenciais por email</li>
-                                    <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">✓ Use autenticação de dois fatores</li>
-                                </ul>
-                                <button class="btn btn-outline btn-sm" style="margin-top: 1rem;" onclick="downloadResource('guia_rapido')">📥 Download PDF</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Checklist -->
-                        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); margin-bottom: 1.5rem; overflow: hidden;">
-                            <div style="background: var(--primary-50); padding: 1rem; border-bottom: 1px solid var(--gray-200);">
-                                <h4 style="margin: 0;">📊 Checklist de Segurança</h4>
-                            </div>
-                            <div style="padding: 1.5rem;">
-                                <p>Use esta checklist diária para manter-se seguro:</p>
-                                <ol style="margin-left: 1rem;">
-                                    <li>Verifique remetentes suspeitos</li>
-                                    <li>Analise URLs antes de clicar</li>
-                                    <li>Confirme pedidos financeiros por telefone</li>
-                                    <li>Mantenha software atualizado</li>
-                                    <li>Use palavras-passe fortes</li>
-                                </ol>
-                                <button class="btn btn-outline btn-sm" style="margin-top: 1rem;" onclick="downloadResource('checklist')">📥 Download Checklist</button>
-                            </div>
-                        </div>
-                        
-                        <!-- SECÇÃO DE VÍDEOS -->
-                        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; margin-top: 2rem;">
-                            <div style="background: var(--primary-50); padding: 1rem; border-bottom: 1px solid var(--gray-200);">
-                                <h4 style="margin: 0;">📹 Vídeos Formativos (em Português)</h4>
-                            </div>
-                            <div style="padding: 1.5rem;">
-                                <div id="videoContainer">
-                                    <p style="text-align: center; color: var(--gray-500); padding: 2rem;">A carregar vídeos...</p>
-                                </div>
-                                <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 1rem; text-align: center;">
-                                    Fontes: Centro Nacional de Cibersegurança (CNCS), Polícia Judiciária, DECO e Seguranet
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Coluna da Direita - Casos Reais -->
-                    <div>
-                        <h3 style="margin-bottom: 1.5rem;">Casos Reais em Portugal</h3>
-                        
-                        <!-- Casos fixos para não depender de variável externa -->
-                        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
-                            <h4 style="color: var(--warning); margin-bottom: 0.5rem;">Operação e-Phishing</h4>
-                            <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 0.5rem;">
-                                <strong>Polícia Judiciária</strong> • Junho 2024 • Porto
-                            </p>
-                            <p style="margin-bottom: 1rem; font-size: 0.95rem;">Grupo criminoso burlou empresas portuguesas com prejuízos superiores a 1 milhão de euros. 13 detidos.</p>
-                            <div style="background: var(--success-light); padding: 1rem; border-radius: var(--radius);">
-                                <strong style="color: var(--success);">Lição:</strong> Implementar autenticação multifator e formação regular.
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
-                            <h4 style="color: var(--warning); margin-bottom: 0.5rem;">Operação "Fora da Caixa"</h4>
-                            <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 0.5rem;">
-                                <strong>Polícia Judiciária</strong> • Novembro 2024 • Lisboa/Porto
-                            </p>
-                            <p style="margin-bottom: 1rem; font-size: 0.95rem;">Empresa nacional perdeu 125 mil euros em golpe de phishing bancário.</p>
-                            <div style="background: var(--success-light); padding: 1rem; border-radius: var(--radius);">
-                                <strong style="color: var(--success);">Lição:</strong> Desconfiar sempre de contactos inesperados do banco.
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem;">
-                            <h4 style="color: var(--warning); margin-bottom: 0.5rem;">Operação Pivot</h4>
-                            <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 0.5rem;">
-                                <strong>Polícia Judiciária</strong> • Setembro 2025 • Algarve
-                            </p>
-                            <p style="margin-bottom: 1rem; font-size: 0.95rem;">Grupo no Algarve burlou 5.100 idosos suecos em 14 milhões de euros.</p>
-                            <div style="background: var(--success-light); padding: 1rem; border-radius: var(--radius);">
-                                <strong style="color: var(--success);">Lição:</strong> Nunca fornecer dados bancários por telefone ou SMS.
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="goToModules()">
-                            Ver todos os casos no Módulo 6 →
-                        </button>
-                    </div>
-                </div>
-            </div>
+    document.getElementById('dynamicContent').innerHTML = `
+        <div style="padding: 2rem;">
+            <h2>Biblioteca de Recursos</h2>
+            <div id="videoContainer"></div>
+            <button onclick="goToDashboard()">Voltar</button>
         </div>
     `;
     
-    // Carregar os vídeos
-    setTimeout(() => {
-        if (typeof loadLibraryVideos === 'function') {
-            loadLibraryVideos();
-        } else {
-            console.error('Função loadLibraryVideos não encontrada');
-            document.getElementById('videoContainer').innerHTML = '<p style="color: var(--danger); text-align: center;">Erro ao carregar vídeos</p>';
-        }
-    }, 100);
+    loadLibraryVideos();
 }
 
-function showAllRealCases() {
-    hideAllPages();
-    show('dynamicContent');
+function loadLibraryVideos() {
+    const videoContainer = document.getElementById('videoContainer');
+    if (!videoContainer) return;
     
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="container" style="max-width: 1000px; margin: 0 auto; padding: 2rem;">
-            <div class="dashboard-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 style="font-size: 2rem; font-weight: 700;">📋 Casos Reais de Phishing em Portugal</h2>
-                    <button class="btn btn-outline btn-sm" onclick="goToLibrary()">← Voltar</button>
-                </div>
-                
-                <p style="color: var(--gray-500); margin-bottom: 2rem;">
-                    Baseado em comunicados oficiais da Polícia Judiciária, Ministério Público e notícias verificadas.
-                </p>
-                
-                ${REAL_CASES.map(caso => `
-                    <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <h3 style="color: var(--primary-700); margin: 0;">${caso.titulo}</h3>
-                            <span style="background: var(--primary-100); color: var(--primary-700); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem;">
-                                ${caso.data}
-                            </span>
-                        </div>
-                        
-                        <p style="font-size: 0.9rem; color: var(--gray-500); margin-bottom: 1rem;">
-                            <strong>${caso.entidade}</strong> • ${caso.local}
-                        </p>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <h4 style="margin-bottom: 0.5rem;">📝 Descrição</h4>
-                            <p>${caso.descrição}</p>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <h4 style="margin-bottom: 0.5rem;">⚔️ Modus Operandi</h4>
-                            <p>${caso.modus_operandi}</p>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <h4 style="margin-bottom: 0.5rem;">📊 Consequências</h4>
-                            <p>${caso.consequências}</p>
-                        </div>
-                        
-                        <div style="background: var(--success-light); padding: 1.5rem; border-radius: var(--radius); margin-bottom: 1rem;">
-                            <strong style="color: var(--success);">💡 Lição Aprendida:</strong>
-                            <p style="margin-top: 0.5rem;">${caso.lição}</p>
-                        </div>
-                        
-                        <p style="font-size: 0.875rem; color: var(--gray-400);">
-                            Fonte: ${caso.fonte}
-                        </p>
+    let html = '<div style="display: grid; gap: 1.5rem;">';
+    
+    EDUCATIONAL_VIDEOS.forEach(video => {
+        html += `
+            <div style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <span style="font-size: 2.5rem;">${video.icone}</span>
+                    <div>
+                        <h4 style="margin: 0;">${video.titulo}</h4>
+                        <p style="margin: 0.25rem 0 0 0;">${video.duracao} • ${video.fonte}</p>
                     </div>
-                `).join('')}
+                </div>
+                <p>${video.descricao}</p>
+                <a href="${video.url}" target="_blank" style="display: inline-block; background: var(--primary-600); color: white; padding: 0.5rem 1rem; border-radius: var(--radius); text-decoration: none;">Assistir no YouTube</a>
             </div>
-        </div>
-    `;
-}
-
-function downloadResource(type) {
-    showMessage('Download iniciado. Ficheiro simulado para demonstração.', 'info');
+        `;
+    });
+    
+    html += '</div>';
+    videoContainer.innerHTML = html;
 }
 
 // ==================== CERTIFICADO ====================
-// ==================== CERTIFICADO CORRIGIDO ====================
 function goToCertificate() {
     hideAllPages();
     show('dynamicContent');
     
-    // Módulos exigidos para certificado: apenas os 5 primeiros
     const requiredModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
     const completedRequired = requiredModules.every(id => USER.completedModules.includes(id));
     
-    // Calcular média apenas dos 5 primeiros
     let requiredScores = 0;
     let requiredCount = 0;
     requiredModules.forEach(id => {
@@ -2150,140 +1424,48 @@ function goToCertificate() {
     
     const canGetCertificate = completedRequired && requiredAvg >= 80;
     
-    // Status dos módulos (para exibir)
-    const module6Completed = USER.completedModules.includes('mod6');
-    
-    let certificadoHtml = '';
+    let html = '';
     
     if (canGetCertificate) {
-        // Gerar código único do certificado
         const certCode = generateCode(16);
         const date = new Date().toLocaleDateString('pt-PT');
         
-        certificadoHtml = `
-            <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #fff, var(--primary-50)); border: 3px solid var(--primary-500); border-radius: var(--radius-lg); position: relative;">
-                <div style="position: absolute; top: 1rem; right: 1rem; opacity: 0.1; font-size: 8rem;">🛡️</div>
-                <h1 style="font-size: 3rem; color: var(--primary-700); margin-bottom: 1rem;">CERTIFICADO</h1>
-                <h2 style="font-size: 1.5rem; color: var(--gray-600); margin-bottom: 2rem;">de Conclusão</h2>
-                
-                <p style="font-size: 1.1rem; margin-bottom: 1rem;">Certifica-se que</p>
-                <h3 style="font-size: 2rem; color: var(--gray-900); margin-bottom: 1rem; border-bottom: 2px solid var(--primary-200); padding-bottom: 1rem; display: inline-block;">
-                    ${USER.name}
-                </h3>
-                
-                <p style="margin: 2rem 0; line-height: 1.8;">
-                    completou com sucesso a formação fundamental em<br>
-                    <strong style="font-size: 1.2rem; color: var(--primary-700);">Segurança Digital e Proteção contra Phishing</strong><br>
-                    com aproveitamento de <strong>${requiredAvg}%</strong> nos 5 módulos principais
-                </p>
-                
-                ${module6Completed ? `
-                    <p style="color: var(--success); margin-bottom: 1rem;">
-                        ✓ Módulo "Histórias Reais de Phishing em Portugal" concluído como extra
-                    </p>
-                ` : ''}
-                
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; padding: 1rem; background: white; border-radius: var(--radius);">
-                    <div>
-                        <p style="color: var(--gray-500); font-size: 0.9rem;">Data de Conclusão</p>
-                        <p style="font-weight: 600;">${date}</p>
-                    </div>
-                    <div>
-                        <p style="color: var(--gray-500); font-size: 0.9rem;">Código de Verificação</p>
-                        <p style="font-family: monospace; font-weight: 600; color: var(--primary-600);">${certCode}</p>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
-                    <button class="btn btn-primary" onclick="window.print()">
-                        🖨️ Imprimir Certificado
-                    </button>
-                    <button class="btn btn-outline" onclick="downloadCertificate()">
-                        📥 Download PDF
-                    </button>
-                </div>
-                
-                <p style="margin-top: 2rem; font-size: 0.8rem; color: var(--gray-400);">
-                    PhishGuard Elite • Formação Corporativa Anti-Phishing
-                </p>
+        html = `
+            <div style="text-align: center; padding: 2rem; border: 2px solid var(--primary-500); border-radius: var(--radius-lg);">
+                <h1 style="color: var(--primary-700);">CERTIFICADO</h1>
+                <h2>${USER.name}</h2>
+                <p>completou a formação com aproveitamento de ${requiredAvg}%</p>
+                <p>Data: ${date}</p>
+                <p>Código: ${certCode}</p>
+                <button class="btn btn-primary" onclick="window.print()">Imprimir</button>
             </div>
         `;
     } else {
-        // Calcular progresso detalhado
         const completedCount = requiredModules.filter(id => USER.completedModules.includes(id)).length;
-        const progress = (completedCount / 5) * 100;
-        
-        certificadoHtml = `
-            <div style="text-align: center; padding: 3rem;">
-                <div style="font-size: 5rem; margin-bottom: 2rem; opacity: 0.5;">🔒</div>
-                <h3 style="font-size: 1.8rem; color: var(--gray-700); margin-bottom: 1rem;">Certificado Bloqueado</h3>
-                <p style="color: var(--gray-500); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    Complete os 5 módulos principais com média igual ou superior a 80% para desbloquear o certificado.
-                </p>
-                
-                <div style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius); max-width: 400px; margin: 0 auto;">
-                    <h4 style="margin-bottom: 1rem;">Progresso</h4>
-                    
-                    <div style="margin-bottom: 1rem;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                            <span>Módulos 1-5 concluídos:</span>
-                            <span><strong>${completedCount}/5</strong></span>
-                        </div>
-                        <div class="progress" style="margin-bottom: 0.5rem;">
-                            <div class="progress-bar" style="width: ${progress}%;"></div>
-                        </div>
-                    </div>
-                    
-                    ${completedCount === 5 ? `
-                        <div style="margin-bottom: 1rem;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Média atual:</span>
-                                <span><strong>${requiredAvg}%</strong></span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Média necessária:</span>
-                                <span><strong>80%</strong></span>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
-                        <div style="display: flex; justify-content: space-between; color: var(--gray-600);">
-                            <span>Módulo 6 (extra):</span>
-                            <span>${module6Completed ? '✓ Concluído' : 'Disponível'}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-                    <button class="btn btn-primary" onclick="goToModules()">
-                        Continuar Formação
-                    </button>
-                </div>
+        html = `
+            <div style="text-align: center;">
+                <h3>Certificado Bloqueado</h3>
+                <p>Complete os 5 módulos com média ≥80%</p>
+                <p>Progresso: ${completedCount}/5 - Média: ${requiredAvg}%</p>
+                <button class="btn btn-primary" onclick="goToModules()">Continuar</button>
             </div>
         `;
     }
     
     document.getElementById('dynamicContent').innerHTML = `
-        <div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+        <div style="padding: 2rem;">
             <div class="dashboard-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h2 style="font-size: 2rem; font-weight: 700;">Certificado</h2>
+                <div style="display: flex; justify-content: space-between;">
+                    <h2>Certificado</h2>
                     <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
                 </div>
-                
-                ${certificadoHtml}
+                ${html}
             </div>
         </div>
     `;
 }
 
-// Função para download (placeholder)
-function downloadCertificate() {
-    showMessage('Função de download em desenvolvimento', 'info');
-}
-
-// ==================== ADMIN COMPLETO ====================
+// ==================== ADMIN ====================
 function goToAdmin() {
     console.log('A entrar no painel admin');
     
@@ -2295,8 +1477,7 @@ function goToAdmin() {
     hideAllPages();
     show('dashboardPage');
     
-    const dashboardPage = document.getElementById('dashboardPage');
-    dashboardPage.innerHTML = `
+    document.getElementById('dashboardPage').innerHTML = `
         <div class="dashboard-container">
             <div class="dashboard-card">
                 <div class="dashboard-header">
@@ -2326,345 +1507,102 @@ function goToAdmin() {
                     </div>
                 </div>
                 
-                <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem; padding-bottom: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;">
                     <button class="admin-tab active" onclick="showAdminTab('overview')" id="tab-overview">Visão Geral</button>
-                    <button class="admin-tab" onclick="showAdminTab('keys')" id="tab-keys">Chaves de Ativação</button>
+                    <button class="admin-tab" onclick="showAdminTab('keys')" id="tab-keys">Chaves</button>
                     <button class="admin-tab" onclick="showAdminTab('employees')" id="tab-employees">Colaboradores</button>
                     <button class="admin-tab" onclick="showAdminTab('settings')" id="tab-settings">Configurações</button>
                 </div>
                 
                 <div id="adminTabContent" class="dashboard-progress-section">
                     <div style="text-align: center; padding: 3rem;">
-                        <p style="color: var(--gray-500);">Selecione uma opção acima</p>
+                        <p>Selecione uma opção</p>
                     </div>
                 </div>
             </div>
         </div>
     `;
+}
+
+function showAdminTab(tab) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${tab}`)?.classList.add('active');
     
-    loadAdminStats();
+    const content = document.getElementById('adminTabContent');
+    if (!content) return;
+    
+    let html = '';
+    
+    switch(tab) {
+        case 'overview':
+            html = `
+                <div style="padding: 2rem;">
+                    <h3>Visão Geral</h3>
+                    <p>Empresa: ${COMPANY.name}</p>
+                    <p>Código: ${COMPANY.code}</p>
+                    <p>Licenças: ${COMPANY.usedLicenses}/${COMPANY.licenseQuota}</p>
+                </div>
+            `;
+            break;
+            
+        case 'keys':
+            html = `
+                <div style="padding: 2rem;">
+                    <h3>Gerar Chaves</h3>
+                    <p>Licenças disponíveis: ${COMPANY.licenseQuota - COMPANY.usedLicenses}</p>
+                    
+                    <div style="margin: 1rem 0;">
+                        <label>Tipo:</label>
+                        <select id="keyType">
+                            <option value="basic">Básica (6 meses)</option>
+                            <option value="premium">Premium (1 ano)</option>
+                        </select>
+                        
+                        <label>Quantidade:</label>
+                        <input type="number" id="keyQuantity" value="1" min="1" max="${COMPANY.licenseQuota - COMPANY.usedLicenses}">
+                        
+                        <button class="btn btn-primary" onclick="generateEmployeeKeys()">Gerar Chaves</button>
+                    </div>
+                    
+                    <div id="generatedKeyDisplay"></div>
+                    <div id="keysList"></div>
+                </div>
+            `;
+            content.innerHTML = html;
+            loadKeysList();
+            break;
+            
+        case 'employees':
+            html = `<div style="padding: 2rem;"><h3>Colaboradores</h3><div id="employeesList">A carregar...</div></div>`;
+            content.innerHTML = html;
+            loadEmployeesList();
+            break;
+            
+        case 'settings':
+            html = `<div style="padding: 2rem;"><h3>Configurações</h3><p>Em breve...</p></div>`;
+            content.innerHTML = html;
+            break;
+    }
+    
+    if (tab !== 'keys' && tab !== 'employees') {
+        content.innerHTML = html;
+    }
 }
 
 async function loadAdminStats() {
     try {
         let totalEmployees = 0;
-        if (database) {
-            const snapshot = await database.ref('employees').once('value');
-            if (snapshot.exists()) {
-                Object.values(snapshot.val()).forEach(emp => {
-                    if (emp.companyCode === (COMPANY.code || USER.companyCode)) totalEmployees++;
-                });
-            }
+        const snapshot = await database.ref('employees').once('value');
+        if (snapshot.exists()) {
+            Object.values(snapshot.val()).forEach(emp => {
+                if (emp.companyCode === COMPANY.code) totalEmployees++;
+            });
         }
         const el = document.getElementById('adminTotalEmployees');
-        if (el) el.textContent = totalEmployees || 1;
+        if (el) el.textContent = totalEmployees;
     } catch (error) {
-        console.error('Erro ao carregar estatísticas admin:', error);
+        console.error('Erro:', error);
     }
-}
-
-// ==================== SHOW ADMIN TAB CORRIGIDA ====================
-function showAdminTab(tab) {
-    console.log('A mostrar tab admin:', tab);
-    
-    // Atualizar tabs ativas
-    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-    const tabElement = document.getElementById(`tab-${tab}`);
-    if (tabElement) tabElement.classList.add('active');
-    
-    const content = document.getElementById('adminTabContent');
-    if (!content) return;
-    
-    // Mostrar loading
-    content.innerHTML = `
-        <div style="text-align: center; padding: 3rem;">
-            <div style="font-size: 2rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
-            <p style="color: var(--gray-500);">A carregar ${tab}...</p>
-        </div>
-    `;
-    
-    // Carregar conteúdo com delay para mostrar loading
-    setTimeout(() => {
-        let html = '';
-        
-        switch(tab) {
-            case 'overview':
-                html = `
-                    <div style="padding: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem;">Visão Geral da Empresa</h3>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
-                            <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                                <h4 style="margin-bottom: 1rem;">Informação</h4>
-                                <p><strong>Empresa:</strong> ${COMPANY.name || 'Não definida'}</p>
-                                <p><strong>Código:</strong> ${COMPANY.code || USER.companyCode}</p>
-                                <p><strong>Administrador:</strong> ${USER.name || USER.email}</p>
-                                <p><strong>Data de registo:</strong> ${USER.startDate ? new Date(USER.startDate).toLocaleDateString('pt-PT') : new Date().toLocaleDateString('pt-PT')}</p>
-                            </div>
-                            <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                                <h4 style="margin-bottom: 1rem;">Estatísticas</h4>
-                                <p><strong>Total de colaboradores:</strong> <span id="statEmployees">0</span></p>
-                                <p><strong>Módulos concluídos:</strong> <span id="statModules">0</span></p>
-                                <p><strong>XP total da equipa:</strong> <span id="statXP">0</span></p>
-                                <p><strong>Simulações realizadas:</strong> <span id="statSims">0</span></p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                content.innerHTML = html;
-                loadAdminStatsDetailed();
-                break;
-                
-            case 'keys':
-                html = `
-                    <div style="padding: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem;">Gestão de Chaves de Ativação</h3>
-                        
-                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem;">Gerar Nova Chave</h4>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                                <div>
-                                    <label class="form-label">Tipo de Chave</label>
-                                    <select id="keyType" class="form-input">
-                                        <option value="basic">Básica (6 meses)</option>
-                                        <option value="premium">Premium (1 ano)</option>
-                                        <option value="enterprise">Enterprise (2 anos)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label">Número de Licenças</label>
-                                    <input type="number" id="keyLicenses" class="form-input" value="1" min="1" max="100">
-                                </div>
-                                <div>
-                                    <label class="form-label">Validade (dias)</label>
-                                    <input type="number" id="keyValidity" class="form-input" value="180" min="1" max="730">
-                                </div>
-                            </div>
-                            
-                            <button class="btn btn-primary" onclick="generateNewKey()">
-                                Gerar Chave
-                            </button>
-                            
-                            <div id="generatedKeyDisplay" class="hidden" style="margin-top: 1.5rem; padding: 1.5rem; background: var(--success-light); border-radius: var(--radius);">
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;">Chave gerada com sucesso:</p>
-                                <div style="display: flex; gap: 0.5rem; align-items: center; background: white; padding: 0.75rem; border-radius: var(--radius);">
-                                    <code id="generatedKey" style="flex: 1; font-family: monospace; font-size: 1.2rem; text-align: center;">XXXX-XXXX-XXXX-XXXX</code>
-                                    <button class="btn btn-sm btn-outline" onclick="copyKey()">Copiar</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                            <h4 style="margin-bottom: 1rem;">Chaves Existentes</h4>
-                            <div id="keysList">
-                                <p style="color: var(--gray-500); text-align: center;">Nenhuma chave gerada ainda.</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                content.innerHTML = html;
-                loadKeysList();
-                break;
-                
-            case 'employees':
-                html = `
-                    <div style="padding: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem;">Gestão de Colaboradores</h3>
-                        
-                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h4>Lista de Colaboradores</h4>
-                                <button class="btn btn-outline btn-sm" onclick="exportEmployees()">📥 Exportar</button>
-                            </div>
-                            
-                            <div id="employeesList">
-                                <div style="text-align: center; padding: 3rem; color: var(--gray-500);">
-                                    <div style="font-size: 2rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
-                                    <p>A carregar colaboradores...</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                            <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                                <div style="font-size: 0.875rem; color: var(--gray-500);">Total</div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-700);" id="statsTotal">0</div>
-                            </div>
-                            <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                                <div style="font-size: 0.875rem; color: var(--gray-500);">XP Total</div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-700);" id="statsXP">0</div>
-                            </div>
-                            <div style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius); text-align: center;">
-                                <div style="font-size: 0.875rem; color: var(--gray-500);">Módulos</div>
-                                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-700);" id="statsModules">0</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                content.innerHTML = html;
-                loadEmployeesList();
-                break;
-                
-            case 'settings':
-                html = `
-                    <div style="padding: 2rem;">
-                        <h3 style="margin-bottom: 1.5rem;">Configurações da Empresa</h3>
-                        
-                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem;">Informação da Empresa</h4>
-                            
-                            <div style="margin-bottom: 1rem;">
-                                <label class="form-label">Nome da Empresa</label>
-                                <input type="text" class="form-input" id="companyNameSetting" value="${COMPANY.name || ''}" placeholder="Nome da empresa">
-                            </div>
-                            
-                            <div style="margin-bottom: 1rem;">
-                                <label class="form-label">Email do Administrador</label>
-                                <input type="email" class="form-input" value="${USER.email}" readonly disabled style="background: var(--gray-100);">
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius); margin-bottom: 2rem;">
-                            <h4 style="margin-bottom: 1rem;">Configurações de Formação</h4>
-                            
-                            <div style="margin-bottom: 1rem;">
-                                <label class="form-label">Pontuação Mínima para Certificado (%)</label>
-                                <input type="number" class="form-input" id="minScoreSetting" value="${COMPANY.settings?.minCertificateScore || 80}" min="50" max="100">
-                            </div>
-                            
-                            <div style="margin-bottom: 1rem;">
-                                <label class="form-label">Módulos Obrigatórios</label>
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.5rem;">
-                                    ${MODULES.map(module => `
-                                        <label style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--gray-50); border-radius: var(--radius);">
-                                            <input type="checkbox" id="mod-${module.id}" ${COMPANY.settings?.mandatoryModules?.includes(module.id) ? 'checked' : ''}>
-                                            ${module.title}
-                                        </label>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="background: white; padding: 1.5rem; border-radius: var(--radius);">
-                            <h4 style="margin-bottom: 1rem;">Configurações Avançadas</h4>
-                            
-                            <div style="margin-bottom: 1rem;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <input type="checkbox" id="require2FA" ${COMPANY.settings?.require2FA ? 'checked' : ''}>
-                                    Exigir autenticação de dois fatores para colaboradores
-                                </label>
-                            </div>
-                            
-                            <div style="margin-bottom: 1rem;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <input type="checkbox" id="allowCustomBranding" ${COMPANY.settings?.allowCustomBranding ? 'checked' : ''}>
-                                    Permitir branding personalizado
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: 2rem; text-align: right;">
-                            <button class="btn btn-primary" onclick="saveCompanySettings()">Guardar Configurações</button>
-                        </div>
-                    </div>
-                `;
-                content.innerHTML = html;
-                break;
-        }
-    }, 300);
-}
-
-async function loadAdminStatsDetailed() {
-    try {
-        let totalEmployees = 0;
-        let totalModules = 0;
-        let totalXP = 0;
-        let totalSims = 0;
-        
-        if (database) {
-            const snapshot = await database.ref('employees').once('value');
-            if (snapshot.exists()) {
-                Object.values(snapshot.val()).forEach(emp => {
-                    if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
-                        totalEmployees++;
-                        totalModules += emp.completedModules?.length || 0;
-                        totalXP += emp.xp || 0;
-                        totalSims += emp.simulationsCompleted?.length || 0;
-                    }
-                });
-            }
-        }
-        
-        document.getElementById('statEmployees').textContent = totalEmployees;
-        document.getElementById('statModules').textContent = totalModules;
-        document.getElementById('statXP').textContent = totalXP;
-        document.getElementById('statSims').textContent = totalSims;
-    } catch (error) {
-        console.error('Erro ao carregar estatísticas detalhadas:', error);
-    }
-}
-
-function generateNewKey() {
-    const type = document.getElementById('keyType')?.value || 'basic';
-    const licenses = parseInt(document.getElementById('keyLicenses')?.value) || 1;
-    const validity = parseInt(document.getElementById('keyValidity')?.value) || 180;
-    
-    const key = generateActivationKey();
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + validity);
-    
-    const keyData = {
-        key,
-        type,
-        licenses,
-        usedCount: 0,
-        expiresAt: expiryDate.toISOString(),
-        createdAt: new Date().toISOString(),
-        companyCode: COMPANY.code || USER.companyCode
-    };
-    
-    const display = document.getElementById('generatedKeyDisplay');
-    const keyEl = document.getElementById('generatedKey');
-    
-    if (display && keyEl) {
-        keyEl.textContent = key;
-        display.classList.remove('hidden');
-    }
-    
-    // Adicionar à lista de chaves
-    const keysList = document.getElementById('keysList');
-    if (keysList) {
-        const keyHtml = `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid var(--gray-200);">
-                <code style="font-family: monospace;">${key}</code>
-                <span style="font-size: 0.875rem;">${type} | ${licenses} licenças | Expira: ${expiryDate.toLocaleDateString('pt-PT')}</span>
-                <button class="btn btn-sm btn-outline" onclick="copyKeyText('${key}')">Copiar</button>
-            </div>
-        `;
-        
-        if (keysList.innerHTML.includes('Nenhuma chave')) {
-            keysList.innerHTML = keyHtml;
-        } else {
-            keysList.innerHTML = keyHtml + keysList.innerHTML;
-        }
-    }
-    
-    showMessage('Chave gerada com sucesso!', 'success');
-}
-
-function copyKey() {
-    const key = document.getElementById('generatedKey')?.textContent;
-    if (key) {
-        navigator.clipboard.writeText(key).then(() => {
-            showMessage('Chave copiada!', 'success');
-        });
-    }
-}
-
-function copyKeyText(key) {
-    navigator.clipboard.writeText(key).then(() => {
-        showMessage('Chave copiada!', 'success');
-    });
 }
 
 async function loadEmployeesList() {
@@ -2673,160 +1611,32 @@ async function loadEmployeesList() {
     
     try {
         let employees = [];
-        
-        if (database) {
-            const snapshot = await database.ref('employees').once('value');
-            if (snapshot.exists()) {
-                Object.values(snapshot.val()).forEach(emp => {
-                    if (emp.companyCode === (COMPANY.code || USER.companyCode)) {
-                        employees.push(emp);
-                    }
-                });
-            }
+        const snapshot = await database.ref('employees').once('value');
+        if (snapshot.exists()) {
+            Object.values(snapshot.val()).forEach(emp => {
+                if (emp.companyCode === COMPANY.code) {
+                    employees.push(emp);
+                }
+            });
         }
         
         if (employees.length === 0) {
-            // Dados de exemplo
             employees = [
-                { name: 'Ana Silva', email: 'ana.silva@empresa.pt', xp: 1250, completedModules: [1,2,3], lastActivity: new Date().toISOString() },
-                { name: 'João Santos', email: 'joao.santos@empresa.pt', xp: 850, completedModules: [1,2], lastActivity: new Date().toISOString() },
-                { name: 'Maria Ferreira', email: 'maria.ferreira@empresa.pt', xp: 2100, completedModules: [1,2,3,4], lastActivity: new Date().toISOString() }
+                { name: 'Ana Silva', email: 'ana@empresa.pt', xp: 1250, completedModules: [1,2,3], lastActivity: new Date().toISOString() },
+                { name: 'João Santos', email: 'joao@empresa.pt', xp: 850, completedModules: [1,2], lastActivity: new Date().toISOString() }
             ];
         }
         
-        list.innerHTML = employees.map(emp => {
-            const progress = emp.completedModules ? Math.round((emp.completedModules.length / MODULES.length) * 100) : 0;
-            return `
-                <div style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr 1fr; gap: 1rem; padding: 0.75rem; border-bottom: 1px solid var(--gray-200); align-items: center;">
-                    <div><strong>${emp.name}</strong></div>
-                    <div style="font-size: 0.875rem;">${emp.email}</div>
-                    <div>${emp.xp || 0} XP</div>
-                    <div>
-                        <div style="font-size: 0.875rem;">${emp.completedModules?.length || 0}/${MODULES.length}</div>
-                        <div class="progress" style="width: 100%; height: 4px; margin-top: 0.25rem;">
-                            <div class="progress-bar" style="width: ${progress}%;"></div>
-                        </div>
-                    </div>
-                    <div style="font-size: 0.875rem;">${emp.lastActivity ? new Date(emp.lastActivity).toLocaleDateString('pt-PT') : 'Nunca'}</div>
-                </div>
-            `;
-        }).join('');
+        list.innerHTML = employees.map(emp => `
+            <div style="padding: 0.5rem; border-bottom: 1px solid #eee;">
+                <strong>${emp.name}</strong> - ${emp.email} - ${emp.xp} XP
+            </div>
+        `).join('');
         
     } catch (error) {
-        console.error('Erro ao carregar colaboradores:', error);
-        list.innerHTML = '<p style="color: var(--danger);">Erro ao carregar colaboradores.</p>';
+        console.error('Erro:', error);
+        list.innerHTML = '<p>Erro ao carregar</p>';
     }
-}
-
-function exportEmployees() {
-    showMessage('Exportação iniciada. Ficheiro simulado para demonstração.', 'info');
-}
-
-function saveCompanySettings() {
-    // Guardar configurações
-    const companyName = document.getElementById('companyNameSetting')?.value;
-    const minScore = document.getElementById('minScoreSetting')?.value;
-    
-    if (companyName) COMPANY.name = companyName;
-    if (minScore) COMPANY.settings.minCertificateScore = parseInt(minScore);
-    
-    // Guardar módulos obrigatórios
-    const mandatoryModules = [];
-    MODULES.forEach(module => {
-        const checkbox = document.getElementById(`mod-${module.id}`);
-        if (checkbox && checkbox.checked) {
-            mandatoryModules.push(module.id);
-        }
-    });
-    COMPANY.settings.mandatoryModules = mandatoryModules;
-    
-    // Guardar configurações avançadas
-    const require2FA = document.getElementById('require2FA')?.checked;
-    const allowCustomBranding = document.getElementById('allowCustomBranding')?.checked;
-    
-    if (require2FA !== undefined) COMPANY.settings.require2FA = require2FA;
-    if (allowCustomBranding !== undefined) COMPANY.settings.allowCustomBranding = allowCustomBranding;
-    
-    showMessage('Configurações guardadas com sucesso!', 'success');
-}
-
-// ==================== POPUP DE CONCLUSÃO ====================
-// ==================== POPUP DE CONCLUSÃO DOS 5 MÓDULOS ====================
-function showCompletionPopup(avgScore) {
-    // Criar overlay se não existir
-    let overlay = document.getElementById('completionOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'completionOverlay';
-        overlay.className = 'modal-overlay hidden';
-        overlay.innerHTML = `
-            <div class="modal" style="max-width: 500px;">
-                <div class="modal-header">
-                    <h3>🏆 Parabéns!</h3>
-                    <button class="modal-close" onclick="hideCompletionPopup()">×</button>
-                </div>
-                <div class="modal-body" id="completionPopupContent">
-                    <!-- Conteúdo dinâmico -->
-                </div>
-                <div class="modal-footer" id="completionPopupFooter">
-                    <!-- Botões dinâmicos -->
-                </div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-    }
-    
-    const content = document.getElementById('completionPopupContent');
-    const footer = document.getElementById('completionPopupFooter');
-    
-    content.innerHTML = `
-        <div style="text-align: center;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
-            <h4 style="margin-bottom: 1rem; color: var(--primary-700);">Completou os 5 módulos fundamentais!</h4>
-            <p style="margin-bottom: 1rem;">A sua média nos 5 primeiros módulos é <strong style="font-size: 1.5rem; color: var(--success);">${avgScore}%</strong></p>
-            <p style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius);">
-                <strong>📌 Módulo 6 obrigatório:</strong><br>
-                Para obter o certificado, precisa também de concluir o módulo<br>
-                <strong>"Histórias Reais de Phishing em Portugal"</strong>
-            </p>
-        </div>
-    `;
-    
-    footer.innerHTML = `
-        <button class="btn btn-primary" onclick="goToModule6(); hideCompletionPopup();" style="flex: 1;">
-            📖 Ir para Módulo 6
-        </button>
-        <button class="btn btn-outline" onclick="hideCompletionPopup()" style="flex: 1;">
-            Continuar depois
-        </button>
-    `;
-    
-    show('completionOverlay');
-}
-
-function hideCompletionPopup() {
-    hide('completionOverlay');
-}
-
-function goToModule6() {
-    // Encontrar e abrir o módulo 6
-    const module6 = MODULES.find(m => m.id === 'mod6');
-    if (module6) {
-        openModule(module6);
-    }
-}
-
-function hideCompletionPopup() {
-    hide('completionOverlay');
-}
-
-function unlockAdvancedModules() {
-    // Marcar que o utilizador desbloqueou os módulos avançados
-    USER.advancedUnlocked = true;
-    localStorage.setItem('phishguard_user', JSON.stringify(USER));
-    
-    // Ir para a página de módulos (que agora mostra os avançados)
-    goToModules();
 }
 
 // ==================== WELCOME POPUP ====================
@@ -2846,37 +1656,30 @@ function goToModulesFromWelcome() {
     goToModules();
 }
 
+function showCompletionPopup(avgScore) {
+    alert(`🎉 Parabéns! Completou os 5 módulos com média ${avgScore}%!`);
+}
+
 // ==================== MESSAGES ====================
 function showMessage(message, type = 'info') {
-    const colors = { 
-        success: 'var(--success)', 
-        error: 'var(--danger)', 
-        warning: 'var(--warning)', 
-        info: 'var(--primary-500)' 
-    };
+    const colors = { success: '#28a745', error: '#dc3545', warning: '#ffc107', info: '#17a2b8' };
     
     const msg = document.createElement('div');
     msg.style.cssText = `
-        position: fixed; top: 80px; right: 20px; background: white; color: ${colors[type]};
-        padding: 1rem 1.5rem; border-radius: var(--radius); border-left: 4px solid ${colors[type]};
-        box-shadow: var(--shadow-lg); z-index: 10000; max-width: 400px;
-        animation: slideIn 0.3s ease;
+        position: fixed; top: 20px; right: 20px; background: white; color: ${colors[type]};
+        padding: 1rem; border-left: 4px solid ${colors[type]}; border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000;
     `;
     msg.textContent = message;
-    
     document.body.appendChild(msg);
     
-    setTimeout(() => {
-        msg.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => msg.remove(), 300);
-    }, 3000);
+    setTimeout(() => msg.remove(), 3000);
 }
 
 // ==================== INICIALIZAÇÃO ====================
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM carregado - a inicializar');
     
-    // Esconder elementos por padrão
     hide('navbar');
     hide('loginSection');
     hide('dashboardPage');
@@ -2884,38 +1687,17 @@ window.addEventListener('DOMContentLoaded', () => {
     hide('dynamicContent');
     hide('welcomeOverlay');
     
-    // Mostrar landing page
     showLandingPage();
     
-    // Configurar formulários
-    const userForm = document.getElementById('userLoginForm');
-    const adminForm = document.getElementById('adminLoginForm');
-    const adminExtraFields = document.getElementById('adminExtraFields');
-    
-    if (userForm) userForm.classList.remove('hidden');
-    if (adminForm) adminForm.classList.add('hidden');
-    if (adminExtraFields) adminExtraFields.classList.add('hidden');
-    
-    // Verificar sessão guardada
     const savedUser = localStorage.getItem('phishguard_user');
     if (savedUser) {
         try {
             USER = JSON.parse(savedUser);
             onLoginSuccess();
         } catch (e) {
-            console.error('Erro ao ler utilizador guardado:', e);
             localStorage.removeItem('phishguard_user');
         }
     }
-    
-    // Estilos de animação
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
-    `;
-    document.head.appendChild(style);
 });
 
 // ==================== EXPORT GLOBAL ====================
@@ -2930,34 +1712,24 @@ window.goToDashboard = goToDashboard;
 window.goToModules = goToModules;
 window.goToSimulator = goToSimulator;
 window.goToBadges = goToBadges;
+window.goToLibrary = goToLibrary;
 window.goToCertificate = goToCertificate;
 window.goToAdmin = goToAdmin;
 window.showAdminTab = showAdminTab;
-window.generateNewKey = generateNewKey;
+window.generateEmployeeKeys = generateEmployeeKeys;
 window.copyKey = copyKey;
-window.copyKeyText = copyKeyText;
-window.exportEmployees = exportEmployees;
-window.saveCompanySettings = saveCompanySettings;
-window.selectOption = selectOption;
-window.submitQuiz = submitQuiz;
-window.startSimulation = startSimulation;
-window.submitSimulation = submitSimulation;
-window.downloadResource = downloadResource;
+window.copyAllKeys = copyAllKeys;
 window.closeWelcomePopup = closeWelcomePopup;
 window.goToModulesFromWelcome = goToModulesFromWelcome;
-window.goToLibrary = goToLibrary;
-window.loadLibraryVideos = loadLibraryVideos;
-window.downloadResource = function(type) {
-    showMessage('Download iniciado. Ficheiro simulado para demonstração.', 'info');
+window.toggleStory = toggleStory;
+window.submitQuiz = submitQuiz;
+window.selectOption = (q, o) => {
+    document.querySelectorAll(`input[name="q${q}"]`).forEach(i => i.checked = false);
+    document.getElementById(`q${q}o${o}`).checked = true;
 };
-// ==================== FUNÇÃO DE EMERGÊNCIA ====================
-// Garante que o botão Admin funciona mesmo em cenários extremos
 window.showAdminTabClick = function() {
-    console.log('⚠️ Função de emergência ativada - redirecionando para admin');
+    console.log('Função de emergência');
     showLoginType('admin');
 };
 
-// Redundância: também expor showLoginType globalmente
-window.showLoginType = showLoginType;
-
-console.log('PhishGuard Elite - Versão Profissional carregada com sucesso!');
+console.log('✅ PhishGuard Elite carregado com sucesso');
