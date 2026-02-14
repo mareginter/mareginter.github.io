@@ -38,7 +38,9 @@ let USER = {
     xp: 0, scores: {}, badges: [], completedModules: [],
     simulationsCompleted: [], simulationScore: 0,
     startDate: null, lastActivity: null,
-    hasSeenWelcome: false, activationKey: '', keyType: 'basic'
+    hasSeenWelcome: false, activationKey: '', keyType: 'basic',
+    advancedUnlocked: false,  // ← ADICIONA ESTA LINHA
+    showedCompletionPopup: false  // ← E ESTA TAMBÉM
 };
 
 let COMPANY = {
@@ -430,6 +432,126 @@ const MODULES = [
         }
     ]
 }
+];
+
+// ==================== MÓDULOS AVANÇADOS ====================
+const ADVANCED_MODULES = [
+    {
+        id: 'adv1',
+        title: 'Análise Forense de Emails',
+        description: 'Técnicas avançadas para analisar cabeçalhos de email e identificar origem de ataques.',
+        difficulty: 'advanced',
+        xp: 250,
+        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
+        requiredScore: 80,
+        content: `
+            <h3>Análise de Cabeçalhos de Email</h3>
+            <p>Os cabeçalhos de email contêm informação valiosa sobre a origem real de uma mensagem.</p>
+            
+            <h4 style="margin-top: 1.5rem;">Campos Importantes:</h4>
+            <ul>
+                <li><strong>Received:</strong> Mostra o caminho que o email percorreu</li>
+                <li><strong>Return-Path:</strong> Endereço para respostas</li>
+                <li><strong>DKIM-Signature:</strong> Assinatura digital do domínio</li>
+                <li><strong>SPF:</strong> Verifica se o servidor está autorizado</li>
+            </ul>
+            
+            <h4 style="margin-top: 1.5rem;">Exercício Prático:</h4>
+            <p>Analise o cabeçalho abaixo e identifique se o email é legítimo ou phishing:</p>
+            <pre style="background: #f5f5f5; padding: 1rem; border-radius: var(--radius); overflow-x: auto;">
+Received: from mail.falso.com (192.168.1.1) by mx.empresa.pt
+Return-Path: &lt;suporte@banco-seguranca.net&gt;
+DKIM-Signature: v=1; a=rsa-sha256; d=banco-seguranca.net; s=selector;
+From: "Banco de Portugal" &lt;suporte@banco-seguranca.net&gt;
+            </pre>
+        `,
+        quiz: [
+            { q: 'Qual campo mostra o caminho percorrido pelo email?', opts: ['From', 'Received', 'Return-Path', 'DKIM'], correct: 1 },
+            { q: 'O que o SPF verifica?', opts: ['Conteúdo do email', 'Servidor autorizado', 'Tamanho do anexo', 'Hora de envio'], correct: 1 }
+        ]
+    },
+    {
+        id: 'adv2',
+        title: 'Engenharia Social Avançada',
+        description: 'Técnicas psicológicas usadas por atacantes e como se proteger.',
+        difficulty: 'advanced',
+        xp: 250,
+        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
+        requiredScore: 80,
+        content: `
+            <h3>Psicologia do Engano</h3>
+            <p>Os atacantes exploram vieses cognitivos para manipular as vítimas.</p>
+            
+            <h4 style="margin-top: 1.5rem;">Principais Técnicas:</h4>
+            <ul>
+                <li><strong>Autoridade:</strong> Fingem ser superiores ou autoridades</li>
+                <li><strong>Urgência:</strong> Criam pressão para agir sem pensar</li>
+                <li><strong>Escassez:</strong> "Oferta limitada" ou "último aviso"</li>
+                <li><strong>Familiaridade:</strong> Usam nomes de colegas ou empresas conhecidas</li>
+            </ul>
+        `,
+        quiz: [
+            { q: 'Qual técnica explora a pressa?', opts: ['Autoridade', 'Urgência', 'Escassez', 'Familiaridade'], correct: 1 },
+            { q: 'Qual técnica usa "oferta limitada"?', opts: ['Autoridade', 'Urgência', 'Escassez', 'Familiaridade'], correct: 2 }
+        ]
+    },
+    {
+        id: 'adv3',
+        title: 'Resposta a Incidentes',
+        description: 'O que fazer quando se é vítima de phishing.',
+        difficulty: 'advanced',
+        xp: 250,
+        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
+        requiredScore: 80,
+        content: `
+            <h3>Plano de Ação Imediata</h3>
+            <p>Se suspeitar que foi vítima de phishing, siga estes passos:</p>
+            
+            <h4 style="margin-top: 1.5rem;">Passo 1: Isolamento</h4>
+            <p>Desligue o computador da internet imediatamente.</p>
+            
+            <h4>Passo 2: Contactar o Banco</h4>
+            <p>Ligue para a linha oficial do seu banco para bloquear contas.</p>
+            
+            <h4>Passo 3: Alterar Palavras-passe</h4>
+            <p>Altere palavras-passe de todas as contas afetadas.</p>
+            
+            <h4>Passo 4: Reportar às Autoridades</h4>
+            <p>Contacte a Polícia Judiciária ou o CNCS.</p>
+        `,
+        quiz: [
+            { q: 'Qual o primeiro passo ao detetar um ataque?', opts: ['Apagar emails', 'Isolar o computador', 'Contactar o banco', 'Alterar passwords'], correct: 1 },
+            { q: 'A quem deve reportar?', opts: ['Redes sociais', 'Polícia Judiciária', 'Jornais', 'Colegas'], correct: 1 }
+        ]
+    },
+    {
+        id: 'adv4',
+        title: 'Proteção de Dados e RGPD',
+        description: 'Como o RGPD se aplica à proteção contra phishing.',
+        difficulty: 'advanced',
+        xp: 250,
+        requiredModules: ['mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6'],
+        requiredScore: 80,
+        content: `
+            <h3>RGPD e Phishing</h3>
+            <p>O Regulamento Geral de Proteção de Dados impõe obrigações às empresas.</p>
+            
+            <h4 style="margin-top: 1.5rem;">Obrigações da Empresa:</h4>
+            <ul>
+                <li>Notificar violações de dados à CNPD em 72h</li>
+                <li>Informar os titulares dos dados afetados</li>
+                <li>Implementar medidas de segurança adequadas</li>
+                <li>Realizar formações regulares</li>
+            </ul>
+            
+            <h4 style="margin-top: 1.5rem;">Multas:</h4>
+            <p>As coimas podem chegar aos 20 milhões de euros ou 4% do volume de negócios anual.</p>
+        `,
+        quiz: [
+            { q: 'Qual o prazo para notificar a CNPD?', opts: ['24h', '48h', '72h', '7 dias'], correct: 2 },
+            { q: 'Qual o valor máximo da multa?', opts: ['1M€', '10M€', '20M€', '50M€'], correct: 2 }
+        ]
+    }
 ];
 
 // ==================== VÍDEOS FORMATIVOS (PT-PT) - LINKS REAIS ====================
@@ -883,21 +1005,26 @@ function logout() {
 
 // ==================== DASHBOARD ====================
 function goToDashboard() {
-    console.log('A abrir dashboard');
     hideAllPages();
     show('dashboardPage');
     
-    const progress = calculateProgress(USER);
-    const avgScore = calculateAverage(USER.scores);
+    // Módulos exigidos para certificado
+    const requiredModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
+    const completedRequired = requiredModules.filter(id => USER.completedModules.includes(id)).length;
+    const requiredAvg = calculateAverage(
+        Object.fromEntries(
+            Object.entries(USER.scores).filter(([key]) => requiredModules.includes(key))
+        )
+    );
+    const canGetCertificate = completedRequired === 5 && requiredAvg >= 80;
     
-    const dashboardPage = document.getElementById('dashboardPage');
-    dashboardPage.innerHTML = `
+    document.getElementById('dashboardPage').innerHTML = `
         <div class="dashboard-container">
             <div class="dashboard-card">
                 <div class="dashboard-header">
                     <div>
                         <h2 class="dashboard-title">Dashboard</h2>
-                        <p class="dashboard-subtitle">Bem-vindo de volta, ${USER.name?.split(' ')[0] || 'Utilizador'}!</p>
+                        <p class="dashboard-subtitle">Bem-vindo, ${USER.name?.split(' ')[0] || 'Utilizador'}!</p>
                     </div>
                     <div>
                         <span class="badge" style="background: var(--primary-100); color: var(--primary-700); padding: 0.5rem 1rem; border-radius: var(--radius-full);">
@@ -912,32 +1039,42 @@ function goToDashboard() {
                         <div class="dashboard-stat-value">${USER.xp || 0}</div>
                     </div>
                     <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">Módulos</div>
-                        <div class="dashboard-stat-value">${USER.completedModules.length}/${MODULES.length}</div>
+                        <div class="dashboard-stat-label">Módulos Base</div>
+                        <div class="dashboard-stat-value">${completedRequired}/5</div>
                     </div>
                     <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">Badges</div>
-                        <div class="dashboard-stat-value">${USER.badges.length}/${BADGES.length}</div>
+                        <div class="dashboard-stat-label">Média</div>
+                        <div class="dashboard-stat-value">${requiredAvg}%</div>
                     </div>
                     <div class="dashboard-stat-card">
-                        <div class="dashboard-stat-label">Sucesso</div>
-                        <div class="dashboard-stat-value">${avgScore}%</div>
+                        <div class="dashboard-stat-label">Módulo 6</div>
+                        <div class="dashboard-stat-value">${USER.completedModules.includes('mod6') ? '✓' : '📖'}</div>
                     </div>
                 </div>
                 
                 <div class="dashboard-progress-section">
                     <div class="dashboard-progress-header">
-                        <span class="dashboard-progress-title">Progresso Global</span>
-                        <span class="dashboard-progress-value">${progress}%</span>
+                        <span class="dashboard-progress-title">Progresso para Certificado</span>
+                        <span class="dashboard-progress-value">${Math.round((completedRequired/5)*100)}%</span>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar" style="width: ${progress}%"></div>
+                        <div class="progress-bar" style="width: ${(completedRequired/5)*100}%"></div>
                     </div>
+                    ${canGetCertificate ? `
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <span style="background: var(--success); color: white; padding: 0.5rem 1rem; border-radius: var(--radius-full);">
+                                ✅ Certificado Disponível!
+                            </span>
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <div class="dashboard-actions">
                     <button class="btn btn-primary" onclick="goToModules()">Continuar Formação</button>
-                    <button class="btn btn-outline" onclick="goToSimulator()">Testar Conhecimentos</button>
+                    ${canGetCertificate ? `
+                        <button class="btn btn-success" onclick="goToCertificate()">Obter Certificado</button>
+                    ` : ''}
+                    <button class="btn btn-outline" onclick="goToSimulator()">Simulador</button>
                 </div>
             </div>
         </div>
@@ -952,38 +1089,118 @@ function goToModules() {
     loadModules();
 }
 
+// ==================== LOAD MODULES CORRIGIDO ====================
 function loadModules() {
+    console.log('A carregar módulos...');
     const container = document.getElementById('modulesList');
-    if (!container) return;
+    if (!container) {
+        console.error('Container modulesList não encontrado');
+        return;
+    }
     
     container.innerHTML = '';
     
+    // Módulos básicos (1-6)
     MODULES.forEach((module, index) => {
         const isCompleted = USER.completedModules.includes(module.id);
+        // Módulo 6 não bloqueia os seguintes
         const isLocked = index > 0 && !USER.completedModules.includes(MODULES[index - 1].id) && module.id !== 'mod6';
         
-        const card = document.createElement('div');
-        card.className = `module-card ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
-        
-        if (!isLocked) {
-            card.onclick = () => openModule(module);
-        }
-        
-        card.innerHTML = `
-            <div class="module-title">${module.title}</div>
-            <div class="module-description">${module.description}</div>
-            <div class="module-meta">
-                <span class="difficulty-badge ${module.difficulty}">
-                    ${module.difficulty === 'beginner' ? 'Iniciante' : 'Intermediário'}
-                </span>
-                ${isCompleted ? '<span style="color: var(--success);">Concluído</span>' : ''}
-                ${isLocked ? '<span style="color: var(--gray-500);">Bloqueado</span>' : ''}
-            </div>
-            ${!isCompleted && !isLocked ? `<div style="color: var(--primary-600); margin-top: 0.5rem; font-weight: 600;">+${module.xp} XP</div>` : ''}
-        `;
-        
+        const card = createModuleCard(module, isCompleted, isLocked);
         container.appendChild(card);
     });
+    
+    // Verificar se os 5 primeiros módulos estão concluídos com média ≥80%
+    const firstFiveModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
+    const completedFirstFive = firstFiveModules.every(id => USER.completedModules.includes(id));
+    
+    // Calcular média dos 5 primeiros
+    let firstFiveScores = 0;
+    let firstFiveCount = 0;
+    firstFiveModules.forEach(id => {
+        if (USER.scores[id]) {
+            firstFiveScores += USER.scores[id];
+            firstFiveCount++;
+        }
+    });
+    const firstFiveAvg = firstFiveCount > 0 ? Math.round(firstFiveScores / firstFiveCount) : 0;
+    
+    // Desbloquear módulos avançados se condição for satisfeita
+    const canAccessAdvanced = completedFirstFive && firstFiveAvg >= 80;
+    
+    if (canAccessAdvanced) {
+        // Atualizar estado se necessário
+        if (!USER.advancedUnlocked) {
+            USER.advancedUnlocked = true;
+            localStorage.setItem('phishguard_user', JSON.stringify(USER));
+        }
+        
+        // Separador visual para módulos avançados
+        const separator = document.createElement('div');
+        separator.style.cssText = 'grid-column: 1 / -1; margin: 2rem 0 1rem 0; padding: 1rem; background: linear-gradient(90deg, var(--primary-100), transparent); border-radius: var(--radius);';
+        separator.innerHTML = `
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.5rem;">🚀</span> Módulos Avançados
+            </h3>
+            <p style="margin: 0.5rem 0 0 0; color: var(--gray-600);">
+                Desbloqueados após concluir os 5 módulos básicos com 80%+ (sua média: ${firstFiveAvg}%)
+            </p>
+        `;
+        container.appendChild(separator);
+        
+        // Carregar módulos avançados
+        if (typeof ADVANCED_MODULES !== 'undefined' && ADVANCED_MODULES.length > 0) {
+            ADVANCED_MODULES.forEach((module) => {
+                const isCompleted = USER.completedModules.includes(module.id);
+                // Módulos avançados não são bloqueados entre si
+                const card = createModuleCard(module, isCompleted, false);
+                container.appendChild(card);
+            });
+        } else {
+            console.warn('ADVANCED_MODULES não definido');
+            // Fallback para teste
+            const fallbackMsg = document.createElement('div');
+            fallbackMsg.style.cssText = 'grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--gray-500);';
+            fallbackMsg.innerHTML = 'Módulos avançados em desenvolvimento...';
+            container.appendChild(fallbackMsg);
+        }
+    } else if (USER.advancedUnlocked) {
+        // Se perdeu o acesso (não devia acontecer, mas por segurança)
+        USER.advancedUnlocked = false;
+        localStorage.setItem('phishguard_user', JSON.stringify(USER));
+    }
+    
+    console.log('Módulos carregados. Avançados desbloqueados:', USER.advancedUnlocked);
+}
+
+// ==================== FUNÇÃO AUXILIAR PARA CRIAR CARDS ====================
+function createModuleCard(module, isCompleted, isLocked) {
+    const card = document.createElement('div');
+    card.className = `module-card ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
+    
+    if (!isLocked) {
+        card.onclick = () => openModule(module);
+    }
+    
+    // Determinar ícone de dificuldade
+    let difficultyIcon = '🟢';
+    if (module.difficulty === 'intermediate') difficultyIcon = '🟡';
+    if (module.difficulty === 'advanced') difficultyIcon = '🔴';
+    
+    card.innerHTML = `
+        <div class="module-title">${module.title}</div>
+        <div class="module-description">${module.description}</div>
+        <div class="module-meta">
+            <span class="difficulty-badge ${module.difficulty}">
+                ${difficultyIcon} ${module.difficulty === 'beginner' ? 'Iniciante' : module.difficulty === 'intermediate' ? 'Intermediário' : 'Avançado'}
+            </span>
+            ${isCompleted ? '<span style="color: var(--success); margin-left: 0.5rem;">✓ Concluído</span>' : ''}
+            ${isLocked ? '<span style="color: var(--gray-500); margin-left: 0.5rem;">🔒 Bloqueado</span>' : ''}
+        </div>
+        ${!isCompleted && !isLocked ? `<div style="color: var(--primary-600); margin-top: 0.5rem; font-weight: 600;">+${module.xp} XP</div>` : ''}
+    `;
+    
+    return card;
 }
 
 // ==================== OPEN MODULE (COM STORIES PARA MOD6) ====================
@@ -1265,8 +1482,11 @@ function selectOption(qIndex, oIndex) {
     }
 }
 
+// ==================== SUBMIT QUIZ ATUALIZADO ====================
+// ==================== SUBMIT QUIZ CORRIGIDO ====================
 async function submitQuiz(moduleId) {
-    const module = MODULES.find(m => m.id === moduleId);
+    // Verificar se é módulo básico ou avançado
+    const module = MODULES.find(m => m.id === moduleId) || ADVANCED_MODULES.find(m => m.id === moduleId);
     if (!module) return;
     
     let allAnswered = true;
@@ -1303,9 +1523,46 @@ async function submitQuiz(moduleId) {
             USER.badges = [...(USER.badges || []), ...newBadges];
             showMessage(`Nova conquista: ${newBadges.length} badges!`, 'success');
         }
+        
+        // ✅ VERIFICAR SE COMPLETOU OS 5 PRIMEIROS MÓDULOS COM +80%
+        const firstFiveModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
+        const completedFirstFive = firstFiveModules.every(id => USER.completedModules.includes(id));
+        
+        // Calcular média apenas dos 5 primeiros
+        let firstFiveScores = 0;
+        let firstFiveCount = 0;
+        firstFiveModules.forEach(id => {
+            if (USER.scores[id]) {
+                firstFiveScores += USER.scores[id];
+                firstFiveCount++;
+            }
+        });
+        const firstFiveAvg = firstFiveCount > 0 ? Math.round(firstFiveScores / firstFiveCount) : 0;
+        
+        // Se completou os 5 primeiros com média ≥80% e ainda não mostrou popup
+        if (completedFirstFive && firstFiveAvg >= 80 && !USER.showedCompletionPopup) {
+            USER.showedCompletionPopup = true;
+            localStorage.setItem('phishguard_user', JSON.stringify(USER));
+            
+            // Mostrar popup após 1 segundo
+            setTimeout(() => showCompletionPopup(firstFiveAvg), 1000);
+        }
     }
     
     localStorage.setItem('phishguard_user', JSON.stringify(USER));
+    
+    try {
+        const userKey = sanitizeEmail(USER.email);
+        await database.ref(`employees/${userKey}`).update({
+            completedModules: USER.completedModules,
+            xp: USER.xp,
+            scores: USER.scores,
+            badges: USER.badges,
+            lastActivity: USER.lastActivity
+        });
+    } catch (error) {
+        console.error('Error saving quiz results:', error);
+    }
     
     setTimeout(() => goToModules(), 2000);
 }
@@ -1844,56 +2101,159 @@ function downloadResource(type) {
 }
 
 // ==================== CERTIFICADO ====================
+// ==================== CERTIFICADO CORRIGIDO ====================
 function goToCertificate() {
-    console.log('A abrir certificado');
     hideAllPages();
     show('dynamicContent');
     
-    const progress = calculateProgress(USER);
-    const avgScore = calculateAverage(USER.scores);
-    const canGetCertificate = progress === 100 && avgScore >= 80;
+    // Módulos exigidos para certificado: apenas os 5 primeiros
+    const requiredModules = ['mod1', 'mod2', 'mod3', 'mod4', 'mod5'];
+    const completedRequired = requiredModules.every(id => USER.completedModules.includes(id));
     
-    const content = document.getElementById('dynamicContent');
-    content.innerHTML = `
-        <div class="container" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+    // Calcular média apenas dos 5 primeiros
+    let requiredScores = 0;
+    let requiredCount = 0;
+    requiredModules.forEach(id => {
+        if (USER.scores[id]) {
+            requiredScores += USER.scores[id];
+            requiredCount++;
+        }
+    });
+    const requiredAvg = requiredCount > 0 ? Math.round(requiredScores / requiredCount) : 0;
+    
+    const canGetCertificate = completedRequired && requiredAvg >= 80;
+    
+    // Status dos módulos (para exibir)
+    const module6Completed = USER.completedModules.includes('mod6');
+    
+    let certificadoHtml = '';
+    
+    if (canGetCertificate) {
+        // Gerar código único do certificado
+        const certCode = generateCode(16);
+        const date = new Date().toLocaleDateString('pt-PT');
+        
+        certificadoHtml = `
+            <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #fff, var(--primary-50)); border: 3px solid var(--primary-500); border-radius: var(--radius-lg); position: relative;">
+                <div style="position: absolute; top: 1rem; right: 1rem; opacity: 0.1; font-size: 8rem;">🛡️</div>
+                <h1 style="font-size: 3rem; color: var(--primary-700); margin-bottom: 1rem;">CERTIFICADO</h1>
+                <h2 style="font-size: 1.5rem; color: var(--gray-600); margin-bottom: 2rem;">de Conclusão</h2>
+                
+                <p style="font-size: 1.1rem; margin-bottom: 1rem;">Certifica-se que</p>
+                <h3 style="font-size: 2rem; color: var(--gray-900); margin-bottom: 1rem; border-bottom: 2px solid var(--primary-200); padding-bottom: 1rem; display: inline-block;">
+                    ${USER.name}
+                </h3>
+                
+                <p style="margin: 2rem 0; line-height: 1.8;">
+                    completou com sucesso a formação fundamental em<br>
+                    <strong style="font-size: 1.2rem; color: var(--primary-700);">Segurança Digital e Proteção contra Phishing</strong><br>
+                    com aproveitamento de <strong>${requiredAvg}%</strong> nos 5 módulos principais
+                </p>
+                
+                ${module6Completed ? `
+                    <p style="color: var(--success); margin-bottom: 1rem;">
+                        ✓ Módulo "Histórias Reais de Phishing em Portugal" concluído como extra
+                    </p>
+                ` : ''}
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0; padding: 1rem; background: white; border-radius: var(--radius);">
+                    <div>
+                        <p style="color: var(--gray-500); font-size: 0.9rem;">Data de Conclusão</p>
+                        <p style="font-weight: 600;">${date}</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--gray-500); font-size: 0.9rem;">Código de Verificação</p>
+                        <p style="font-family: monospace; font-weight: 600; color: var(--primary-600);">${certCode}</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        🖨️ Imprimir Certificado
+                    </button>
+                    <button class="btn btn-outline" onclick="downloadCertificate()">
+                        📥 Download PDF
+                    </button>
+                </div>
+                
+                <p style="margin-top: 2rem; font-size: 0.8rem; color: var(--gray-400);">
+                    PhishGuard Elite • Formação Corporativa Anti-Phishing
+                </p>
+            </div>
+        `;
+    } else {
+        // Calcular progresso detalhado
+        const completedCount = requiredModules.filter(id => USER.completedModules.includes(id)).length;
+        const progress = (completedCount / 5) * 100;
+        
+        certificadoHtml = `
+            <div style="text-align: center; padding: 3rem;">
+                <div style="font-size: 5rem; margin-bottom: 2rem; opacity: 0.5;">🔒</div>
+                <h3 style="font-size: 1.8rem; color: var(--gray-700); margin-bottom: 1rem;">Certificado Bloqueado</h3>
+                <p style="color: var(--gray-500); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                    Complete os 5 módulos principais com média igual ou superior a 80% para desbloquear o certificado.
+                </p>
+                
+                <div style="background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius); max-width: 400px; margin: 0 auto;">
+                    <h4 style="margin-bottom: 1rem;">Progresso</h4>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <span>Módulos 1-5 concluídos:</span>
+                            <span><strong>${completedCount}/5</strong></span>
+                        </div>
+                        <div class="progress" style="margin-bottom: 0.5rem;">
+                            <div class="progress-bar" style="width: ${progress}%;"></div>
+                        </div>
+                    </div>
+                    
+                    ${completedCount === 5 ? `
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Média atual:</span>
+                                <span><strong>${requiredAvg}%</strong></span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Média necessária:</span>
+                                <span><strong>80%</strong></span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
+                        <div style="display: flex; justify-content: space-between; color: var(--gray-600);">
+                            <span>Módulo 6 (extra):</span>
+                            <span>${module6Completed ? '✓ Concluído' : 'Disponível'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-primary" onclick="goToModules()">
+                        Continuar Formação
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById('dynamicContent').innerHTML = `
+        <div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
             <div class="dashboard-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h2 style="font-size: 2rem; font-weight: 700;">Certificado</h2>
                     <button class="btn btn-outline btn-sm" onclick="goToDashboard()">← Voltar</button>
                 </div>
                 
-                ${canGetCertificate ? `
-                    <div style="text-align: center; padding: 3rem; border: 2px solid var(--primary-500); border-radius: var(--radius-lg);">
-                        <h1 style="font-size: 2.5rem; color: var(--primary-600); margin-bottom: 2rem;">CERTIFICADO</h1>
-                        <p>Certifica-se que</p>
-                        <h2 style="font-size: 2rem; margin: 1rem 0;">${USER.name}</h2>
-                        <p>completou com sucesso a formação em</p>
-                        <h3 style="margin: 1rem 0;">Segurança Digital e Proteção contra Phishing</h3>
-                        <p>com aproveitamento de ${avgScore}%</p>
-                        <p style="margin-top: 2rem;">Data: ${new Date().toLocaleDateString('pt-PT')}</p>
-                        <p><strong>Código de verificação:</strong> ${generateCode(16)}</p>
-                        <button class="btn btn-primary" onclick="window.print()" style="margin-top: 2rem;">
-                            Imprimir Certificado
-                        </button>
-                    </div>
-                ` : `
-                    <div style="text-align: center; padding: 3rem;">
-                        <h3 style="margin-bottom: 1rem;">Certificado Bloqueado</h3>
-                        <p>Complete todos os módulos com pelo menos 80% de média.</p>
-                        <div style="margin-top: 2rem; background: var(--gray-50); padding: 1.5rem; border-radius: var(--radius);">
-                            <p><strong>Progresso:</strong> ${progress}%</p>
-                            <p><strong>Média atual:</strong> ${avgScore}%</p>
-                            <p><strong>Módulos concluídos:</strong> ${USER.completedModules.length}/${MODULES.length}</p>
-                            <p><strong>Média necessária:</strong> 80%</p>
-                        </div>
-                        <button class="btn btn-primary" onclick="goToModules()" style="margin-top: 2rem;">
-                            Continuar Formação
-                        </button>
-                    </div>
-                `}
+                ${certificadoHtml}
             </div>
         </div>
     `;
+}
+
+// Função para download (placeholder)
+function downloadCertificate() {
+    showMessage('Função de download em desenvolvimento', 'info');
 }
 
 // ==================== ADMIN COMPLETO ====================
@@ -2320,6 +2680,85 @@ function saveCompanySettings() {
     if (allowCustomBranding !== undefined) COMPANY.settings.allowCustomBranding = allowCustomBranding;
     
     showMessage('Configurações guardadas com sucesso!', 'success');
+}
+
+// ==================== POPUP DE CONCLUSÃO ====================
+// ==================== POPUP DE CONCLUSÃO DOS 5 MÓDULOS ====================
+function showCompletionPopup(avgScore) {
+    // Criar overlay se não existir
+    let overlay = document.getElementById('completionOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'completionOverlay';
+        overlay.className = 'modal-overlay hidden';
+        overlay.innerHTML = `
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>🏆 Parabéns!</h3>
+                    <button class="modal-close" onclick="hideCompletionPopup()">×</button>
+                </div>
+                <div class="modal-body" id="completionPopupContent">
+                    <!-- Conteúdo dinâmico -->
+                </div>
+                <div class="modal-footer" id="completionPopupFooter">
+                    <!-- Botões dinâmicos -->
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
+    
+    const content = document.getElementById('completionPopupContent');
+    const footer = document.getElementById('completionPopupFooter');
+    
+    content.innerHTML = `
+        <div style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+            <h4 style="margin-bottom: 1rem; color: var(--primary-700);">Completou os 5 módulos fundamentais!</h4>
+            <p style="margin-bottom: 1rem;">A sua média nos 5 primeiros módulos é <strong style="font-size: 1.5rem; color: var(--success);">${avgScore}%</strong></p>
+            <p style="background: var(--primary-50); padding: 1rem; border-radius: var(--radius);">
+                <strong>📌 Módulo 6 obrigatório:</strong><br>
+                Para obter o certificado, precisa também de concluir o módulo<br>
+                <strong>"Histórias Reais de Phishing em Portugal"</strong>
+            </p>
+        </div>
+    `;
+    
+    footer.innerHTML = `
+        <button class="btn btn-primary" onclick="goToModule6(); hideCompletionPopup();" style="flex: 1;">
+            📖 Ir para Módulo 6
+        </button>
+        <button class="btn btn-outline" onclick="hideCompletionPopup()" style="flex: 1;">
+            Continuar depois
+        </button>
+    `;
+    
+    show('completionOverlay');
+}
+
+function hideCompletionPopup() {
+    hide('completionOverlay');
+}
+
+function goToModule6() {
+    // Encontrar e abrir o módulo 6
+    const module6 = MODULES.find(m => m.id === 'mod6');
+    if (module6) {
+        openModule(module6);
+    }
+}
+
+function hideCompletionPopup() {
+    hide('completionOverlay');
+}
+
+function unlockAdvancedModules() {
+    // Marcar que o utilizador desbloqueou os módulos avançados
+    USER.advancedUnlocked = true;
+    localStorage.setItem('phishguard_user', JSON.stringify(USER));
+    
+    // Ir para a página de módulos (que agora mostra os avançados)
+    goToModules();
 }
 
 // ==================== WELCOME POPUP ====================
